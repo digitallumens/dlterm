@@ -2,16 +2,38 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 
-QString keywordsReadOnly = "firmwareVersion,temperature";
-QString keywordsReadWrite = "productCode,serialNumber,unixTime,lightManualLevel";
+struct completerDict_t {
+  const QString commands;
+  const QString options;
+};
+
+struct completerDict_t dictReadOnlyRegs = { .commands = "get", .options = "firmwareVersion,temperature" };
+struct completerDict_t dictReadWriteRegs = { .commands = "get,set", .options = "productCode,serialNumber,unixTime,lightManualLevel" };
+struct completerDict_t dictReboot = { .commands = "reboot", .options = "dla,lightbar,batteryBackup,wirelessCard" };
+struct completerDict_t dictReset = { .commands = "reset", .options = "usage,log,oldLog,eeprom,eepromToDefault" };
+QStringList keywordList;
+QCompleter *completer;
+
+void addToCompleterDictionary(struct completerDict_t * dict) {
+  QStringList commandsList;
+  QStringList optionsList;
+  QStringList::const_iterator commandsIter;
+  QStringList::const_iterator optionsIter;
+  commandsList = dict->commands.split(",");
+  optionsList = dict->options.split(",");
+  for (commandsIter = commandsList.constBegin(); commandsIter != commandsList.constEnd(); ++commandsIter) {
+    for (optionsIter = optionsList.constBegin(); optionsIter != optionsList.constEnd(); ++optionsIter) {
+      keywordList << (QString)(*commandsIter).toLocal8Bit().constData() + " " + (QString)(*optionsIter).toLocal8Bit().constData();
+    }
+  }
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
-  uiInit();
-  completerInit();
+  setupApp();
 }
 
 MainWindow::~MainWindow()
@@ -19,25 +41,16 @@ MainWindow::~MainWindow()
   delete ui;
 }
 
-void MainWindow::uiInit()
+void MainWindow::setupApp()
 {
+  // configure GUI widgets
   ui->actionDisconnect->setVisible(false);
-}
 
-void MainWindow::completerInit()
-{
-  QStringList list;
-  QStringList::const_iterator constIterator;
-  // build a dictionary of keywords
-  list = keywordsReadOnly.split(",");
-  for (constIterator = list.constBegin(); constIterator != list.constEnd(); ++constIterator) {
-    keywordList << (QString)"get " + (QString)(*constIterator).toLocal8Bit().constData();
-  }
-  list = keywordsReadWrite.split(",");
-  for (constIterator = list.constBegin(); constIterator != list.constEnd(); ++constIterator) {
-    keywordList << (QString)"get " + (QString)(*constIterator).toLocal8Bit().constData();
-    keywordList << (QString)"set " + (QString)(*constIterator).toLocal8Bit().constData();
-  }
+  // configure autocomplete
+  addToCompleterDictionary(&dictReadOnlyRegs);
+  addToCompleterDictionary(&dictReadWriteRegs);
+  addToCompleterDictionary(&dictReboot);
+  addToCompleterDictionary(&dictReset);
   completer = new QCompleter(keywordList, this);
   completer->setCaseSensitivity(Qt::CaseInsensitive);
   ui->lineEdit->setCompleter(completer);
