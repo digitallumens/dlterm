@@ -30,22 +30,18 @@ void addToCompleterDictionary(struct completerDict_t * dict) {
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
-{
+    ui(new Ui::MainWindow) {
   ui->setupUi(this);
   setupApp();
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
   delete ui;
 }
 
-void MainWindow::setupApp()
-{
+void MainWindow::setupApp() {
   // configure GUI widgets
   ui->actionDisconnect->setVisible(false);
-
   // configure autocomplete
   addToCompleterDictionary(&dictReadOnlyRegs);
   addToCompleterDictionary(&dictReadWriteRegs);
@@ -53,27 +49,35 @@ void MainWindow::setupApp()
   addToCompleterDictionary(&dictReset);
   completer = new QCompleter(keywordList, this);
   completer->setCaseSensitivity(Qt::CaseInsensitive);
+  completer->popup()->installEventFilter(this);
   ui->lineEdit->setCompleter(completer);
+  connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(custom_on_lineEdit_returnPressed()));
 }
 
-void MainWindow::on_lineEdit_returnPressed()
-{
-  ui->plainTextEdit->appendPlainText(ui->lineEdit->text());
+void MainWindow::custom_on_lineEdit_returnPressed() {
+  // eat leading whitespace
+  QString cmdRequest = ui->lineEdit->text().simplified();
+  // discard empty commands
+  if (cmdRequest == "") {
+    return;
+  }
+  if (completer->currentCompletion() != "") {
+    //return;
+  }
+  qDebug() << "got a command";
+  ui->plainTextEdit->appendPlainText(cmdRequest);
   ui->lineEdit->clear();
 }
 
-void MainWindow::on_actionUseFTDICable_triggered()
-{
+void MainWindow::on_actionUseFTDICable_triggered() {
   ui->actionUseTelegesisAdapter->setChecked(false);
 }
 
-void MainWindow::on_actionUseTelegesisAdapter_triggered()
-{
+void MainWindow::on_actionUseTelegesisAdapter_triggered() {
   ui->actionUseFTDICable->setChecked(false);
 }
 
-void MainWindow::on_actionConnect_triggered()
-{
+void MainWindow::on_actionConnect_triggered() {
   ui->actionConnect->setVisible(false);
   ui->actionDisconnect->setVisible(true);
   ui->actionUseFTDICable->setDisabled(true);
@@ -81,8 +85,7 @@ void MainWindow::on_actionConnect_triggered()
   ui->actionConfigure->setDisabled(true);
 }
 
-void MainWindow::on_actionDisconnect_triggered()
-{
+void MainWindow::on_actionDisconnect_triggered() {
   ui->actionDisconnect->setVisible(false);
   ui->actionConnect->setVisible(true);
   ui->actionUseFTDICable->setDisabled(false);
@@ -90,7 +93,22 @@ void MainWindow::on_actionDisconnect_triggered()
   ui->actionConfigure->setDisabled(false);
 }
 
-void MainWindow::on_actionConfigure_triggered()
-{
+void MainWindow::on_actionConfigure_triggered() {
   qDebug() << "configure all the things!";
+}
+
+void MainWindow::on_actionClear_Output_triggered() {
+  ui->plainTextEdit->clear();
+}
+
+bool MainWindow::eventFilter(QObject *target, QEvent *event) {
+  if (event->type() == QEvent::KeyPress) {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    if (keyEvent->key() == Qt::Key_Return) {
+      qDebug() << "intercepted return";
+      completer->popup()->close();
+      return true;
+    }
+  }
+  return QObject::eventFilter(target, event);
 }
