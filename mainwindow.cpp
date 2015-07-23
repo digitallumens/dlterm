@@ -18,7 +18,7 @@ void MainWindow::setupApp() {
   ui->actionDisconnect->setVisible(false);
   // configure autocomplete
   m_cmdHelper = new cmdHelper(this);
-  ui->lineEdit->setCompleter(m_cmdHelper->completer);
+  ui->lineEdit->setCompleter(m_cmdHelper->cmdCompleter);
   // connect signals to callbacks
   connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(custom_on_lineEdit_returnPressed()));
 }

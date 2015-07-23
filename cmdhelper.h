@@ -9,7 +9,7 @@ class cmdHelper : public QObject
     Q_OBJECT
 public:
     explicit cmdHelper(QObject *parent = 0);
-    QCompleter *completer;
+    QCompleter *cmdCompleter;
 
 signals:
 
