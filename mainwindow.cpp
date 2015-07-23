@@ -2,32 +2,6 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 
-struct completerDict_t {
-  const QString commands;
-  const QString options;
-};
-
-struct completerDict_t dictReadOnlyRegs = { .commands = "get", .options = "firmwareVersion,temperature" };
-struct completerDict_t dictReadWriteRegs = { .commands = "get,set", .options = "productCode,serialNumber,unixTime,lightManualLevel" };
-struct completerDict_t dictReboot = { .commands = "reboot", .options = "dla,lightbar,batteryBackup,wirelessCard" };
-struct completerDict_t dictReset = { .commands = "reset", .options = "usage,log,oldLog,eeprom,eepromToDefault" };
-QStringList keywordList;
-QCompleter *completer;
-
-void addToCompleterDictionary(struct completerDict_t * dict) {
-  QStringList commandsList;
-  QStringList optionsList;
-  QStringList::const_iterator commandsIter;
-  QStringList::const_iterator optionsIter;
-  commandsList = dict->commands.split(",");
-  optionsList = dict->options.split(",");
-  for (commandsIter = commandsList.constBegin(); commandsIter != commandsList.constEnd(); ++commandsIter) {
-    for (optionsIter = optionsList.constBegin(); optionsIter != optionsList.constEnd(); ++optionsIter) {
-      keywordList << (QString)(*commandsIter).toLocal8Bit().constData() + " " + (QString)(*optionsIter).toLocal8Bit().constData();
-    }
-  }
-}
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) {
@@ -43,14 +17,9 @@ void MainWindow::setupApp() {
   // configure GUI widgets
   ui->actionDisconnect->setVisible(false);
   // configure autocomplete
-  addToCompleterDictionary(&dictReadOnlyRegs);
-  addToCompleterDictionary(&dictReadWriteRegs);
-  addToCompleterDictionary(&dictReboot);
-  addToCompleterDictionary(&dictReset);
-  completer = new QCompleter(keywordList, this);
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-  completer->popup()->installEventFilter(this);
-  ui->lineEdit->setCompleter(completer);
+  m_cmdHelper = new cmdHelper(this);
+  ui->lineEdit->setCompleter(m_cmdHelper->completer);
+  // connect signals to callbacks
   connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(custom_on_lineEdit_returnPressed()));
 }
 
@@ -61,10 +30,6 @@ void MainWindow::custom_on_lineEdit_returnPressed() {
   if (cmdRequest == "") {
     return;
   }
-  if (completer->currentCompletion() != "") {
-    //return;
-  }
-  qDebug() << "got a command";
   ui->plainTextEdit->appendPlainText(cmdRequest);
   ui->lineEdit->clear();
 }
@@ -99,16 +64,4 @@ void MainWindow::on_actionConfigure_triggered() {
 
 void MainWindow::on_actionClear_Output_triggered() {
   ui->plainTextEdit->clear();
-}
-
-bool MainWindow::eventFilter(QObject *target, QEvent *event) {
-  if (event->type() == QEvent::KeyPress) {
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-    if (keyEvent->key() == Qt::Key_Return) {
-      qDebug() << "intercepted return";
-      completer->popup()->close();
-      return true;
-    }
-  }
-  return QObject::eventFilter(target, event);
 }

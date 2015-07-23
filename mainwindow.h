@@ -2,7 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QCompleter>
+
+#include "cmdhelper.h"
 
 namespace Ui {
   class MainWindow;
@@ -28,7 +29,7 @@ public slots:
 private:
   Ui::MainWindow *ui;
   void setupApp();
-  bool eventFilter(QObject *target, QEvent *event);
+  cmdHelper *m_cmdHelper;
 };
 
 #endif // MAINWINDOW_H
