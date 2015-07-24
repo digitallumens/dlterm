@@ -3,15 +3,22 @@
 #include <QAbstractItemView>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QDebug>
 
 struct dlCmd_t {
   const QString inputCmd;
   const QString outputCmd;
+  bool(*parser)(QString*);
 };
+
+bool parse_firmwareVersion(QString * response) {
+  (void)response;
+  return true;
+}
 
 const struct dlCmd_t dlCmdList[] = {
   // DLA register commands
-  { .inputCmd = "get firmwareVersion", .outputCmd = "G0000" },
+  { .inputCmd = "get firmwareVersion", .outputCmd = "G0000", .parser = parse_firmwareVersion },
   { .inputCmd = "get productCode", .outputCmd = "G0001" },
   { .inputCmd = "set productCode", .outputCmd = "S0001" },
   { .inputCmd = "get serialNumber", .outputCmd = "G0002" },

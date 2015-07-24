@@ -24,12 +24,13 @@ public slots:
   void on_actionDisconnect_triggered();
   void on_actionConfigure_triggered();
   void on_actionClear_Output_triggered();
-  void custom_on_lineEdit_returnPressed();
 
 private:
   Ui::MainWindow *ui;
-  void setupApp();
+  bool eventFilter(QObject *target, QEvent *event);
   cmdHelper *m_cmdHelper;
+  quint8 m_cmdHistoryIndex;
+  QStringList m_cmdHistory;
 };
 
 #endif // MAINWINDOW_H

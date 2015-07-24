@@ -3,35 +3,74 @@
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow) {
+  QMainWindow(parent),
+  ui(new Ui::MainWindow),
+  m_cmdHelper(new cmdHelper::cmdHelper)
+  {
   ui->setupUi(this);
-  setupApp();
+  // configure GUI widgets
+  ui->actionDisconnect->setVisible(false);
+  // configure autocomplete
+  ui->lineEdit->setCompleter(m_cmdHelper->cmdCompleter);
+  // catch command events
+  ui->lineEdit->installEventFilter(this);
 }
 
 MainWindow::~MainWindow() {
   delete ui;
 }
 
-void MainWindow::setupApp() {
-  // configure GUI widgets
-  ui->actionDisconnect->setVisible(false);
-  // configure autocomplete
-  m_cmdHelper = new cmdHelper(this);
-  ui->lineEdit->setCompleter(m_cmdHelper->cmdCompleter);
-  // connect signals to callbacks
-  connect(ui->lineEdit, SIGNAL(returnPressed()), this, SLOT(custom_on_lineEdit_returnPressed()));
-}
-
-void MainWindow::custom_on_lineEdit_returnPressed() {
-  // eat leading whitespace
-  QString cmdRequest = ui->lineEdit->text().simplified();
-  // discard empty commands
-  if (cmdRequest == "") {
-    return;
+bool MainWindow::eventFilter(QObject *target, QEvent *event) {
+  QString cmdRequest;
+  if (event->type() == QEvent::KeyPress) {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    switch (keyEvent->key()) {
+    case Qt::Key_Return:
+    case Qt::Key_Enter:
+      // enter a new command
+      cmdRequest = ui->lineEdit->text().simplified();
+      if (cmdRequest.isEmpty()) {
+        break;
+      }
+      // append to command history
+      if ((m_cmdHistory.count() == 0) || (cmdRequest != m_cmdHistory.at(m_cmdHistory.count() - 1))) {
+        m_cmdHistory << cmdRequest;
+      }
+      // reset history pointer
+      m_cmdHistoryIndex = m_cmdHistory.count() - 1;
+      // process the command
+      ui->plainTextEdit->appendPlainText(cmdRequest);
+      ui->lineEdit->clear();
+      break;
+    case Qt::Key_Up:
+      // scroll back through command history
+      if (m_cmdHistory.count() > 0) {
+        ui->lineEdit->setText(m_cmdHistory.at(m_cmdHistoryIndex));
+        if (m_cmdHistoryIndex > 0) {
+          m_cmdHistoryIndex--;
+        }
+      }
+      break;
+    case Qt::Key_Down:
+      // scroll forward through command history
+      if (m_cmdHistory.count() > 0) {
+        ui->lineEdit->setText(m_cmdHistory.at(m_cmdHistoryIndex));
+        if ((m_cmdHistoryIndex + 1) < m_cmdHistory.count()) {
+          m_cmdHistoryIndex++;
+        } 
+      }
+      break;
+    case Qt::Key_Left:
+      // SHIFT + LEFT clears the command line
+      if (keyEvent->modifiers() & Qt::ShiftModifier) {
+        ui->lineEdit->clear();
+      }
+      break;
+    default:
+      break;
+    }
   }
-  ui->plainTextEdit->appendPlainText(cmdRequest);
-  ui->lineEdit->clear();
+  return QObject::eventFilter(target, event); 
 }
 
 void MainWindow::on_actionUseFTDICable_triggered() {
