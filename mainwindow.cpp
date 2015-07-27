@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QDate>
+#include <QTime>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -21,6 +23,7 @@ MainWindow::~MainWindow() {
 }
 
 bool MainWindow::eventFilter(QObject *target, QEvent *event) {
+  QString timestamp;
   QString cmdRequest;
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
@@ -39,6 +42,12 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       // reset history pointer
       m_cmdHistoryIndex = m_cmdHistory.count() - 1;
       // process the command
+      if (ui->actionShow_Timestamp->isChecked()) {
+        timestamp = QDate::currentDate().toString(Qt::ISODate) + " " + QTime::currentTime().toString(Qt::ISODate);
+        cmdRequest = timestamp + " > " + cmdRequest;
+      } else {
+        cmdRequest = " > " + cmdRequest;
+      }
       ui->plainTextEdit->appendPlainText(cmdRequest);
       ui->lineEdit->clear();
       break;
