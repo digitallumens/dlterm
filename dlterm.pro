@@ -14,9 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    cmdhelper.cpp
+    cmdhelper.cpp \
+    cmd.cpp
 
 HEADERS  += mainwindow.h \
-    cmdhelper.h
+    cmdhelper.h \
+    cmd.h
 
 FORMS    += mainwindow.ui

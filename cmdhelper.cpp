@@ -5,257 +5,247 @@
 #include <QKeyEvent>
 #include <QDebug>
 
-struct dlCmd_t {
-  const QString inputCmd;
-  const QString outputCmd;
-  bool(*parser)(QString*);
-};
-
-bool parse_firmwareVersion(QString * response) {
-  (void)response;
-  return true;
+QString parse_getFirmwareVersion(QString pmuResponse) {
+  return pmuResponse;
 }
-
-const struct dlCmd_t dlCmdList[] = {
-  // DLA register commands
-  { .inputCmd = "get firmwareVersion", .outputCmd = "G0000", .parser = parse_firmwareVersion },
-  { .inputCmd = "get productCode", .outputCmd = "G0001" },
-  { .inputCmd = "set productCode", .outputCmd = "S0001" },
-  { .inputCmd = "get serialNumber", .outputCmd = "G0002" },
-  { .inputCmd = "set serialNumber", .outputCmd = "S0002" },
-  { .inputCmd = "get unixTime", .outputCmd = "G0003" },
-  { .inputCmd = "set unixTime", .outputCmd = "S0003" },
-  { .inputCmd = "get temperature", .outputCmd = "G0004" },
-  { .inputCmd = "get lightManualLevel", .outputCmd = "G0005" },
-  { .inputCmd = "set lightManualLevel", .outputCmd = "S0005" },
-  { .inputCmd = "get lightActiveLevel", .outputCmd = "G0006" },
-  { .inputCmd = "get lightInactiveLevel", .outputCmd = "G0007" },
-  { .inputCmd = "get lightOverrideActiveLevel", .outputCmd = "G0008" },
-  { .inputCmd = "set lightOverrideActiveLevel", .outputCmd = "S0008" },
-  { .inputCmd = "get lightOverrideInactiveLevel", .outputCmd = "G0009" },
-  { .inputCmd = "set lightOverrideInactiveLevel", .outputCmd = "S0009" },
-  { .inputCmd = "get sensorDelayTime", .outputCmd = "G000A" },
-  { .inputCmd = "get sensorOverrideDelayTime", .outputCmd = "G000B" },
-  { .inputCmd = "set sensorOverrideDelayTime", .outputCmd = "S000B" },
-  { .inputCmd = "get powerupTime", .outputCmd = "G000C" },
-  { .inputCmd = "get usageActiveTime", .outputCmd = "G000D" },
-  { .inputCmd = "get usageInactiveTime", .outputCmd = "G000E" },
-  { .inputCmd = "get usagePermActiveTime", .outputCmd = "G000F" },
-  { .inputCmd = "get usagePermInactiveTime", .outputCmd = "G0010" },
-  { .inputCmd = "get usageWh", .outputCmd = "G0011" },
-  { .inputCmd = "get usagePerm", .outputCmd = "G0012" },
-  { .inputCmd = "get usageSenorEvents", .outputCmd = "G0013" },
-  { .inputCmd = "get usagePermSensorEvents", .outputCmd = "G0014" },
-  { .inputCmd = "get numberOfLogEntries", .outputCmd = "G0015" },
-  { .inputCmd = "get configCalibrationP0", .outputCmd = "G0016" },
-  { .inputCmd = "set configCalibrationP0", .outputCmd = "S0016" },
-  { .inputCmd = "get configCalibrationP1", .outputCmd = "G0017" },
-  { .inputCmd = "set configCalibrationP1", .outputCmd = "S0017" },
-  { .inputCmd = "get configCalibrationP2", .outputCmd = "G0018" },
-  { .inputCmd = "set configCalibrationP2", .outputCmd = "S0018" },
-  { .inputCmd = "get configCalibrationP3", .outputCmd = "G0019" },
-  { .inputCmd = "set configCalibrationP3", .outputCmd = "S0019" },
-  { .inputCmd = "get buildTime", .outputCmd = "G001A" },
-  { .inputCmd = "set buildTime", .outputCmd = "S001A" },
-  { .inputCmd = "get sensorTimeoutCountdown", .outputCmd = "G001B" },
-  { .inputCmd = "get currentLightLevel", .outputCmd = "G001C" },
-  { .inputCmd = "get safeMode", .outputCmd = "G001D" },
-  { .inputCmd = "get lightBarSelect", .outputCmd = "G001E" },
-  { .inputCmd = "set lightBarSelect", .outputCmd = "S001E" },
-  { .inputCmd = "get currentPowerConsumption", .outputCmd = "G001F" },
-  { .inputCmd = "get wirelessDataAggregator", .outputCmd = "G0020" },
-  { .inputCmd = "set wirelessDataAggregator", .outputCmd = "S0020" },
-  { .inputCmd = "get resetUsageTimestamp", .outputCmd = "G0021" },
-  { .inputCmd = "get pwmPeriodRegister", .outputCmd = "G0022" },
-  { .inputCmd = "set pwmPeriodRegister", .outputCmd = "S0022" },
-  { .inputCmd = "get analogSensorValue", .outputCmd = "G0023" },
-  { .inputCmd = "get analogReportingHysteresis", .outputCmd = "G0024" },
-  { .inputCmd = "get zone", .outputCmd = "G0025" },
-  { .inputCmd = "set zone", .outputCmd = "S0025" },
-  { .inputCmd = "get lightTemporaryActiveLevel", .outputCmd = "G0026" },
-  { .inputCmd = "set lightTemporaryActiveLevel", .outputCmd = "S0026" },
-  { .inputCmd = "get lightTemporaryInactiveLevel", .outputCmd = "G0027" },
-  { .inputCmd = "set lightTemporaryInactiveLevel", .outputCmd = "S0027" },
-  { .inputCmd = "get sensorTemporaryDelayTime", .outputCmd = "G0028" },
-  { .inputCmd = "set sensorTemporaryDelayTime", .outputCmd = "S0028" },
-  { .inputCmd = "get temporaryOverrideTimeout", .outputCmd = "G0029" },
-  { .inputCmd = "set temporaryOverrideTimeout", .outputCmd = "S0029" },
-  { .inputCmd = "get setRemoteState", .outputCmd = "G002A" },
-  { .inputCmd = "set setRemoteState", .outputCmd = "S002A" },
-  { .inputCmd = "get remoteSetDelayTime", .outputCmd = "G002B" },
-  { .inputCmd = "set remoteSetDelayTime", .outputCmd = "S002B" },
-  { .inputCmd = "get remoteSecondsCountdown", .outputCmd = "G002C" },
-  { .inputCmd = "get minimumDimmingValue", .outputCmd = "G002D" },
-  { .inputCmd = "get powerCalibrationA0", .outputCmd = "G002E" },
-  { .inputCmd = "set powerCalibrationA0", .outputCmd = "S002E" },
-  { .inputCmd = "get powerCalibrationB0", .outputCmd = "G002F" },
-  { .inputCmd = "set powerCalibrationB0", .outputCmd = "S002F" },
-  { .inputCmd = "get powerCalibrationC0", .outputCmd = "G0030" },
-  { .inputCmd = "set powerCalibrationC0", .outputCmd = "S0030" },
-  { .inputCmd = "get powerCalibrationMA", .outputCmd = "G0031" },
-  { .inputCmd = "set powerCalibrationMA", .outputCmd = "S0031" },
-  { .inputCmd = "get powerCalibrationMB", .outputCmd = "G0032" },
-  { .inputCmd = "set powerCalibrationMB", .outputCmd = "S0032" },
-  { .inputCmd = "get powerCalibrationMC", .outputCmd = "G0033" },
-  { .inputCmd = "set powerCalibrationMC", .outputCmd = "S0033" },
-  { .inputCmd = "get powerCalibrationPOff", .outputCmd = "G0034" },
-  { .inputCmd = "set powerCalibrationPOff", .outputCmd = "S0034" },
-  { .inputCmd = "get powerCalibrationPOn", .outputCmd = "G0035" },
-  { .inputCmd = "set powerCalibrationPOn", .outputCmd = "S0035" },
-  { .inputCmd = "get powerCalibrationT0", .outputCmd = "G0036" },
-  { .inputCmd = "set powerCalibrationT0", .outputCmd = "S0036" },
-  { .inputCmd = "get powerEstimatorTemperatureOverride", .outputCmd = "G0037" },
-  { .inputCmd = "set powerEstimatorTemperatureOverride", .outputCmd = "S0037" },
-  { .inputCmd = "get cachedTemperatureValue", .outputCmd = "G0038" },
-  { .inputCmd = "get eepromSize", .outputCmd = "G0039" },
-  { .inputCmd = "get hardwareRevision", .outputCmd = "G003A" },
-  { .inputCmd = "get wirelessPanId", .outputCmd = "G003B" },
-  { .inputCmd = "set wirelessPanId", .outputCmd = "S003B" },
-  { .inputCmd = "get wirelessChannelMask", .outputCmd = "G003C" },
-  { .inputCmd = "set wirelessChannelMask", .outputCmd = "S003C" },
-  { .inputCmd = "get wirelessShortAddress", .outputCmd = "G003D" },
-  { .inputCmd = "set wirelessShortAddress", .outputCmd = "S003D" },
-  { .inputCmd = "get wirelessRole", .outputCmd = "G003E" },
-  { .inputCmd = "set wirelessRole", .outputCmd = "S003E" },
-  { .inputCmd = "get wirelessWatchdogHold", .outputCmd = "G003F" },
-  { .inputCmd = "set wirelessWatchdogHold", .outputCmd = "S003F" },
-  { .inputCmd = "get wirelessWatchdogPeriod", .outputCmd = "G0040" },
-  { .inputCmd = "set wirelessWatchdogPeriod", .outputCmd = "S0040" },
-  { .inputCmd = "get firmwareCode", .outputCmd = "G0041" },
-  { .inputCmd = "get moduleFirmwareCode", .outputCmd = "G0042" },
-  { .inputCmd = "get maxTemperatureObserved", .outputCmd = "G0043" },
-  { .inputCmd = "get maxTemperatureObservedTime", .outputCmd = "G0044" },
-  { .inputCmd = "get overTemperatureThresholdLow", .outputCmd = "G0045" },
-  { .inputCmd = "set overTemperatureThresholdLow", .outputCmd = "S0045" },
-  { .inputCmd = "get overTemperatureThresholdHigh", .outputCmd = "G0046" },
-  { .inputCmd = "set overTemperatureThresholdHigh", .outputCmd = "S0046" },
-  { .inputCmd = "get overTemperatureDimmingLimit", .outputCmd = "G0047" },
-  { .inputCmd = "set overTemperatureDimmingLimit", .outputCmd = "S0047" },
-  { .inputCmd = "get analogDimmingMode", .outputCmd = "G0048" },
-  { .inputCmd = "set analogDimmingMode", .outputCmd = "S0048" },
-  { .inputCmd = "get fixtureIdMode", .outputCmd = "G0049" },
-  { .inputCmd = "set fixtureIdMode", .outputCmd = "S0049" },
-  { .inputCmd = "get acFrequency", .outputCmd = "G004A" },
-  { .inputCmd = "get sensorBits", .outputCmd = "G004B" },
-  { .inputCmd = "get powerMeterCommand", .outputCmd = "G004C" },
-  { .inputCmd = "set powerMeterCommand", .outputCmd = "S004C" },
-  { .inputCmd = "get powerMeterRegister", .outputCmd = "G004D" },
-  { .inputCmd = "set powerMeterRegister", .outputCmd = "S004D" },
-  { .inputCmd = "get ambientTemperature", .outputCmd = "G004E" },
-  { .inputCmd = "get lightSensorLevel", .outputCmd = "G004F" },
-  { .inputCmd = "get sensor0Timeout", .outputCmd = "G0050" },
-  { .inputCmd = "set sensor0Timeout", .outputCmd = "S0050" },
-  { .inputCmd = "get sensor0Offset", .outputCmd = "G0051" },
-  { .inputCmd = "set sensor0Offset", .outputCmd = "S0051" },
-  { .inputCmd = "get sensor1Timeout", .outputCmd = "G0052" },
-  { .inputCmd = "set sensor1Timeout", .outputCmd = "S0052" },
-  { .inputCmd = "get sensor1Offset", .outputCmd = "G0053" },
-  { .inputCmd = "set sensor1Offset", .outputCmd = "S0053" },
-  { .inputCmd = "get analogDimmingLowValue", .outputCmd = "G0054" },
-  { .inputCmd = "set analogDimmingLowValue", .outputCmd = "S0054" },
-  { .inputCmd = "get analogDimmingHighValue", .outputCmd = "G0055" },
-  { .inputCmd = "set analogDimmingHighValue", .outputCmd = "S0055" },
-  { .inputCmd = "get analogDimmingOffValue", .outputCmd = "G0056" },
-  { .inputCmd = "set analogDimmingOffValue", .outputCmd = "S0056" },
-  { .inputCmd = "get powerMeasurementMode", .outputCmd = "G0057" },
-  { .inputCmd = "set powerMeasurementMode", .outputCmd = "S0057" },
-  { .inputCmd = "get externalPowerMeter", .outputCmd = "G0058" },
-  { .inputCmd = "set externalPowerMeter", .outputCmd = "S0058" },
-  { .inputCmd = "get ambientSensorValue", .outputCmd = "G0059" },
-  { .inputCmd = "get ambientActiveLevel", .outputCmd = "G005A" },
-  { .inputCmd = "set ambientActiveLevel", .outputCmd = "S005A" },
-  { .inputCmd = "get ambientInactiveLevel", .outputCmd = "G005B" },
-  { .inputCmd = "set ambientInactiveLevel", .outputCmd = "S005B" },
-  { .inputCmd = "get ambientEnvironmentalGain", .outputCmd = "G005C" },
-  { .inputCmd = "set ambientEnvironmentalGain", .outputCmd = "S005C" },
-  { .inputCmd = "get ambientOffHysteresis", .outputCmd = "G005D" },
-  { .inputCmd = "set ambientOffHysteresis", .outputCmd = "S005D" },
-  { .inputCmd = "get ambientOnHysteresis", .outputCmd = "G005E" },
-  { .inputCmd = "set ambientOnHysteresis", .outputCmd = "S005E" },
-  { .inputCmd = "get powerboardProtocol", .outputCmd = "G005F" },
-  { .inputCmd = "get ledOverride", .outputCmd = "G0060" },
-  { .inputCmd = "set ledOverride", .outputCmd = "S0060" },
-  { .inputCmd = "get fadeUpStep", .outputCmd = "G0061" },
-  { .inputCmd = "set fadeUpStep", .outputCmd = "S0061" },
-  { .inputCmd = "get fadeDownStep", .outputCmd = "G0062" },
-  { .inputCmd = "set fadeDownStep", .outputCmd = "S0062" },
-  { .inputCmd = "get maxBrightness", .outputCmd = "G0063" },
-  { .inputCmd = "set maxBrightness", .outputCmd = "S0063" },
-  { .inputCmd = "get i2cResets", .outputCmd = "G0064" },
-  { .inputCmd = "get sensorGuardTime", .outputCmd = "G0065" },
-  { .inputCmd = "set sensorGuardTime", .outputCmd = "S0065" },
-  { .inputCmd = "get inputVoltage", .outputCmd = "G0066" },
-  { .inputCmd = "get inputVoltageCalibration", .outputCmd = "G0067" },
-  { .inputCmd = "set inputVoltageCalibration", .outputCmd = "S0067" },
-  { .inputCmd = "get numberOfLightbars", .outputCmd = "G0068" },
-  { .inputCmd = "set numberOfLightbars", .outputCmd = "S0068" },
-  { .inputCmd = "get ambientDivisor", .outputCmd = "G0069" },
-  { .inputCmd = "get currentLimit", .outputCmd = "G006A" },
-  { .inputCmd = "set currentLimit", .outputCmd = "S006A" },
-  { .inputCmd = "get bootloaderCode", .outputCmd = "G006B" },
-  { .inputCmd = "get xpressMode", .outputCmd = "G006C" },
-  { .inputCmd = "set xpressMode", .outputCmd = "S006C" },
-  { .inputCmd = "get batteryBackupStatus", .outputCmd = "G006D" },
-  { .inputCmd = "set batteryBackupStatus", .outputCmd = "S006D" },
-  { .inputCmd = "get sensorSeconds", .outputCmd = "G006E" },
-  { .inputCmd = "get inputVoltageTwo", .outputCmd = "G006F" },
-  { .inputCmd = "get inputVoltageTwoCalibration", .outputCmd = "G0070" },
-  { .inputCmd = "set inputVoltageTwoCalibration", .outputCmd = "S0070" },
-  { .inputCmd = "get maxRampUpSpeed", .outputCmd = "G0071" },
-  { .inputCmd = "set maxRampUpSpeed", .outputCmd = "S0071" },
-  { .inputCmd = "get maxRampDownSpeed", .outputCmd = "G0072" },
-  { .inputCmd = "set maxRampDownSpeed", .outputCmd = "S0072" },
-  { .inputCmd = "get wirelessNetworkKey", .outputCmd = "G0073" },
-  { .inputCmd = "set wirelessNetworkKey", .outputCmd = "S0073" },
-  { .inputCmd = "get emergencyLightLevel", .outputCmd = "G0074" },
-  { .inputCmd = "get batteryBackupPowerCalibration", .outputCmd = "G0075" },
-  { .inputCmd = "set batteryBackupPowerCalibration", .outputCmd = "S0075" },
-  { .inputCmd = "get motionSensorProfile", .outputCmd = "G0076" },
-  { .inputCmd = "set motionSensorProfile", .outputCmd = "S0076" },
-  { .inputCmd = "get powerMeterLevelAtOff", .outputCmd = "G0077" },
-  { .inputCmd = "set powerMeterLevelAtOff", .outputCmd = "S0077" },
-  { .inputCmd = "get powerMeterLevelAtMin", .outputCmd = "G0078" },
-  { .inputCmd = "set powerMeterLevelAtMin", .outputCmd = "S0078" },
-  { .inputCmd = "get powerMeterLevelAtMax", .outputCmd = "G0079" },
-  { .inputCmd = "set powerMeterLevelAtMax", .outputCmd = "S0079" },
-  { .inputCmd = "get powerMeterType", .outputCmd = "G007A" },
-  { .inputCmd = "set powerMeterType", .outputCmd = "S007A" },
-  { .inputCmd = "get DLAiSlaveMode", .outputCmd = "G007B" },
-  { .inputCmd = "set DLAiSlaveMode", .outputCmd = "S007B" },
-  { .inputCmd = "get DALIBootloadingActive", .outputCmd = "G007C" },
-  { .inputCmd = "get testingMode", .outputCmd = "G007D" },
-  { .inputCmd = "set testingMode", .outputCmd = "S007D" },
-  { .inputCmd = "get numberOfBatteriesSupported", .outputCmd = "G007E" },
-  { .inputCmd = "set numberOfBatteriesSupported", .outputCmd = "S007E" },
-  // reset commands
-  { .inputCmd = "reset usage", .outputCmd = "!U" },
-  { .inputCmd = "reset log", .outputCmd = "!L" },
-  { .inputCmd = "reset newLog", .outputCmd = "!K" },
-  { .inputCmd = "reset eeprom", .outputCmd = "!Z" },
-  { .inputCmd = "reset eepromToDefault", .outputCmd = "!C" },
-  { .inputCmd = "reset eepromToLatestMapVersion", .outputCmd = "!E" },
-  { .inputCmd = "reset network", .outputCmd = "!N" },
-  { .inputCmd = "reset networkWithoutChecking", .outputCmd = "!N1" },
-  { .inputCmd = "reset daliCommissioning", .outputCmd = "!Y" },
-  { .inputCmd = "reset daliPowerMetering", .outputCmd = "!A" },
-  // reboot commands
-  { .inputCmd = "reboot", .outputCmd = "!R" },
-  { .inputCmd = "reboot wirelessCard", .outputCmd = "!W" },
-  { .inputCmd = "reboot i2cDevices", .outputCmd = "!X" },
-  // reload commands
-  { .inputCmd = "reload dlaFirmware", .outputCmd = "!B" },
-  { .inputCmd = "reload wirelessModuleFirmware", .outputCmd = "!M" },
-  { .inputCmd = "reload powerboardFirmware", .outputCmd = "!P" },
-  { .inputCmd = "reload lightbarFirmware", .outputCmd = "!P" },
-  { .inputCmd = "reload batteryBackupFirmware", .outputCmd = "!P" },
-  { .inputCmd = "reload motionSensorFirmware", .outputCmd = "!V" },
-};
 
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   QStringList keywordList;
-  // build the command dictionary
-  for (quint32 i = 0; i < sizeof(dlCmdList) / sizeof(dlCmdList[0]); i++) {
-    keywordList << dlCmdList[i].inputCmd;
+  // get & set commands
+  m_cmds << new cmd(this, "get firmwareVersion", "G0000", parse_getFirmwareVersion);
+  m_cmds << new cmd(this, "get productCode", "G0001");
+  m_cmds << new cmd(this, "set productCode", "S0001");
+  m_cmds << new cmd(this, "get serialNumber", "G0002");
+  m_cmds << new cmd(this, "set serialNumber", "S0002");
+  m_cmds << new cmd(this, "get unixTime", "G0003");
+  m_cmds << new cmd(this, "set unixTime", "S0003");
+  m_cmds << new cmd(this, "get temperature", "G0004");
+  m_cmds << new cmd(this, "get lightManualLevel", "G0005");
+  m_cmds << new cmd(this, "set lightManualLevel", "S0005");
+  m_cmds << new cmd(this, "get lightActiveLevel", "G0006");
+  m_cmds << new cmd(this, "get lightInactiveLevel", "G0007");
+  m_cmds << new cmd(this, "get lightOverrideActiveLevel", "G0008");
+  m_cmds << new cmd(this, "set lightOverrideActiveLevel", "S0008");
+  m_cmds << new cmd(this, "get lightOverrideInactiveLevel", "G0009");
+  m_cmds << new cmd(this, "set lightOverrideInactiveLevel", "S0009");
+  m_cmds << new cmd(this, "get sensorDelayTime", "G000A");
+  m_cmds << new cmd(this, "get sensorOverrideDelayTime", "G000B");
+  m_cmds << new cmd(this, "set sensorOverrideDelayTime", "S000B");
+  m_cmds << new cmd(this, "get powerupTime", "G000C");
+  m_cmds << new cmd(this, "get usageActiveTime", "G000D");
+  m_cmds << new cmd(this, "get usageInactiveTime", "G000E");
+  m_cmds << new cmd(this, "get usagePermActiveTime", "G000F");
+  m_cmds << new cmd(this, "get usagePermInactiveTime", "G0010");
+  m_cmds << new cmd(this, "get usageWh", "G0011");
+  m_cmds << new cmd(this, "get usagePerm", "G0012");
+  m_cmds << new cmd(this, "get usageSenorEvents", "G0013");
+  m_cmds << new cmd(this, "get usagePermSensorEvents", "G0014");
+  m_cmds << new cmd(this, "get numberOfLogEntries", "G0015");
+  m_cmds << new cmd(this, "get configCalibrationP0", "G0016");
+  m_cmds << new cmd(this, "set configCalibrationP0", "S0016");
+  m_cmds << new cmd(this, "get configCalibrationP1", "G0017");
+  m_cmds << new cmd(this, "set configCalibrationP1", "S0017");
+  m_cmds << new cmd(this, "get configCalibrationP2", "G0018");
+  m_cmds << new cmd(this, "set configCalibrationP2", "S0018");
+  m_cmds << new cmd(this, "get configCalibrationP3", "G0019");
+  m_cmds << new cmd(this, "set configCalibrationP3", "S0019");
+  m_cmds << new cmd(this, "get buildTime", "G001A");
+  m_cmds << new cmd(this, "set buildTime", "S001A");
+  m_cmds << new cmd(this, "get sensorTimeoutCountdown", "G001B");
+  m_cmds << new cmd(this, "get currentLightLevel", "G001C");
+  m_cmds << new cmd(this, "get safeMode", "G001D");
+  m_cmds << new cmd(this, "get lightBarSelect", "G001E");
+  m_cmds << new cmd(this, "set lightBarSelect", "S001E");
+  m_cmds << new cmd(this, "get currentPowerConsumption", "G001F");
+  m_cmds << new cmd(this, "get wirelessDataAggregator", "G0020");
+  m_cmds << new cmd(this, "set wirelessDataAggregator", "S0020");
+  m_cmds << new cmd(this, "get resetUsageTimestamp", "G0021");
+  m_cmds << new cmd(this, "get pwmPeriodRegister", "G0022");
+  m_cmds << new cmd(this, "set pwmPeriodRegister", "S0022");
+  m_cmds << new cmd(this, "get analogSensorValue", "G0023");
+  m_cmds << new cmd(this, "get analogReportingHysteresis", "G0024");
+  m_cmds << new cmd(this, "get zone", "G0025");
+  m_cmds << new cmd(this, "set zone", "S0025");
+  m_cmds << new cmd(this, "get lightTemporaryActiveLevel", "G0026");
+  m_cmds << new cmd(this, "set lightTemporaryActiveLevel", "S0026");
+  m_cmds << new cmd(this, "get lightTemporaryInactiveLevel", "G0027");
+  m_cmds << new cmd(this, "set lightTemporaryInactiveLevel", "S0027");
+  m_cmds << new cmd(this, "get sensorTemporaryDelayTime", "G0028");
+  m_cmds << new cmd(this, "set sensorTemporaryDelayTime", "S0028");
+  m_cmds << new cmd(this, "get temporaryOverrideTimeout", "G0029");
+  m_cmds << new cmd(this, "set temporaryOverrideTimeout", "S0029");
+  m_cmds << new cmd(this, "get setRemoteState", "G002A");
+  m_cmds << new cmd(this, "set setRemoteState", "S002A");
+  m_cmds << new cmd(this, "get remoteSetDelayTime", "G002B");
+  m_cmds << new cmd(this, "set remoteSetDelayTime", "S002B");
+  m_cmds << new cmd(this, "get remoteSecondsCountdown", "G002C");
+  m_cmds << new cmd(this, "get minimumDimmingValue", "G002D");
+  m_cmds << new cmd(this, "get powerCalibrationA0", "G002E");
+  m_cmds << new cmd(this, "set powerCalibrationA0", "S002E");
+  m_cmds << new cmd(this, "get powerCalibrationB0", "G002F");
+  m_cmds << new cmd(this, "set powerCalibrationB0", "S002F");
+  m_cmds << new cmd(this, "get powerCalibrationC0", "G0030");
+  m_cmds << new cmd(this, "set powerCalibrationC0", "S0030");
+  m_cmds << new cmd(this, "get powerCalibrationMA", "G0031");
+  m_cmds << new cmd(this, "set powerCalibrationMA", "S0031");
+  m_cmds << new cmd(this, "get powerCalibrationMB", "G0032");
+  m_cmds << new cmd(this, "set powerCalibrationMB", "S0032");
+  m_cmds << new cmd(this, "get powerCalibrationMC", "G0033");
+  m_cmds << new cmd(this, "set powerCalibrationMC", "S0033");
+  m_cmds << new cmd(this, "get powerCalibrationPOff", "G0034");
+  m_cmds << new cmd(this, "set powerCalibrationPOff", "S0034");
+  m_cmds << new cmd(this, "get powerCalibrationPOn", "G0035");
+  m_cmds << new cmd(this, "set powerCalibrationPOn", "S0035");
+  m_cmds << new cmd(this, "get powerCalibrationT0", "G0036");
+  m_cmds << new cmd(this, "set powerCalibrationT0", "S0036");
+  m_cmds << new cmd(this, "get powerEstimatorTemperatureOverride", "G0037");
+  m_cmds << new cmd(this, "set powerEstimatorTemperatureOverride", "S0037");
+  m_cmds << new cmd(this, "get cachedTemperatureValue", "G0038");
+  m_cmds << new cmd(this, "get eepromSize", "G0039");
+  m_cmds << new cmd(this, "get hardwareRevision", "G003A");
+  m_cmds << new cmd(this, "get wirelessPanId", "G003B");
+  m_cmds << new cmd(this, "set wirelessPanId", "S003B");
+  m_cmds << new cmd(this, "get wirelessChannelMask", "G003C");
+  m_cmds << new cmd(this, "set wirelessChannelMask", "S003C");
+  m_cmds << new cmd(this, "get wirelessShortAddress", "G003D");
+  m_cmds << new cmd(this, "set wirelessShortAddress", "S003D");
+  m_cmds << new cmd(this, "get wirelessRole", "G003E");
+  m_cmds << new cmd(this, "set wirelessRole", "S003E");
+  m_cmds << new cmd(this, "get wirelessWatchdogHold", "G003F");
+  m_cmds << new cmd(this, "set wirelessWatchdogHold", "S003F");
+  m_cmds << new cmd(this, "get wirelessWatchdogPeriod", "G0040");
+  m_cmds << new cmd(this, "set wirelessWatchdogPeriod", "S0040");
+  m_cmds << new cmd(this, "get firmwareCode", "G0041");
+  m_cmds << new cmd(this, "get moduleFirmwareCode", "G0042");
+  m_cmds << new cmd(this, "get maxTemperatureObserved", "G0043");
+  m_cmds << new cmd(this, "get maxTemperatureObservedTime", "G0044");
+  m_cmds << new cmd(this, "get overTemperatureThresholdLow", "G0045");
+  m_cmds << new cmd(this, "set overTemperatureThresholdLow", "S0045");
+  m_cmds << new cmd(this, "get overTemperatureThresholdHigh", "G0046");
+  m_cmds << new cmd(this, "set overTemperatureThresholdHigh", "S0046");
+  m_cmds << new cmd(this, "get overTemperatureDimmingLimit", "G0047");
+  m_cmds << new cmd(this, "set overTemperatureDimmingLimit", "S0047");
+  m_cmds << new cmd(this, "get analogDimmingMode", "G0048");
+  m_cmds << new cmd(this, "set analogDimmingMode", "S0048");
+  m_cmds << new cmd(this, "get fixtureIdMode", "G0049");
+  m_cmds << new cmd(this, "set fixtureIdMode", "S0049");
+  m_cmds << new cmd(this, "get acFrequency", "G004A");
+  m_cmds << new cmd(this, "get sensorBits", "G004B");
+  m_cmds << new cmd(this, "get powerMeterCommand", "G004C");
+  m_cmds << new cmd(this, "set powerMeterCommand", "S004C");
+  m_cmds << new cmd(this, "get powerMeterRegister", "G004D");
+  m_cmds << new cmd(this, "set powerMeterRegister", "S004D");
+  m_cmds << new cmd(this, "get ambientTemperature", "G004E");
+  m_cmds << new cmd(this, "get lightSensorLevel", "G004F");
+  m_cmds << new cmd(this, "get sensor0Timeout", "G0050");
+  m_cmds << new cmd(this, "set sensor0Timeout", "S0050");
+  m_cmds << new cmd(this, "get sensor0Offset", "G0051");
+  m_cmds << new cmd(this, "set sensor0Offset", "S0051");
+  m_cmds << new cmd(this, "get sensor1Timeout", "G0052");
+  m_cmds << new cmd(this, "set sensor1Timeout", "S0052");
+  m_cmds << new cmd(this, "get sensor1Offset", "G0053");
+  m_cmds << new cmd(this, "set sensor1Offset", "S0053");
+  m_cmds << new cmd(this, "get analogDimmingLowValue", "G0054");
+  m_cmds << new cmd(this, "set analogDimmingLowValue", "S0054");
+  m_cmds << new cmd(this, "get analogDimmingHighValue", "G0055");
+  m_cmds << new cmd(this, "set analogDimmingHighValue", "S0055");
+  m_cmds << new cmd(this, "get analogDimmingOffValue", "G0056");
+  m_cmds << new cmd(this, "set analogDimmingOffValue", "S0056");
+  m_cmds << new cmd(this, "get powerMeasurementMode", "G0057");
+  m_cmds << new cmd(this, "set powerMeasurementMode", "S0057");
+  m_cmds << new cmd(this, "get externalPowerMeter", "G0058");
+  m_cmds << new cmd(this, "set externalPowerMeter", "S0058");
+  m_cmds << new cmd(this, "get ambientSensorValue", "G0059");
+  m_cmds << new cmd(this, "get ambientActiveLevel", "G005A");
+  m_cmds << new cmd(this, "set ambientActiveLevel", "S005A");
+  m_cmds << new cmd(this, "get ambientInactiveLevel", "G005B");
+  m_cmds << new cmd(this, "set ambientInactiveLevel", "S005B");
+  m_cmds << new cmd(this, "get ambientEnvironmentalGain", "G005C");
+  m_cmds << new cmd(this, "set ambientEnvironmentalGain", "S005C");
+  m_cmds << new cmd(this, "get ambientOffHysteresis", "G005D");
+  m_cmds << new cmd(this, "set ambientOffHysteresis", "S005D");
+  m_cmds << new cmd(this, "get ambientOnHysteresis", "G005E");
+  m_cmds << new cmd(this, "set ambientOnHysteresis", "S005E");
+  m_cmds << new cmd(this, "get powerboardProtocol", "G005F");
+  m_cmds << new cmd(this, "get ledOverride", "G0060");
+  m_cmds << new cmd(this, "set ledOverride", "S0060");
+  m_cmds << new cmd(this, "get fadeUpStep", "G0061");
+  m_cmds << new cmd(this, "set fadeUpStep", "S0061");
+  m_cmds << new cmd(this, "get fadeDownStep", "G0062");
+  m_cmds << new cmd(this, "set fadeDownStep", "S0062");
+  m_cmds << new cmd(this, "get maxBrightness", "G0063");
+  m_cmds << new cmd(this, "set maxBrightness", "S0063");
+  m_cmds << new cmd(this, "get i2cResets", "G0064");
+  m_cmds << new cmd(this, "get sensorGuardTime", "G0065");
+  m_cmds << new cmd(this, "set sensorGuardTime", "S0065");
+  m_cmds << new cmd(this, "get inputVoltage", "G0066");
+  m_cmds << new cmd(this, "get inputVoltageCalibration", "G0067");
+  m_cmds << new cmd(this, "set inputVoltageCalibration", "S0067");
+  m_cmds << new cmd(this, "get numberOfLightbars", "G0068");
+  m_cmds << new cmd(this, "set numberOfLightbars", "S0068");
+  m_cmds << new cmd(this, "get ambientDivisor", "G0069");
+  m_cmds << new cmd(this, "get currentLimit", "G006A");
+  m_cmds << new cmd(this, "set currentLimit", "S006A");
+  m_cmds << new cmd(this, "get bootloaderCode", "G006B");
+  m_cmds << new cmd(this, "get xpressMode", "G006C");
+  m_cmds << new cmd(this, "set xpressMode", "S006C");
+  m_cmds << new cmd(this, "get batteryBackupStatus", "G006D");
+  m_cmds << new cmd(this, "set batteryBackupStatus", "S006D");
+  m_cmds << new cmd(this, "get sensorSeconds", "G006E");
+  m_cmds << new cmd(this, "get inputVoltageTwo", "G006F");
+  m_cmds << new cmd(this, "get inputVoltageTwoCalibration", "G0070");
+  m_cmds << new cmd(this, "set inputVoltageTwoCalibration", "S0070");
+  m_cmds << new cmd(this, "get maxRampUpSpeed", "G0071");
+  m_cmds << new cmd(this, "set maxRampUpSpeed", "S0071");
+  m_cmds << new cmd(this, "get maxRampDownSpeed", "G0072");
+  m_cmds << new cmd(this, "set maxRampDownSpeed", "S0072");
+  m_cmds << new cmd(this, "get wirelessNetworkKey", "G0073");
+  m_cmds << new cmd(this, "set wirelessNetworkKey", "S0073");
+  m_cmds << new cmd(this, "get emergencyLightLevel", "G0074");
+  m_cmds << new cmd(this, "get batteryBackupPowerCalibration", "G0075");
+  m_cmds << new cmd(this, "set batteryBackupPowerCalibration", "S0075");
+  m_cmds << new cmd(this, "get motionSensorProfile", "G0076");
+  m_cmds << new cmd(this, "set motionSensorProfile", "S0076");
+  m_cmds << new cmd(this, "get powerMeterLevelAtOff", "G0077");
+  m_cmds << new cmd(this, "set powerMeterLevelAtOff", "S0077");
+  m_cmds << new cmd(this, "get powerMeterLevelAtMin", "G0078");
+  m_cmds << new cmd(this, "set powerMeterLevelAtMin", "S0078");
+  m_cmds << new cmd(this, "get powerMeterLevelAtMax", "G0079");
+  m_cmds << new cmd(this, "set powerMeterLevelAtMax", "S0079");
+  m_cmds << new cmd(this, "get powerMeterType", "G007A");
+  m_cmds << new cmd(this, "set powerMeterType", "S007A");
+  m_cmds << new cmd(this, "get DLAiSlaveMode", "G007B");
+  m_cmds << new cmd(this, "set DLAiSlaveMode", "S007B");
+  m_cmds << new cmd(this, "get DALIBootloadingActive", "G007C");
+  m_cmds << new cmd(this, "get testingMode", "G007D");
+  m_cmds << new cmd(this, "set testingMode", "S007D");
+  m_cmds << new cmd(this, "get numberOfBatteriesSupported", "G007E");
+  m_cmds << new cmd(this, "set numberOfBatteriesSupported", "S007E");
+  // reset commands
+  m_cmds << new cmd(this, "reset usage", "!U");
+  m_cmds << new cmd(this, "reset log", "!L");
+  m_cmds << new cmd(this, "reset newLog", "!K");
+  m_cmds << new cmd(this, "reset eeprom", "!Z");
+  m_cmds << new cmd(this, "reset eepromToDefault", "!C");
+  m_cmds << new cmd(this, "reset eepromToLatestMapVersion", "!E");
+  m_cmds << new cmd(this, "reset network", "!N");
+  m_cmds << new cmd(this, "reset networkWithoutChecking", "!N1");
+  m_cmds << new cmd(this, "reset daliCommissioning", "!Y");
+  m_cmds << new cmd(this, "reset daliPowerMetering", "!A");
+  // reboot commands
+  m_cmds << new cmd(this, "reboot", "!R");
+  m_cmds << new cmd(this, "reboot wirelessCard", "!W");
+  m_cmds << new cmd(this, "reboot i2cDevices", "!X");
+  // reload commands
+  m_cmds << new cmd(this, "reload dlaFirmware", "!B");
+  m_cmds << new cmd(this, "reload wirelessModuleFirmware", "!M");
+  m_cmds << new cmd(this, "reload powerboardFirmware", "!P");
+  m_cmds << new cmd(this, "reload lightbarFirmware", "!P");
+  m_cmds << new cmd(this, "reload batteryBackupFirmware", "!P");
+  m_cmds << new cmd(this, "reload motionSensorFirmware", "!V");
+  // build the dictionary of helper commands
+  foreach(cmd *cmd, m_cmds) {
+    keywordList << cmd->m_helperCmd;
   }
   cmdCompleter = new QCompleter(keywordList, this);
   cmdCompleter->setCaseSensitivity(Qt::CaseInsensitive);
