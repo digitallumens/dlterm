@@ -48,7 +48,8 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       } else {
         cmdRequest = " > " + cmdRequest;
       }
-      ui->plainTextEdit->appendPlainText(cmdRequest);
+      ui->plainTextEdit->appendPlainText(cmdRequest);      
+      ui->plainTextEdit->appendPlainText(m_cmdHelper->m_cmds.at(0)->m_parsePmuResponse("02010A0F070B"));
       ui->lineEdit->clear();
       break;
     case Qt::Key_Up:

@@ -6,7 +6,17 @@
 #include <QDebug>
 
 QString parse_getFirmwareVersion(QString pmuResponse) {
-  return pmuResponse;
+  bool ok;
+  qulonglong verInt = pmuResponse.toULongLong(&ok, 16);
+  // format verMajor.verMinor.verBuild (buildMonth/buildDay/BuildYear)
+  QString verStr = QString("%1.%2.%3 (%5/%6/%4)").
+      arg((verInt >> 40) & 0xFF).
+      arg((verInt >> 32) & 0xFF).
+      arg((verInt >> 24) & 0xFF).
+      arg((verInt >> 16) & 0xFF).
+      arg((verInt >> 8) & 0xFF).
+      arg(verInt & 0xFF);
+  return verStr;
 }
 
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
