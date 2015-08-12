@@ -19,7 +19,6 @@ signals:
 public slots:
 
 private:
-  bool eventFilter(QObject *target, QEvent *event);
 };
 
 #endif // CMDHELPER_H

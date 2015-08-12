@@ -259,17 +259,5 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   }
   cmdCompleter = new QCompleter(keywordList, this);
   cmdCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-  cmdCompleter->popup()->installEventFilter(this);
-}
-
-bool cmdHelper::eventFilter(QObject *target, QEvent *event) {
-  // just close the completer list when enter/return is pressed
-  if (event->type() == QEvent::KeyPress) {
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-    if ((keyEvent->key() == Qt::Key_Return) || (keyEvent->key() == Qt::Key_Enter)) {
-      cmdCompleter->popup()->close();
-      return true;
-    }
-  }
-  return QObject::eventFilter(target, event);
+  cmdCompleter->setCompletionMode(QCompleter::InlineCompletion);
 }
