@@ -10,15 +10,16 @@ class cmdHelper : public QObject
 {
     Q_OBJECT
 public:
-    explicit cmdHelper(QObject *parent = 0);
-    QCompleter *cmdCompleter;
-    QList<cmd *> m_cmds;
+  explicit cmdHelper(QObject *parent = 0);
+  QCompleter *m_cmdCompleter;
+  cmd * findCmd(QString cmd);
 
 signals:
 
 public slots:
 
 private:
+  QList<cmd *> m_cmds;
 };
 
 #endif // CMDHELPER_H

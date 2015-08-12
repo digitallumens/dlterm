@@ -21,7 +21,7 @@ QString parse_getFirmwareVersion(QString pmuResponse) {
 
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   QStringList keywordList;
-  // get & set commands
+  // get & set PMU register commands
   m_cmds << new cmd(this, "get firmwareVersion", "G0000", parse_getFirmwareVersion);
   m_cmds << new cmd(this, "get productCode", "G0001");
   m_cmds << new cmd(this, "set productCode", "S0001");
@@ -257,7 +257,16 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   foreach(cmd *cmd, m_cmds) {
     keywordList << cmd->m_helperCmd;
   }
-  cmdCompleter = new QCompleter(keywordList, this);
-  cmdCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-  cmdCompleter->setCompletionMode(QCompleter::InlineCompletion);
+  m_cmdCompleter = new QCompleter(keywordList, this);
+  m_cmdCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+  m_cmdCompleter->setCompletionMode(QCompleter::InlineCompletion);
+}
+
+cmd * cmdHelper::findCmd(QString helperCmd) {
+  foreach(cmd * cmd, m_cmds) {
+    if (cmd->m_helperCmd == helperCmd) {
+      return cmd;
+    }
+  }
+  return NULL;
 }

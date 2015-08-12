@@ -12,18 +12,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   // configure GUI widgets
   ui->actionDisconnect->setVisible(false);
   // configure autocomplete
-  ui->lineEdit->setCompleter(m_cmdHelper->cmdCompleter);
+  ui->lineEdit->setCompleter(m_cmdHelper->m_cmdCompleter);
   // catch command events
   ui->lineEdit->installEventFilter(this);
+  // disable tab focus policy
+  ui->plainTextEdit->setFocusPolicy(Qt::NoFocus);
 }
 
 MainWindow::~MainWindow() {
   delete ui;
 }
 
+QString sendPmuCommand(QString pmuCmd) {
+  // todo
+  return "02010A0F070B";
+}
+
 bool MainWindow::eventFilter(QObject *target, QEvent *event) {
   QString timestamp;
   QString cmdRequest;
+  QString cmdResponse;
+  cmd *cmd;
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     switch (keyEvent->key()) {
@@ -36,16 +45,27 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       }
       // append new command to history
       m_cmdHistory->append(cmdRequest);
-      // process the command
+      // find the associated helper entry
+      cmd = m_cmdHelper->findCmd(cmdRequest);
+      // send the command
+      if (cmd != NULL) {
+        cmdResponse = sendPmuCommand(cmd->m_pmuCmd);
+        if (cmd->m_parsePmuResponse != NULL) {
+          cmdResponse = cmd->m_parsePmuResponse(cmdResponse);
+        }
+      } else {
+        cmdResponse = sendPmuCommand(cmdRequest);
+      }
+      // print results
+      ui->lineEdit->clear();
       if (ui->actionShow_Timestamp->isChecked()) {
         timestamp = QDate::currentDate().toString(Qt::ISODate) + " " + QTime::currentTime().toString(Qt::ISODate);
         cmdRequest = timestamp + " > " + cmdRequest;
       } else {
         cmdRequest = " > " + cmdRequest;
       }
-      ui->plainTextEdit->appendPlainText(cmdRequest);      
-      ui->plainTextEdit->appendPlainText(m_cmdHelper->m_cmds.at(0)->m_parsePmuResponse("02010A0F070B"));
-      ui->lineEdit->clear();
+      ui->plainTextEdit->appendPlainText(cmdRequest);
+      ui->plainTextEdit->appendPlainText(cmdResponse);
       break;
     case Qt::Key_Up:
       // scroll back through command history
@@ -60,6 +80,15 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       if (keyEvent->modifiers() & Qt::ShiftModifier) {
         ui->lineEdit->clear();
       }
+      break;
+    case Qt::Key_Home:
+      // move cursor to start of line
+      ui->lineEdit->home(false);
+      break;
+    case Qt::Key_End:
+    case Qt::Key_Tab:
+      // move cursor to end of line
+      ui->lineEdit->end(false);
       break;
     default:
       break;
