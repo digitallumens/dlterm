@@ -4,11 +4,10 @@
 #include <QTime>
 #include <QDebug>
 
-MainWindow::MainWindow(QWidget *parent) :
-  QMainWindow(parent),
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui(new Ui::MainWindow),
-  m_cmdHelper(new cmdHelper::cmdHelper)
-  {
+  m_cmdHelper(new cmdHelper::cmdHelper),
+  m_cmdHistory(new cmdHistory::cmdHistory) {
   ui->setupUi(this);
   // configure GUI widgets
   ui->actionDisconnect->setVisible(false);
@@ -35,12 +34,8 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       if (cmdRequest.isEmpty()) {
         break;
       }
-      // append to command history
-      if ((m_cmdHistory.count() == 0) || (cmdRequest != m_cmdHistory.at(m_cmdHistory.count() - 1))) {
-        m_cmdHistory << cmdRequest;
-      }
-      // reset history pointer
-      m_cmdHistoryIndex = m_cmdHistory.count() - 1;
+      // append new command to history
+      m_cmdHistory->append(cmdRequest);
       // process the command
       if (ui->actionShow_Timestamp->isChecked()) {
         timestamp = QDate::currentDate().toString(Qt::ISODate) + " " + QTime::currentTime().toString(Qt::ISODate);
@@ -54,21 +49,11 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       break;
     case Qt::Key_Up:
       // scroll back through command history
-      if (m_cmdHistory.count() > 0) {
-        ui->lineEdit->setText(m_cmdHistory.at(m_cmdHistoryIndex));
-        if (m_cmdHistoryIndex > 0) {
-          m_cmdHistoryIndex--;
-        }
-      }
+      ui->lineEdit->setText(m_cmdHistory->scrollBack());
       break;
     case Qt::Key_Down:
       // scroll forward through command history
-      if (m_cmdHistory.count() > 0) {
-        ui->lineEdit->setText(m_cmdHistory.at(m_cmdHistoryIndex));
-        if ((m_cmdHistoryIndex + 1) < m_cmdHistory.count()) {
-          m_cmdHistoryIndex++;
-        } 
-      }
+      ui->lineEdit->setText(m_cmdHistory->scrollForward());
       break;
     case Qt::Key_Left:
       // SHIFT + LEFT clears the command line

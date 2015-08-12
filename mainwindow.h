@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include "cmdhelper.h"
+#include "cmdhistory.h"
 
 namespace Ui {
   class MainWindow;
@@ -29,8 +30,7 @@ private:
   Ui::MainWindow *ui;
   bool eventFilter(QObject *target, QEvent *event);
   cmdHelper *m_cmdHelper;
-  quint8 m_cmdHistoryIndex;
-  QStringList m_cmdHistory;
+  cmdHistory *m_cmdHistory;
 };
 
 #endif // MAINWINDOW_H
