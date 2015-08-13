@@ -50,7 +50,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       // append new command to history
       m_cmdHistory->append(cmdRequest);
       // find the associated helper entry
-      pmu = m_cmdHelper->cmdMap[cmdRequest];
+      pmu = m_cmdHelper->m_cmdTable[cmdRequest];
       // send the command
       if (pmu != NULL) {
         cmdResponse = sendPmuCommand(pmu->cmd);

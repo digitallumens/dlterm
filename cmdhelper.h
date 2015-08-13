@@ -20,7 +20,7 @@ class cmdHelper : public QObject
 
 public:
   explicit cmdHelper(QObject *parent = 0);
-  QMap <QString, struct pmu*> cmdMap;
+  QHash <QString, struct pmu*> m_cmdTable;
   QCompleter *m_cmdCompleter;
   QString getNextCompletion(void);
   int getCurrentCompletionLength(void);
