@@ -270,3 +270,12 @@ cmd * cmdHelper::findCmd(QString helperCmd) {
   }
   return NULL;
 }
+
+QString cmdHelper::getNextCompletion(void) {
+  m_cmdCompleter->setCurrentRow(m_cmdCompleter->currentRow() + 1);
+  return m_cmdCompleter->currentCompletion();
+}
+
+int cmdHelper::getCurrentCompletionLength(void) {
+  return m_cmdCompleter->currentCompletion().length();
+}

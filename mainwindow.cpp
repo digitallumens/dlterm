@@ -67,6 +67,15 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       ui->plainTextEdit->appendPlainText(cmdRequest);
       ui->plainTextEdit->appendPlainText(cmdResponse);
       break;
+    case Qt::Key_Tab:
+      if (ui->lineEdit->cursorPosition() != m_cmdHelper->getCurrentCompletionLength()) {
+        // accept current completion
+        ui->lineEdit->end(false);
+      } else {
+        // next completion
+        ui->lineEdit->setText(m_cmdHelper->getNextCompletion());
+      }
+      break;
     case Qt::Key_Up:
       // scroll back through command history
       ui->lineEdit->setText(m_cmdHistory->scrollBack());
@@ -86,7 +95,6 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       ui->lineEdit->home(false);
       break;
     case Qt::Key_End:
-    case Qt::Key_Tab:
       // move cursor to end of line
       ui->lineEdit->end(false);
       break;

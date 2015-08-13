@@ -13,6 +13,8 @@ public:
   explicit cmdHelper(QObject *parent = 0);
   QCompleter *m_cmdCompleter;
   cmd * findCmd(QString cmd);
+  QString getNextCompletion(void);
+  int getCurrentCompletionLength(void);
 
 signals:
 
