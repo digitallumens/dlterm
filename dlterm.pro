@@ -15,12 +15,10 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     cmdhelper.cpp \
-    cmd.cpp \
     cmdhistory.cpp
 
 HEADERS  += mainwindow.h \
     cmdhelper.h \
-    cmd.h \
     cmdhistory.h
 
 FORMS    += mainwindow.ui

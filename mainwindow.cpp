@@ -25,14 +25,18 @@ MainWindow::~MainWindow() {
 
 QString sendPmuCommand(QString pmuCmd) {
   // todo
-  return "02010A0F070B";
+  if (pmuCmd == "G0000") {
+    return "G0000: 02010A0F070B";
+  } else {
+    return "FFFF";
+  }
 }
 
 bool MainWindow::eventFilter(QObject *target, QEvent *event) {
   QString timestamp;
   QString cmdRequest;
   QString cmdResponse;
-  cmd *cmd;
+  struct pmu * pmu;
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     switch (keyEvent->key()) {
@@ -46,12 +50,12 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       // append new command to history
       m_cmdHistory->append(cmdRequest);
       // find the associated helper entry
-      cmd = m_cmdHelper->findCmd(cmdRequest);
+      pmu = m_cmdHelper->cmdMap[cmdRequest];
       // send the command
-      if (cmd != NULL) {
-        cmdResponse = sendPmuCommand(cmd->m_pmuCmd);
-        if (cmd->m_parsePmuResponse != NULL) {
-          cmdResponse = cmd->m_parsePmuResponse(cmdResponse);
+      if (pmu != NULL) {
+        cmdResponse = sendPmuCommand(pmu->cmd);
+        if (pmu->parser != NULL) {
+          cmdResponse = pmu->parser(cmdResponse);
         }
       } else {
         cmdResponse = sendPmuCommand(cmdRequest);
