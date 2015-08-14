@@ -37,6 +37,51 @@ QString parse_getTemperature(QString pmuResponse) {
   }
 }
 
+QString parse_getBatteryBackupStatus(QString pmuResponse) {
+  bool ok;
+  QString parsedResponse;
+  QMap <int, QString> battDetectedDict;
+  QMap <int, QString> testReportDict;
+  QMap <int, QString> testRunningDict;
+  if (pmuResponse.startsWith("G")) {
+    quint32 status = pmuResponse.split(" ").at(1).toLong(&ok, 16);
+    // parse batteries detected bits
+    battDetectedDict.insert(0, "No batteries detected");
+    battDetectedDict.insert(1, "Battery 1 detected");
+    battDetectedDict.insert(2, "Battery 2 detected");
+    battDetectedDict.insert(3, "Batteries 1 & 2 detected");
+    parsedResponse = (battDetectedDict[status & 0x3] + "\r");
+    // parse test reports
+    testReportDict.insert(0, "Passed");
+    testReportDict.insert(1, "Battery disconnected");
+    testReportDict.insert(2, "Battery over temperature");
+    testReportDict.insert(3, "Lightbar powered from PSU");
+    testReportDict.insert(4, "Lightbar voltage out of range");
+    testReportDict.insert(5, "Emergency activated");
+    testReportDict.insert(6, "Battery drained");
+    testReportDict.insert(7, "Unexpected lightbar pattern");
+    testReportDict.insert(8, "Certification mismatch");
+    parsedResponse += "Battery 1 test report: ";
+    parsedResponse += (testReportDict[(status >> 2) & 0xF] + "\r");
+    parsedResponse += "Battery 2 test report: ";
+    parsedResponse += (testReportDict[(status >> 6) & 0xF] + "\r");
+    // parse test running bits
+    testRunningDict.insert(0, "No tests running");
+    testRunningDict.insert(1, "Short test running");
+    testRunningDict.insert(2, "Long test running");
+    testRunningDict.insert(4, "Push button test running");
+    parsedResponse += (testRunningDict[(status >> 10) & 0x3] + "\r");
+    // parse test time
+    parsedResponse += "Test time: ";
+    parsedResponse += QString("%1 seconds").arg(status >> 16);
+    return parsedResponse;
+  } else if (pmuResponse.startsWith("F")) {
+    return errorResponses.value(pmuResponse);
+  } else {
+    return "Could not parse response";
+  }
+}
+
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   QStringList keywordList;
   // get & set PMU register commands
@@ -217,7 +262,7 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("get bootloaderCode", new pmu("G006B"));
   m_cmdTable.insert("get xpressMode", new pmu("G006C"));
   m_cmdTable.insert("set xpressMode", new pmu("S006C"));
-  m_cmdTable.insert("get batteryBackupStatus", new pmu("G006D"));
+  m_cmdTable.insert("get batteryBackupStatus", new pmu("G006D", parse_getBatteryBackupStatus));
   m_cmdTable.insert("set batteryBackupStatus", new pmu("S006D"));
   m_cmdTable.insert("get sensorSeconds", new pmu("G006E"));
   m_cmdTable.insert("get inputVoltageTwo", new pmu("G006F"));

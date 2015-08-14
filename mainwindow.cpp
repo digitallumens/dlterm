@@ -27,6 +27,8 @@ QString sendPmuCommand(QString pmuCmd) {
   // todo
   if (pmuCmd == "G0000") {
     return "G0000: 02010A0F070B";
+  } if (pmuCmd == "G006D") {
+    return "G006D: 00200001";
   } else {
     return "FFFF";
   }
