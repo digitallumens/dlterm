@@ -5,36 +5,15 @@
 #include <QKeyEvent>
 #include <QDebug>
 
-QMap <QString, QString> errorResponses;
-
 QString parse_getFirmwareVersion(QString pmuResponse) {
   bool ok;
-  if (pmuResponse.startsWith("G")) {
-    qulonglong verInt = pmuResponse.split(" ").at(1).toULongLong(&ok, 16);
-    // format verMajor.verMinor.verBuild (buildMonth/buildDay/BuildYear)
-    return QString("%1.%2.%3 (%5/%6/%4)").
-        arg((verInt >> 40) & 0xFF).
-        arg((verInt >> 32) & 0xFF).
-        arg((verInt >> 24) & 0xFF).
-        arg((verInt >> 16) & 0xFF).
-        arg((verInt >> 8) & 0xFF).
-        arg(verInt & 0xFF);
-  } else if (pmuResponse.startsWith("F")) {
-    return errorResponses.value(pmuResponse);
-  } else {
-    return "Could not parse response";
-  }
+  qulonglong verInt = pmuResponse.toULongLong(&ok, 16);
+  // format verMajor.verMinor.verBuild (buildMonth/buildDay/BuildYear)
+  return QString("%1.%2.%3 (%5/%6/%4)").arg((verInt >> 40) & 0xFF).arg((verInt >> 32) & 0xFF).arg((verInt >> 24) & 0xFF).arg((verInt >> 16) & 0xFF).arg((verInt >> 8) & 0xFF).arg(verInt & 0xFF);
 }
 
 QString parse_getTemperature(QString pmuResponse) {
-  if (pmuResponse.startsWith("G")) {
-    // todo
-    return pmuResponse;
-  } else if (pmuResponse.startsWith("F")) {
-    return errorResponses.value(pmuResponse);
-  } else {
-    return "Could not parse response";
-  }
+  return "todo";
 }
 
 QString parse_getBatteryBackupStatus(QString pmuResponse) {
@@ -43,43 +22,37 @@ QString parse_getBatteryBackupStatus(QString pmuResponse) {
   QMap <int, QString> battDetectedDict;
   QMap <int, QString> testReportDict;
   QMap <int, QString> testRunningDict;
-  if (pmuResponse.startsWith("G")) {
-    quint32 status = pmuResponse.split(" ").at(1).toLong(&ok, 16);
-    // parse batteries detected bits
-    battDetectedDict.insert(0, "No batteries detected");
-    battDetectedDict.insert(1, "Battery 1 detected");
-    battDetectedDict.insert(2, "Battery 2 detected");
-    battDetectedDict.insert(3, "Batteries 1 & 2 detected");
-    parsedResponse = (battDetectedDict[status & 0x3] + "\r");
-    // parse test reports
-    testReportDict.insert(0, "Passed");
-    testReportDict.insert(1, "Battery disconnected");
-    testReportDict.insert(2, "Battery over temperature");
-    testReportDict.insert(3, "Lightbar powered from PSU");
-    testReportDict.insert(4, "Lightbar voltage out of range");
-    testReportDict.insert(5, "Emergency activated");
-    testReportDict.insert(6, "Battery drained");
-    testReportDict.insert(7, "Unexpected lightbar pattern");
-    testReportDict.insert(8, "Certification mismatch");
-    parsedResponse += "Battery 1 test report: ";
-    parsedResponse += (testReportDict[(status >> 2) & 0xF] + "\r");
-    parsedResponse += "Battery 2 test report: ";
-    parsedResponse += (testReportDict[(status >> 6) & 0xF] + "\r");
-    // parse test running bits
-    testRunningDict.insert(0, "No tests running");
-    testRunningDict.insert(1, "Short test running");
-    testRunningDict.insert(2, "Long test running");
-    testRunningDict.insert(4, "Push button test running");
-    parsedResponse += (testRunningDict[(status >> 10) & 0x3] + "\r");
-    // parse test time
-    parsedResponse += "Test time: ";
-    parsedResponse += QString("%1 seconds").arg(status >> 16);
-    return parsedResponse;
-  } else if (pmuResponse.startsWith("F")) {
-    return errorResponses.value(pmuResponse);
-  } else {
-    return "Could not parse response";
-  }
+  quint32 status = pmuResponse.toLong(&ok, 16);
+  // parse batteries detected bits
+  battDetectedDict.insert(0, "No batteries detected");
+  battDetectedDict.insert(1, "Battery 1 detected");
+  battDetectedDict.insert(2, "Battery 2 detected");
+  battDetectedDict.insert(3, "Batteries 1 & 2 detected");
+  parsedResponse = (battDetectedDict[status & 0x3] + "\r");
+  // parse test reports
+  testReportDict.insert(0, "Passed");
+  testReportDict.insert(1, "Battery disconnected");
+  testReportDict.insert(2, "Battery over temperature");
+  testReportDict.insert(3, "Lightbar powered from PSU");
+  testReportDict.insert(4, "Lightbar voltage out of range");
+  testReportDict.insert(5, "Emergency activated");
+  testReportDict.insert(6, "Battery drained");
+  testReportDict.insert(7, "Unexpected lightbar pattern");
+  testReportDict.insert(8, "Certification mismatch");
+  parsedResponse += "Battery 1 test report: ";
+  parsedResponse += (testReportDict[(status >> 2) & 0xF] + "\r");
+  parsedResponse += "Battery 2 test report: ";
+  parsedResponse += (testReportDict[(status >> 6) & 0xF] + "\r");
+  // parse test running bits
+  testRunningDict.insert(0, "No tests running");
+  testRunningDict.insert(1, "Short test running");
+  testRunningDict.insert(2, "Long test running");
+  testRunningDict.insert(4, "Push button test running");
+  parsedResponse += (testRunningDict[(status >> 10) & 0x3] + "\r");
+  // parse test time
+  parsedResponse += "Test time: ";
+  parsedResponse += QString("%1 seconds").arg(status >> 16);
+  return parsedResponse;
 }
 
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
@@ -321,24 +294,24 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdCompleter->setCaseSensitivity(Qt::CaseInsensitive);
   m_cmdCompleter->setCompletionMode(QCompleter::InlineCompletion);
   // build a dictionary of error responses
-  errorResponses.insert("FFFF", "Invalid opcode");
-  errorResponses.insert("FFFE", "Syntax error");
-  errorResponses.insert("FFFD", "Invalid register");
-  errorResponses.insert("FFFC", "Register is read only");
-  errorResponses.insert("FFFB", "Invalid register length");
-  errorResponses.insert("FFFA", "ARP not addressed");
-  errorResponses.insert("FFF9", "Flash error");
-  errorResponses.insert("FFF8", "Storage out of bounds");
-  errorResponses.insert("FFF7", "Storage unaligned");
-  errorResponses.insert("FFF6", "Message queue full");
-  errorResponses.insert("FFF5", "I2C error");
-  errorResponses.insert("FFF4", "Internal error");
-  errorResponses.insert("FFF3", "Insufficient free buffers");
-  errorResponses.insert("FFF2", "Bad image");
-  errorResponses.insert("FFF1", "Remote install fail");
-  errorResponses.insert("FFF0", "Bus error");
-  errorResponses.insert("FFEF", "Bus busy");
-  errorResponses.insert("FFEE", "Resource busy");
+  m_errorResponses.insert("ERROR: FFFF", "Invalid opcode");
+  m_errorResponses.insert("ERROR: FFFE", "Syntax error");
+  m_errorResponses.insert("ERROR: FFFD", "Invalid register");
+  m_errorResponses.insert("ERROR: FFFC", "Register is read only");
+  m_errorResponses.insert("ERROR: FFFB", "Invalid register length");
+  m_errorResponses.insert("ERROR: FFFA", "ARP not addressed");
+  m_errorResponses.insert("ERROR: FFF9", "Flash error");
+  m_errorResponses.insert("ERROR: FFF8", "Storage out of bounds");
+  m_errorResponses.insert("ERROR: FFF7", "Storage unaligned");
+  m_errorResponses.insert("ERROR: FFF6", "Message queue full");
+  m_errorResponses.insert("ERROR: FFF5", "I2C error");
+  m_errorResponses.insert("ERROR: FFF4", "Internal error");
+  m_errorResponses.insert("ERROR: FFF3", "Insufficient free buffers");
+  m_errorResponses.insert("ERROR: FFF2", "Bad image");
+  m_errorResponses.insert("ERROR: FFF1", "Remote install fail");
+  m_errorResponses.insert("ERROR: FFF0", "Bus error");
+  m_errorResponses.insert("ERROR: FFEF", "Bus busy");
+  m_errorResponses.insert("ERROR: FFEE", "Resource busy");
 }
 
 QString cmdHelper::getNextCompletion(void) {

@@ -22,6 +22,7 @@ public:
   explicit cmdHelper(QObject *parent = 0);
   QHash <QString, struct pmu*> m_cmdTable;
   QCompleter *m_cmdCompleter;
+  QMap <QString, QString> m_errorResponses;
   QString getNextCompletion(void);
   int getCurrentCompletionLength(void);
 

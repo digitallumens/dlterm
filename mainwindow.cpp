@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "dllib.h"
 #include <QDate>
 #include <QTime>
 #include <QDebug>
@@ -15,23 +16,34 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui->lineEdit->setCompleter(m_cmdHelper->m_cmdCompleter);
   // catch command events
   ui->lineEdit->installEventFilter(this);
+  // default text before connection is established
+  ui->lineEdit->setPlaceholderText("Press ⌘K to establish a connection.");
   // disable tab focus policy
   ui->plainTextEdit->setFocusPolicy(Qt::NoFocus);
+  // create the discovery agent
+  m_discoveryAgent = new DiscoveryAgent();
+  Q_CHECK_PTR(m_discoveryAgent);
+  connect(m_discoveryAgent, SIGNAL(signalPMUDiscovered(PMU*)), this, SLOT(slotPMUDiscovered(PMU*)));
 }
 
 MainWindow::~MainWindow() {
   delete ui;
 }
 
-QString sendPmuCommand(QString pmuCmd) {
-  // todo
-  if (pmuCmd == "G0000") {
-    return "G0000: 02010A0F070B";
-  } if (pmuCmd == "G006D") {
-    return "G006D: 00200001";
-  } else {
-    return "FFFF";
+QString MainWindow::sendPmuCommand(QString cmd) {
+  QString response;
+  // figure out the length NOT including the space
+  int len = cmd.length();
+  int i = cmd.indexOf(' ');
+  if (i != -1) {
+    len = cmd.left(i).length();
   }
+  DLResult ret = m_pmuUSB->issueCommand(cmd, response, len);
+  if (ret != DLLIB_SUCCESS) {
+    // parse error response
+    response = m_cmdHelper->m_errorResponses.value(response);
+  }
+  return response;
 }
 
 bool MainWindow::eventFilter(QObject *target, QEvent *event) {
@@ -44,6 +56,11 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
     switch (keyEvent->key()) {
     case Qt::Key_Return:
     case Qt::Key_Enter:
+      // ignore requests until a connection is established
+      if (ui->actionUseFTDICable && (m_pmuUSB == NULL)) {
+        ui->lineEdit->clear();
+        break;
+      }
       // enter a new command
       cmdRequest = ui->lineEdit->text().simplified();
       if (cmdRequest.isEmpty()) {
@@ -120,11 +137,18 @@ void MainWindow::on_actionUseTelegesisAdapter_triggered() {
 }
 
 void MainWindow::on_actionConnect_triggered() {
-  ui->actionConnect->setVisible(false);
-  ui->actionDisconnect->setVisible(true);
-  ui->actionUseFTDICable->setDisabled(true);
-  ui->actionUseTelegesisAdapter->setDisabled(true);
-  ui->actionConfigure->setDisabled(true);
+  // establish a connection
+  if (ui->actionUseFTDICable) {
+    m_discoveryAgent->clearLists();
+    do {
+      m_discoveryAgent->discoverPMU_usbs();
+      MSLEEP(500);
+      QApplication::processEvents();
+    }
+    while (m_discoveryAgent->m_pmuList.isEmpty());
+  } else if (ui->actionUseTelegesisAdapter) {
+    // todo
+  }
 }
 
 void MainWindow::on_actionDisconnect_triggered() {
@@ -133,6 +157,7 @@ void MainWindow::on_actionDisconnect_triggered() {
   ui->actionUseFTDICable->setDisabled(false);
   ui->actionUseTelegesisAdapter->setDisabled(false);
   ui->actionConfigure->setDisabled(false);
+  ui->lineEdit->setPlaceholderText("Press ⌘K to establish a connection.");
 }
 
 void MainWindow::on_actionConfigure_triggered() {
@@ -141,4 +166,21 @@ void MainWindow::on_actionConfigure_triggered() {
 
 void MainWindow::on_actionClear_Output_triggered() {
   ui->plainTextEdit->clear();
+}
+
+void MainWindow::slotPMUDiscovered(PMU* pmu) {
+  //DLDebug(100, DL_FUNC_INFO) << "Found pmu via USB: " << pmu->getEESNStr();
+  m_pmuUSB = qobject_cast<PMU_USB*>(pmu);
+  if (!m_pmuUSB) {
+    //DLDebug(1, DL_FUNC_INFO) << "BUG! Converting PMU to PMU_USB failed.";
+    return;
+  }
+  //report(tr("Fixture %1 connected.").arg(m_pmuUSB->getEESNStr()));
+  // update controls
+  ui->actionConnect->setVisible(false);
+  ui->actionDisconnect->setVisible(true);
+  ui->actionUseFTDICable->setDisabled(true);
+  ui->actionUseTelegesisAdapter->setDisabled(true);
+  ui->actionConfigure->setDisabled(true);
+  ui->lineEdit->setPlaceholderText("Type a command here. Terminate by pressing ENTER.");
 }
