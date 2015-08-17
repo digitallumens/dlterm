@@ -13,18 +13,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   // configure GUI widgets
   ui->actionDisconnect->setVisible(false);
   // configure autocomplete
-  ui->lineEdit->setCompleter(m_cmdHelper->m_cmdCompleter);
+  ui->commandLine->setCompleter(m_cmdHelper->m_cmdCompleter);
   // catch command events
-  ui->lineEdit->installEventFilter(this);
+  ui->commandLine->installEventFilter(this);
   // default text before connection is established
-  ui->lineEdit->setPlaceholderText("Press ⌘K to establish a connection.");
+  ui->commandLine->setPlaceholderText("Press ⌘K to establish a connection.");
   // disable tab focus policy
-  ui->plainTextEdit->setFocusPolicy(Qt::NoFocus);
+  ui->outputFeed->setFocusPolicy(Qt::NoFocus);
   // create the discovery agent
   m_discoveryAgent = new DiscoveryAgent();
   Q_CHECK_PTR(m_discoveryAgent);
   connect(m_discoveryAgent, SIGNAL(signalPMUDiscovered(PMU*)), this, SLOT(slotPMUDiscovered(PMU*)));
-  ui->statusBar->showMessage("Disconnected");
+  ui->status->setText("Disconnected");
 }
 
 MainWindow::~MainWindow() {
@@ -59,11 +59,11 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
     case Qt::Key_Enter:
       // ignore requests until a connection is established
       if (ui->actionUseFTDICable && (m_pmuUSB == NULL)) {
-        ui->lineEdit->clear();
+        ui->commandLine->clear();
         break;
       }
       // enter a new command
-      cmdRequest = ui->lineEdit->text().simplified();
+      cmdRequest = ui->commandLine->text().simplified();
       if (cmdRequest.isEmpty()) {
         break;
       }
@@ -81,46 +81,46 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
         cmdResponse = sendPmuCommand(cmdRequest);
       }
       // print results
-      ui->lineEdit->clear();
+      ui->commandLine->clear();
       if (ui->actionShow_Timestamp->isChecked()) {
         timestamp = QDate::currentDate().toString(Qt::ISODate) + " " + QTime::currentTime().toString(Qt::ISODate);
         cmdRequest = timestamp + " > " + cmdRequest;
       } else {
         cmdRequest = " > " + cmdRequest;
       }
-      ui->plainTextEdit->appendPlainText(cmdRequest);
-      ui->plainTextEdit->appendPlainText(cmdResponse);
+      ui->outputFeed->appendPlainText(cmdRequest);
+      ui->outputFeed->appendPlainText(cmdResponse);
       break;
     case Qt::Key_Tab:
-      if (ui->lineEdit->cursorPosition() != m_cmdHelper->getCurrentCompletionLength()) {
+      if (ui->commandLine->cursorPosition() != m_cmdHelper->getCurrentCompletionLength()) {
         // accept current completion
-        ui->lineEdit->end(false);
+        ui->commandLine->end(false);
       } else {
         // next completion
-        ui->lineEdit->setText(m_cmdHelper->getNextCompletion());
+        ui->commandLine->setText(m_cmdHelper->getNextCompletion());
       }
       break;
     case Qt::Key_Up:
       // scroll back through command history
-      ui->lineEdit->setText(m_cmdHistory->scrollBack());
+      ui->commandLine->setText(m_cmdHistory->scrollBack());
       break;
     case Qt::Key_Down:
       // scroll forward through command history
-      ui->lineEdit->setText(m_cmdHistory->scrollForward());
+      ui->commandLine->setText(m_cmdHistory->scrollForward());
       break;
     case Qt::Key_Left:
       // SHIFT + LEFT clears the command line
       if (keyEvent->modifiers() & Qt::ShiftModifier) {
-        ui->lineEdit->clear();
+        ui->commandLine->clear();
       }
       break;
     case Qt::Key_Home:
       // move cursor to start of line
-      ui->lineEdit->home(false);
+      ui->commandLine->home(false);
       break;
     case Qt::Key_End:
       // move cursor to end of line
-      ui->lineEdit->end(false);
+      ui->commandLine->end(false);
       break;
     default:
       break;
@@ -158,7 +158,8 @@ void MainWindow::on_actionDisconnect_triggered() {
   ui->actionUseFTDICable->setDisabled(false);
   ui->actionUseTelegesisAdapter->setDisabled(false);
   ui->actionConfigure->setDisabled(false);
-  ui->lineEdit->setPlaceholderText("Press ⌘K to establish a connection.");
+  ui->status->setText("Disconnected");
+  ui->commandLine->setPlaceholderText("Press ⌘K to establish a connection.");
 }
 
 void MainWindow::on_actionConfigure_triggered() {
@@ -166,7 +167,7 @@ void MainWindow::on_actionConfigure_triggered() {
 }
 
 void MainWindow::on_actionClear_Output_triggered() {
-  ui->plainTextEdit->clear();
+  ui->outputFeed->clear();
 }
 
 void MainWindow::slotPMUDiscovered(PMU* pmu) {
@@ -183,5 +184,6 @@ void MainWindow::slotPMUDiscovered(PMU* pmu) {
   ui->actionUseFTDICable->setDisabled(true);
   ui->actionUseTelegesisAdapter->setDisabled(true);
   ui->actionConfigure->setDisabled(true);
-  ui->lineEdit->setPlaceholderText("Type a command here. Terminate by pressing ENTER.");
+  ui->status->setText("Connected");
+  ui->commandLine->setPlaceholderText("Type a command here. Terminate by pressing ENTER.");
 }
