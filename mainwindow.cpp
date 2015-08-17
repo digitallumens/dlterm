@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   m_discoveryAgent = new DiscoveryAgent();
   Q_CHECK_PTR(m_discoveryAgent);
   connect(m_discoveryAgent, SIGNAL(signalPMUDiscovered(PMU*)), this, SLOT(slotPMUDiscovered(PMU*)));
+  ui->statusBar->showMessage("Disconnected");
 }
 
 MainWindow::~MainWindow() {
