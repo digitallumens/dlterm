@@ -4,6 +4,7 @@
 #include <QDate>
 #include <QTime>
 #include <QDebug>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui(new Ui::MainWindow),
@@ -170,14 +171,20 @@ void MainWindow::on_actionClear_Output_triggered() {
   ui->outputFeed->clear();
 }
 
+void MainWindow::on_actionSave_Output_to_File_triggered() {
+  QString filename = QFileDialog::getSaveFileName(this, tr("Save output"), QDir::currentPath(), tr("Text File (*.txt)"));
+  QFile file(filename);
+  if (file.open(QFile::WriteOnly | QFile::Truncate)) {
+    QTextStream out(&file);
+    out << ui->outputFeed->toPlainText();
+  }
+}
+
 void MainWindow::slotPMUDiscovered(PMU* pmu) {
-  //DLDebug(100, DL_FUNC_INFO) << "Found pmu via USB: " << pmu->getEESNStr();
   m_pmuUSB = qobject_cast<PMU_USB*>(pmu);
   if (!m_pmuUSB) {
-    //DLDebug(1, DL_FUNC_INFO) << "BUG! Converting PMU to PMU_USB failed.";
     return;
   }
-  //report(tr("Fixture %1 connected.").arg(m_pmuUSB->getEESNStr()));
   // update controls
   ui->actionConnect->setVisible(false);
   ui->actionDisconnect->setVisible(true);

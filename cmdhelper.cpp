@@ -29,6 +29,12 @@ QString parse_getBatteryBackupStatus(QString pmuResponse) {
   battDetectedDict.insert(2, "Battery 2 detected");
   battDetectedDict.insert(3, "Batteries 1 & 2 detected");
   parsedResponse = (battDetectedDict[status & 0x3] + "\r");
+  // parse test running bits
+  testRunningDict.insert(0, "No tests running");
+  testRunningDict.insert(1, "Short test running");
+  testRunningDict.insert(2, "Long test running");
+  testRunningDict.insert(4, "Push button test running");
+  parsedResponse += (testRunningDict[(status >> 10) & 0x3] + "\r");
   // parse test reports
   testReportDict.insert(0, "Passed");
   testReportDict.insert(1, "Battery disconnected");
@@ -43,12 +49,6 @@ QString parse_getBatteryBackupStatus(QString pmuResponse) {
   parsedResponse += (testReportDict[(status >> 2) & 0xF] + "\r");
   parsedResponse += "Battery 2 test report: ";
   parsedResponse += (testReportDict[(status >> 6) & 0xF] + "\r");
-  // parse test running bits
-  testRunningDict.insert(0, "No tests running");
-  testRunningDict.insert(1, "Short test running");
-  testRunningDict.insert(2, "Long test running");
-  testRunningDict.insert(4, "Push button test running");
-  parsedResponse += (testRunningDict[(status >> 10) & 0x3] + "\r");
   // parse test time
   parsedResponse += "Test time: ";
   parsedResponse += QString("%1 seconds").arg(status >> 16);
