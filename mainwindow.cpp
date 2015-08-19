@@ -11,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   m_cmdHelper(new cmdHelper::cmdHelper),
   m_cmdHistory(new cmdHistory::cmdHistory) {
   ui->setupUi(this);
+  // remove the ugly focus border
+  ui->commandLine->setAttribute(Qt::WA_MacShowFocusRect, 0);
   // configure GUI widgets
   ui->actionDisconnect->setVisible(false);
   // configure autocomplete
@@ -25,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   m_discoveryAgent = new DiscoveryAgent();
   Q_CHECK_PTR(m_discoveryAgent);
   connect(m_discoveryAgent, SIGNAL(signalPMUDiscovered(PMU*)), this, SLOT(slotPMUDiscovered(PMU*)));
-  ui->status->setText("Disconnected");
+  this->setWindowTitle("DLTerm (Disconnected)");
 }
 
 MainWindow::~MainWindow() {
@@ -159,8 +161,8 @@ void MainWindow::on_actionDisconnect_triggered() {
   ui->actionUseFTDICable->setDisabled(false);
   ui->actionUseTelegesisAdapter->setDisabled(false);
   ui->actionConfigure->setDisabled(false);
-  ui->status->setText("Disconnected");
   ui->commandLine->setPlaceholderText("Press ⌘K to establish a connection.");
+  this->setWindowTitle("DLTerm (Disconnected)");
 }
 
 void MainWindow::on_actionConfigure_triggered() {
@@ -191,6 +193,6 @@ void MainWindow::slotPMUDiscovered(PMU* pmu) {
   ui->actionUseFTDICable->setDisabled(true);
   ui->actionUseTelegesisAdapter->setDisabled(true);
   ui->actionConfigure->setDisabled(true);
-  ui->status->setText("Connected");
   ui->commandLine->setPlaceholderText("Type a command here. Terminate by pressing ENTER.");
+  this->setWindowTitle("DLTerm (Connected)");
 }

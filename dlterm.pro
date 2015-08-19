@@ -39,3 +39,8 @@ macx {
     #LIBS += /Applications/Xcode.app//Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Carbon.framework/Carbon
     #LIBS += /Applications/Xcode.app//Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework/Foundation
 }
+
+DISTFILES += \
+    solarized-dark.qss
+
+RESOURCES +=
