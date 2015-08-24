@@ -5,11 +5,13 @@
 #include <QTime>
 #include <QDebug>
 #include <QFileDialog>
+#include <QKeyEvent>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui(new Ui::MainWindow),
   m_cmdHelper(new cmdHelper::cmdHelper),
-  m_cmdHistory(new cmdHistory::cmdHistory) {
+  m_cmdHistory(new cmdHistory::cmdHistory),
+  m_solarized(new solarized::solarized) {
   ui->setupUi(this);
   // remove the ugly focus border
   ui->commandLine->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -34,81 +36,95 @@ MainWindow::~MainWindow() {
   delete ui;
 }
 
-QString MainWindow::sendPmuCommand(QString cmd) {
-  QString response;
+void MainWindow::processUserRequest(QString *request, QString *response) {
+  QString pmuCmd;
+  QString pmuResponse;
+  // find the associated helper entry
+  struct pmu *pmu = m_cmdHelper->m_cmdTable[*request];
+  if (pmu != NULL) {
+    // translate helper command
+    pmuCmd = pmu->cmd;
+    m_solarized->setColor(request, SOLAR_YELLOW);
+  } else {
+    // not a helper command
+    pmuCmd = *request;
+    m_solarized->setColor(request, SOLAR_BASE_01);
+  }
   // figure out the length NOT including the space
-  int len = cmd.length();
-  int i = cmd.indexOf(' ');
+  int len = pmuCmd.length();
+  int i = pmuCmd.indexOf(' ');
   if (i != -1) {
-    len = cmd.left(i).length();
+    len = pmuCmd.left(i).length();
   }
-  DLResult ret = m_pmuUSB->issueCommand(cmd, response, len);
-  if (ret != DLLIB_SUCCESS) {
-    // parse error response
-    response = m_cmdHelper->m_errorResponses.value(response);
+  // send command
+  if (m_pmuUSB->issueCommand(pmuCmd, pmuResponse, len) != DLLIB_SUCCESS) {
+    // error response
+    *response = m_cmdHelper->m_errorResponses[pmuResponse];
+    m_solarized->setColor(response, SOLAR_RED);
+  } else if (pmu != NULL) {
+    if (pmu->parser != NULL) {
+      // parser response
+      *response = pmu->parser(pmuResponse);
+      m_solarized->setColor(response, SOLAR_BLUE);
+    } else {
+      // no parser available
+      *response = pmuResponse;
+      m_solarized->setColor(response, SOLAR_VIOLET);
+    }
+  } else {
+    // not a helper command
+    *response = pmuResponse;
+    m_solarized->setColor(response, SOLAR_BASE_01);
   }
-  return response;
+}
+
+QString MainWindow::buildPrompt(void) {
+  QString prompt;
+  QString timestamp;
+  if (ui->actionShow_Timestamp->isChecked()) {
+    timestamp = QDate::currentDate().toString(Qt::ISODate) + " " + QTime::currentTime().toString(Qt::ISODate);
+    prompt = timestamp + " > ";
+  } else {
+    prompt = " > ";
+  }
+  m_solarized->setColor(&prompt, SOLAR_BASE_01);
+  return prompt;
 }
 
 bool MainWindow::eventFilter(QObject *target, QEvent *event) {
-  QString timestamp;
-  QString cmdRequest;
-  QString cmdResponse;
-  struct pmu * pmu;
+  QString userRequest;
+  QString pmuResponse;
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     switch (keyEvent->key()) {
     case Qt::Key_Return:
     case Qt::Key_Enter:
+      // scrub the input
+      userRequest = ui->commandLine->text().simplified();
       // ignore requests until a connection is established
-      if (ui->actionUseFTDICable && (m_pmuUSB == NULL)) {
+      if (userRequest.isEmpty() || (ui->actionUseFTDICable && !m_pmuUSB)) {
         ui->commandLine->clear();
         break;
       }
-      // enter a new command
-      cmdRequest = ui->commandLine->text().simplified();
-      if (cmdRequest.isEmpty()) {
-        break;
-      }
-      // append new command to history
-      m_cmdHistory->append(cmdRequest);
-      // find the associated helper entry
-      pmu = m_cmdHelper->m_cmdTable[cmdRequest];
-      // send the command
-      if (pmu != NULL) {
-        cmdResponse = sendPmuCommand(pmu->cmd);
-        if (pmu->parser != NULL) {
-          cmdResponse = pmu->parser(cmdResponse);
-        }
-      } else {
-        cmdResponse = sendPmuCommand(cmdRequest);
-      }
-      // print results
+      // process the command
+      m_cmdHistory->append(userRequest);
+      processUserRequest(&userRequest, &pmuResponse);
       ui->commandLine->clear();
-      if (ui->actionShow_Timestamp->isChecked()) {
-        timestamp = QDate::currentDate().toString(Qt::ISODate) + " " + QTime::currentTime().toString(Qt::ISODate);
-        cmdRequest = timestamp + " > " + cmdRequest;
-      } else {
-        cmdRequest = " > " + cmdRequest;
-      }
-      ui->outputFeed->appendPlainText(cmdRequest);
-      ui->outputFeed->appendPlainText(cmdResponse);
+      ui->outputFeed->insertHtml(buildPrompt() + userRequest + "<br>");
+      ui->outputFeed->insertHtml(pmuResponse + "<br>");
       break;
     case Qt::Key_Tab:
       if (ui->commandLine->cursorPosition() != m_cmdHelper->getCurrentCompletionLength()) {
         // accept current completion
         ui->commandLine->end(false);
       } else {
-        // next completion
         ui->commandLine->setText(m_cmdHelper->getNextCompletion());
       }
       break;
     case Qt::Key_Up:
-      // scroll back through command history
       ui->commandLine->setText(m_cmdHistory->scrollBack());
       break;
     case Qt::Key_Down:
-      // scroll forward through command history
       ui->commandLine->setText(m_cmdHistory->scrollForward());
       break;
     case Qt::Key_Left:
@@ -118,11 +134,9 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       }
       break;
     case Qt::Key_Home:
-      // move cursor to start of line
       ui->commandLine->home(false);
       break;
     case Qt::Key_End:
-      // move cursor to end of line
       ui->commandLine->end(false);
       break;
     default:

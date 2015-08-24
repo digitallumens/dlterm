@@ -5,6 +5,7 @@
 
 #include "cmdhelper.h"
 #include "cmdhistory.h"
+#include "solarized.h"
 
 class DiscoveryAgent;
 class PMU;
@@ -36,9 +37,11 @@ private:
   bool eventFilter(QObject *target, QEvent *event);
   cmdHelper *m_cmdHelper;
   cmdHistory *m_cmdHistory;
+  solarized *m_solarized;
   PMU_USB *m_pmuUSB;
   DiscoveryAgent *m_discoveryAgent;
-  QString sendPmuCommand(QString pmuCmd);
+  void processUserRequest(QString *request, QString *response);
+  QString buildPrompt(void);
 
 private slots:
   void slotPMUDiscovered(PMU* pmu);

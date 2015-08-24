@@ -28,13 +28,13 @@ QString parse_getBatteryBackupStatus(QString pmuResponse) {
   battDetectedDict.insert(1, "Battery 1 detected");
   battDetectedDict.insert(2, "Battery 2 detected");
   battDetectedDict.insert(3, "Batteries 1 & 2 detected");
-  parsedResponse = (battDetectedDict[status & 0x3] + "\r");
+  parsedResponse = (battDetectedDict[status & 0x3] + "<br>");
   // parse test running bits
   testRunningDict.insert(0, "No tests running");
   testRunningDict.insert(1, "Short test running");
   testRunningDict.insert(2, "Long test running");
   testRunningDict.insert(4, "Push button test running");
-  parsedResponse += (testRunningDict[(status >> 10) & 0x3] + "\r");
+  parsedResponse += (testRunningDict[(status >> 10) & 0x3] + "<br>");
   // parse test reports
   testReportDict.insert(0, "Passed");
   testReportDict.insert(1, "Battery disconnected");
@@ -46,9 +46,9 @@ QString parse_getBatteryBackupStatus(QString pmuResponse) {
   testReportDict.insert(7, "Unexpected lightbar pattern");
   testReportDict.insert(8, "Certification mismatch");
   parsedResponse += "Battery 1 test report: ";
-  parsedResponse += (testReportDict[(status >> 2) & 0xF] + "\r");
+  parsedResponse += (testReportDict[(status >> 2) & 0xF] + "<br>");
   parsedResponse += "Battery 2 test report: ";
-  parsedResponse += (testReportDict[(status >> 6) & 0xF] + "\r");
+  parsedResponse += (testReportDict[(status >> 6) & 0xF] + "<br>");
   // parse test time
   parsedResponse += "Test time: ";
   parsedResponse += QString("%1 seconds").arg(status >> 16);
@@ -294,24 +294,24 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdCompleter->setCaseSensitivity(Qt::CaseInsensitive);
   m_cmdCompleter->setCompletionMode(QCompleter::InlineCompletion);
   // build a dictionary of error responses
-  m_errorResponses.insert("ERROR: FFFF", "Invalid opcode");
-  m_errorResponses.insert("ERROR: FFFE", "Syntax error");
-  m_errorResponses.insert("ERROR: FFFD", "Invalid register");
-  m_errorResponses.insert("ERROR: FFFC", "Register is read only");
-  m_errorResponses.insert("ERROR: FFFB", "Invalid register length");
-  m_errorResponses.insert("ERROR: FFFA", "ARP not addressed");
-  m_errorResponses.insert("ERROR: FFF9", "Flash error");
-  m_errorResponses.insert("ERROR: FFF8", "Storage out of bounds");
-  m_errorResponses.insert("ERROR: FFF7", "Storage unaligned");
-  m_errorResponses.insert("ERROR: FFF6", "Message queue full");
-  m_errorResponses.insert("ERROR: FFF5", "I2C error");
-  m_errorResponses.insert("ERROR: FFF4", "Internal error");
-  m_errorResponses.insert("ERROR: FFF3", "Insufficient free buffers");
-  m_errorResponses.insert("ERROR: FFF2", "Bad image");
-  m_errorResponses.insert("ERROR: FFF1", "Remote install fail");
-  m_errorResponses.insert("ERROR: FFF0", "Bus error");
-  m_errorResponses.insert("ERROR: FFEF", "Bus busy");
-  m_errorResponses.insert("ERROR: FFEE", "Resource busy");
+  m_errorResponses.insert("ERROR: FFFF", "ERROR: Invalid opcode");
+  m_errorResponses.insert("ERROR: FFFE", "ERROR: Syntax error");
+  m_errorResponses.insert("ERROR: FFFD", "ERROR: Invalid register");
+  m_errorResponses.insert("ERROR: FFFC", "ERROR: Register is read only");
+  m_errorResponses.insert("ERROR: FFFB", "ERROR: Invalid register length");
+  m_errorResponses.insert("ERROR: FFFA", "ERROR: ARP not addressed");
+  m_errorResponses.insert("ERROR: FFF9", "ERROR: Flash error");
+  m_errorResponses.insert("ERROR: FFF8", "ERROR: Storage out of bounds");
+  m_errorResponses.insert("ERROR: FFF7", "ERROR: Storage unaligned");
+  m_errorResponses.insert("ERROR: FFF6", "ERROR: Message queue full");
+  m_errorResponses.insert("ERROR: FFF5", "ERROR: I2C error");
+  m_errorResponses.insert("ERROR: FFF4", "ERROR: Internal error");
+  m_errorResponses.insert("ERROR: FFF3", "ERROR: Insufficient free buffers");
+  m_errorResponses.insert("ERROR: FFF2", "ERROR: Bad image");
+  m_errorResponses.insert("ERROR: FFF1", "ERROR: Remote install fail");
+  m_errorResponses.insert("ERROR: FFF0", "ERROR: Bus error");
+  m_errorResponses.insert("ERROR: FFEF", "ERROR: Bus busy");
+  m_errorResponses.insert("ERROR: FFEE", "ERROR: Resource busy");
 }
 
 QString cmdHelper::getNextCompletion(void) {

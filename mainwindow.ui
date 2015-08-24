@@ -39,16 +39,6 @@
     <property name="spacing">
      <number>0</number>
     </property>
-    <item row="1" column="0">
-     <widget class="QPlainTextEdit" name="outputFeed">
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0">
      <widget class="QLineEdit" name="commandLine">
       <property name="frame">
@@ -61,6 +51,9 @@
        <enum>Qt::LogicalMoveStyle</enum>
       </property>
      </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QTextEdit" name="outputFeed"/>
     </item>
    </layout>
   </widget>
@@ -162,7 +155,7 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Show Timestamp</string>
