@@ -37,51 +37,69 @@ MainWindow::~MainWindow() {
   delete ui;
 }
 
-void MainWindow::processUserRequest(QString *request, QString *response) {
-  QString pmuCmd;
-  QString pmuResponse;
-  QStringList pmuResponseList;
-  // find the associated helper entry
-  struct pmu *pmu = m_cmdHelper->m_cmdTable[*request];
-  if (pmu != NULL) {
-    // translate helper command
-    pmuCmd = pmu->cmd.at(0);
-    m_solarized->setColor(request, SOLAR_YELLOW);
-  } else {
-    // not a helper command
-    pmuCmd = *request;
-    m_solarized->setColor(request, SOLAR_BASE_01);
-  }
-  // figure out the length NOT including the space
-  int len = pmuCmd.length();
-  int i = pmuCmd.indexOf(' ');
-  if (i != -1) {
-    len = pmuCmd.left(i).length();
-  }
-  // send command
-  if (m_pmuUSB->issueCommand(pmuCmd, pmuResponse, len) != DLLIB_SUCCESS) {
-    // error response
-    *response = m_cmdHelper->m_errorResponses[pmuResponse];
-    m_solarized->setColor(response, SOLAR_RED);
-  } else if (pmu != NULL) {
-    if (pmu->parser != NULL) {
-      // parse response
-      pmuResponseList << pmuResponse;
-      *response = pmu->parser(pmuResponseList);
-      m_solarized->setColor(response, SOLAR_BLUE);
-    } else {
-      // no parser available
-      *response = pmuResponse;
-      m_solarized->setColor(response, SOLAR_VIOLET);
+QString MainWindow::queryPmu(QStringList cmdList, QStringList *responseList) {
+  QString response;
+  foreach (const QString &cmd, cmdList) {
+    // figure out the length NOT including the space
+    int len = cmd.length();
+    int i = cmd.indexOf(' ');
+    if (i != -1) {
+      len = cmd.left(i).length();
     }
-  } else {
-    // not a helper command
-    *response = pmuResponse;
-    m_solarized->setColor(response, SOLAR_VIOLET);
+    if (m_pmuUSB->issueCommand(cmd, response, len) != DLLIB_SUCCESS) {
+      // return error
+      return response;
+    } else {
+      responseList->append(response);
+    }
   }
+  return NULL;
 }
 
-QString MainWindow::formatRequest(QString request) {
+QString MainWindow::processUserRequest(QString *request) {
+  QStringList cmdList;
+  QStringList responseList;
+  QString errorResponse;
+  QString response;
+  // find the associated helper entry
+  struct pmu *pmu = m_cmdHelper->m_cmdTable[*request];
+  if (pmu == NULL) {
+    // not a helper command
+    cmdList << *request;
+    m_solarized->setColor(request, SOLAR_BASE_01);
+  } else {
+    // translate helper command
+    cmdList = pmu->cmd;
+    m_solarized->setColor(request, SOLAR_YELLOW);
+  }
+  // send commands & get responses
+  errorResponse = queryPmu(cmdList, &responseList);
+  // parse responses
+  if (errorResponse != NULL) {
+    // translate error response
+    response = m_cmdHelper->m_errorResponses[errorResponse];
+    m_solarized->setColor(&response, SOLAR_RED);
+  } else if (pmu == NULL) {
+    // not a helper command, flatten responses
+    foreach (QString s, responseList) {
+      response.append(s);
+    }
+    m_solarized->setColor(&response, SOLAR_VIOLET);
+  } else if (pmu->parser == NULL) {
+    // no helper parser available, flatten responses
+    foreach (QString s, responseList) {
+      response.append(s);
+    }
+    m_solarized->setColor(&response, SOLAR_VIOLET);
+  } else {
+    // use helper parser
+    response = pmu->parser(responseList);
+    m_solarized->setColor(&response, SOLAR_BLUE);
+  }
+  return response;
+}
+
+QString MainWindow::buildPrompt(void) {
   QString prompt;
   QString timestamp;
   if (ui->actionShow_Timestamp->isChecked()) {
@@ -91,12 +109,7 @@ QString MainWindow::formatRequest(QString request) {
     prompt = " > ";
   }
   m_solarized->setColor(&prompt, SOLAR_BASE_01);
-}
-
-QString MainWindow::formatResponse(QString response) {
-  QString responseHTML;
-  responseHTML =
-  return responseHTML;
+  return prompt;
 }
 
 bool MainWindow::eventFilter(QObject *target, QEvent *event) {
@@ -116,7 +129,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       }
       // process the command
       m_cmdHistory->append(userRequest);
-      processUserRequest(&userRequest, &pmuResponse);
+      pmuResponse = processUserRequest(&userRequest);
       ui->commandLine->clear();
       ui->outputFeed->insertHtml(buildPrompt() + userRequest + "<br>");
       ui->outputFeed->insertHtml(pmuResponse + "<br>");

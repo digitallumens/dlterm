@@ -40,7 +40,8 @@ private:
   solarized *m_solarized;
   PMU_USB *m_pmuUSB;
   DiscoveryAgent *m_discoveryAgent;
-  void processUserRequest(QString *request, QString *response);
+  QString queryPmu(QStringList cmdList, QStringList *responseList);
+  QString processUserRequest(QString *request);
   QString buildPrompt(void);
 
 private slots:

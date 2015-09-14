@@ -5,18 +5,18 @@
 #include <QKeyEvent>
 #include <QDebug>
 
-QString parse_getFirmwareVersion(QStringList pmuResponse) {
+QString parse_get_firmwareVersion(QStringList pmuResponse) {
   bool ok;
   qulonglong verInt = pmuResponse.at(0).toULongLong(&ok, 16);
   // format verMajor.verMinor.verBuild (buildMonth/buildDay/BuildYear)
   return QString("%1.%2.%3 (%5/%6/%4)").arg((verInt >> 40) & 0xFF).arg((verInt >> 32) & 0xFF).arg((verInt >> 24) & 0xFF).arg((verInt >> 16) & 0xFF).arg((verInt >> 8) & 0xFF).arg(verInt & 0xFF);
 }
 
-QString parse_getTemperature(QStringList pmuResponse) {
+QString parse_get_temperature(QStringList pmuResponse) {
   return "todo";
 }
 
-QString parse_getBatteryBackupStatus(QStringList pmuResponse) {
+QString parse_get_batteryBackupStatus(QStringList pmuResponse) {
   bool ok;
   QString parsedResponse;
   QMap <int, QString> battDetectedDict;
@@ -55,17 +55,24 @@ QString parse_getBatteryBackupStatus(QStringList pmuResponse) {
   return parsedResponse;
 }
 
+QString parse_get_lbFirmwareVersion(QStringList pmuResponse) {
+  bool ok;
+  quint16 verHiInt = pmuResponse.at(0).toUShort(&ok, 16);
+  quint16 verLoInt = pmuResponse.at(1).toUShort(&ok, 16);
+  return QString("%1.%2.%3").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
+}
+
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   QStringList keywordList;
   // get & set PMU register commands
-  m_cmdTable.insert("get firmwareVersion", new pmu(QStringList("G0000"), parse_getFirmwareVersion));
+  m_cmdTable.insert("get firmwareVersion", new pmu(QStringList("G0000"), parse_get_firmwareVersion));
   m_cmdTable.insert("get productCode", new pmu(QStringList("G0001")));
   m_cmdTable.insert("set productCode", new pmu(QStringList("S0001")));
   m_cmdTable.insert("get serialNumber", new pmu(QStringList("G0002")));
   m_cmdTable.insert("set serialNumber", new pmu(QStringList("S0002")));
   m_cmdTable.insert("get unixTime", new pmu(QStringList("G0003")));
   m_cmdTable.insert("set unixTime", new pmu(QStringList("S0003")));
-  m_cmdTable.insert("get temperature", new pmu(QStringList("G0004"), parse_getTemperature));
+  m_cmdTable.insert("get temperature", new pmu(QStringList("G0004"), parse_get_temperature));
   m_cmdTable.insert("get lightManualLevel", new pmu(QStringList("G0005")));
   m_cmdTable.insert("set lightManualLevel", new pmu(QStringList("S0005")));
   m_cmdTable.insert("get lightActiveLevel", new pmu(QStringList("G0006")));
@@ -235,7 +242,7 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("get bootloaderCode", new pmu(QStringList("G006B")));
   m_cmdTable.insert("get xpressMode", new pmu(QStringList("G006C")));
   m_cmdTable.insert("set xpressMode", new pmu(QStringList("S006C")));
-  m_cmdTable.insert("get batteryBackupStatus", new pmu(QStringList("G006D"), parse_getBatteryBackupStatus));
+  m_cmdTable.insert("get batteryBackupStatus", new pmu(QStringList("G006D"), parse_get_batteryBackupStatus));
   m_cmdTable.insert("set batteryBackupStatus", new pmu(QStringList("S006D")));
   m_cmdTable.insert("get sensorSeconds", new pmu(QStringList("G006E")));
   m_cmdTable.insert("get inputVoltageTwo", new pmu(QStringList("G006F")));
@@ -269,7 +276,7 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("set numberOfBatteriesSupported", new pmu(QStringList("S007E")));
   // get & set lightbar commands
   m_cmdTable.insert("get lbProtocolVersion", new pmu(QStringList("R0000")));
-  m_cmdTable.insert("get lbFirmwareVersion", new pmu(QStringList() << "R0001" << "R0002"));
+  m_cmdTable.insert("get lbFirmwareVersion", new pmu(QStringList() << "R0003" << "R0004", parse_get_lbFirmwareVersion));
   // reset commands
   m_cmdTable.insert("reset usage", new pmu(QStringList("!U")));
   m_cmdTable.insert("reset log", new pmu(QStringList("!L")));
