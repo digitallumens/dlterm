@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QKeyEvent>
+#include <QScrollBar>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui(new Ui::MainWindow),
@@ -74,7 +75,7 @@ void MainWindow::processUserRequest(QString *request, QString *response) {
   } else {
     // not a helper command
     *response = pmuResponse;
-    m_solarized->setColor(response, SOLAR_BASE_01);
+    m_solarized->setColor(response, SOLAR_VIOLET);
   }
 }
 
@@ -102,7 +103,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       // scrub the input
       userRequest = ui->commandLine->text().simplified();
       // ignore requests until a connection is established
-      if (userRequest.isEmpty() || (ui->actionUseFTDICable && !m_pmuUSB)) {
+      if (userRequest.isEmpty() || m_discoveryAgent->m_pmuList.isEmpty()) {
         ui->commandLine->clear();
         break;
       }
@@ -112,6 +113,8 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       ui->commandLine->clear();
       ui->outputFeed->insertHtml(buildPrompt() + userRequest + "<br>");
       ui->outputFeed->insertHtml(pmuResponse + "<br>");
+      // scroll to bottom
+      ui->outputFeed->verticalScrollBar()->setValue(ui->outputFeed->verticalScrollBar()->maximum());
       break;
     case Qt::Key_Tab:
       if (ui->commandLine->cursorPosition() != m_cmdHelper->getCurrentCompletionLength()) {

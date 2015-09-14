@@ -5,7 +5,7 @@
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
   // load application stylesheet
-  QFile styleFile("/Users/mshaffer/Source/dlterm/solarized-dark.qss");
+  QFile styleFile("/Users/mshaffer/Source/dlterm/solarized-light.qss");
   styleFile.open(QFile::ReadOnly);
   QString style(styleFile.readAll());
   a.setStyleSheet(style);

@@ -43,6 +43,6 @@ macx {
 }
 
 DISTFILES += \
-    solarized-dark.qss
+    solarized-light.qss
 
 RESOURCES +=
