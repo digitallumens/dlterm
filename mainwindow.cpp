@@ -40,11 +40,12 @@ MainWindow::~MainWindow() {
 void MainWindow::processUserRequest(QString *request, QString *response) {
   QString pmuCmd;
   QString pmuResponse;
+  QStringList pmuResponseList;
   // find the associated helper entry
   struct pmu *pmu = m_cmdHelper->m_cmdTable[*request];
   if (pmu != NULL) {
     // translate helper command
-    pmuCmd = pmu->cmd;
+    pmuCmd = pmu->cmd.at(0);
     m_solarized->setColor(request, SOLAR_YELLOW);
   } else {
     // not a helper command
@@ -64,8 +65,9 @@ void MainWindow::processUserRequest(QString *request, QString *response) {
     m_solarized->setColor(response, SOLAR_RED);
   } else if (pmu != NULL) {
     if (pmu->parser != NULL) {
-      // parser response
-      *response = pmu->parser(pmuResponse);
+      // parse response
+      pmuResponseList << pmuResponse;
+      *response = pmu->parser(pmuResponseList);
       m_solarized->setColor(response, SOLAR_BLUE);
     } else {
       // no parser available
@@ -79,7 +81,7 @@ void MainWindow::processUserRequest(QString *request, QString *response) {
   }
 }
 
-QString MainWindow::buildPrompt(void) {
+QString MainWindow::formatRequest(QString request) {
   QString prompt;
   QString timestamp;
   if (ui->actionShow_Timestamp->isChecked()) {
@@ -89,7 +91,12 @@ QString MainWindow::buildPrompt(void) {
     prompt = " > ";
   }
   m_solarized->setColor(&prompt, SOLAR_BASE_01);
-  return prompt;
+}
+
+QString MainWindow::formatResponse(QString response) {
+  QString responseHTML;
+  responseHTML =
+  return responseHTML;
 }
 
 bool MainWindow::eventFilter(QObject *target, QEvent *event) {

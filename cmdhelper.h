@@ -4,13 +4,13 @@
 #include <QObject>
 #include <QCompleter>
 
-typedef QString(*parser_t)(QString pmuResponse);
+typedef QString(*parser_t)(QStringList pmuResponse);
 
 struct pmu {
   pmu(){}
-  pmu(QString default_cmd) : cmd(default_cmd), parser(NULL) {}
-  pmu(QString default_cmd, parser_t default_parser) : cmd(default_cmd), parser(default_parser) {}
-  QString cmd;
+  pmu(QStringList default_cmd) : cmd(default_cmd), parser(NULL) {}
+  pmu(QStringList default_cmd, parser_t default_parser) : cmd(default_cmd), parser(default_parser) {}
+  QStringList cmd;
   parser_t parser;
 };
 
