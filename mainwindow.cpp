@@ -57,6 +57,7 @@ QString MainWindow::queryPmu(QStringList cmdList, QStringList *responseList) {
 }
 
 QString MainWindow::processUserRequest(QString *request) {
+  QStringList argList;
   QStringList cmdList;
   QStringList responseList;
   QString errorResponse;
@@ -68,8 +69,13 @@ QString MainWindow::processUserRequest(QString *request) {
     cmdList << *request;
     m_solarized->setColor(request, SOLAR_BASE_01);
   } else {
+    // request format "verb object argList"
+    // ex: set serialNumber 0400DEAD
+    argList = request->split(" ");
+    argList.removeFirst();
+    argList.removeFirst();
     // translate helper command
-    cmdList = pmu->cmd;
+    cmdList = pmu->cmd(argList);
     m_solarized->setColor(request, SOLAR_YELLOW);
   }
   // send commands & get responses

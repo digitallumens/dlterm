@@ -44,6 +44,18 @@
     </item>
     <item row="0" column="0">
      <widget class="QLineEdit" name="commandLine">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>25</height>
+       </size>
+      </property>
       <property name="frame">
        <bool>true</bool>
       </property>
