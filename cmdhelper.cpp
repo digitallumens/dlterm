@@ -1025,11 +1025,11 @@ QStringList cmd_get_lbProtocolVersion(QStringList argList) {
 }
 
 QStringList cmd_get_lbFirmwareCode(QStringList argList) {
-  return QStringList() << QString("R%101").arg(argList.at(0)) << QString("R%102").arg(argList.at(0));
+  return QStringList() << QString("R%1").arg(argList.at(0)) + "01" << QString("R%1").arg(argList.at(0)) + "02";
 }
 
 QStringList cmd_get_lbFirmwareVersion(QStringList argList) {
-  return QStringList() << QString("R%103").arg(argList.at(0)) << QString("R%104").arg(argList.at(0));
+  return QStringList() << QString("R%1").arg(argList.at(0)) + "03" << QString("R%1").arg(argList.at(0)) + "04";
 }
 
 QString parse_get_lbFirmwareVersion(QStringList pmuResponse) {

@@ -57,23 +57,25 @@ QString MainWindow::queryPmu(QStringList cmdList, QStringList *responseList) {
 }
 
 QString MainWindow::processUserRequest(QString *request) {
+  QString cmd;
   QStringList argList;
   QStringList cmdList;
   QStringList responseList;
   QString errorResponse;
   QString response;
+  // request format "verb object argList"
+  // ex: set serialNumber 0400DEAD
+  argList = request->split(" ");
+  cmd = argList.at(0) + " " + argList.at(1);
+  argList.removeFirst();
+  argList.removeFirst();
   // find the associated helper entry
-  struct pmu *pmu = m_cmdHelper->m_cmdTable[*request];
+  struct pmu *pmu = m_cmdHelper->m_cmdTable[cmd];
   if (pmu == NULL) {
     // not a helper command
     cmdList << *request;
     m_solarized->setColor(request, SOLAR_BASE_01);
   } else {
-    // request format "verb object argList"
-    // ex: set serialNumber 0400DEAD
-    argList = request->split(" ");
-    argList.removeFirst();
-    argList.removeFirst();
     // translate helper command
     cmdList = pmu->cmd(argList);
     m_solarized->setColor(request, SOLAR_YELLOW);
@@ -90,13 +92,21 @@ QString MainWindow::processUserRequest(QString *request) {
     foreach (QString s, responseList) {
       response.append(s);
     }
-    m_solarized->setColor(&response, SOLAR_VIOLET);
+    if (response.contains("OK")) {
+      m_solarized->setColor(&response, SOLAR_GREEN);
+    } else {
+      m_solarized->setColor(&response, SOLAR_VIOLET);
+    }
   } else if (pmu->parser == NULL) {
     // no helper parser available, flatten responses
     foreach (QString s, responseList) {
       response.append(s);
     }
-    m_solarized->setColor(&response, SOLAR_VIOLET);
+    if (response.contains("OK")) {
+      m_solarized->setColor(&response, SOLAR_GREEN);
+    } else {
+      m_solarized->setColor(&response, SOLAR_VIOLET);
+    }
   } else {
     // use helper parser
     response = pmu->parser(responseList);
@@ -152,9 +162,11 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       break;
     case Qt::Key_Up:
       ui->commandLine->setText(m_cmdHistory->scrollBack());
+      ui->commandLine->end(false);
       break;
     case Qt::Key_Down:
       ui->commandLine->setText(m_cmdHistory->scrollForward());
+      ui->commandLine->end(false);
       break;
     case Qt::Key_Left:
       // SHIFT + LEFT clears the command line
