@@ -1021,15 +1021,15 @@ QStringList cmd_set_numberOfBatteriesSupported(QStringList argList) {
 
 /*** lightbar register commands ***/
 QStringList cmd_get_lbProtocolVersion(QStringList argList) {
-  return QStringList(QString("R%100").arg(argList.at(0)));
+  return QStringList() << QString("R%1%2").arg(argList.at(0)).arg("00");
 }
 
 QStringList cmd_get_lbFirmwareCode(QStringList argList) {
-  return QStringList() << QString("R%1").arg(argList.at(0)) + "01" << QString("R%1").arg(argList.at(0)) + "02";
+  return QStringList() << QString("R%1%2").arg(argList.at(0)).arg("01") << QString("R%1%2").arg(argList.at(0)).arg("02");
 }
 
 QStringList cmd_get_lbFirmwareVersion(QStringList argList) {
-  return QStringList() << QString("R%1").arg(argList.at(0)) + "03" << QString("R%1").arg(argList.at(0)) + "04";
+  return QStringList() << QString("R%1%2").arg(argList.at(0)).arg("03") << QString("R%1%2").arg(argList.at(0)).arg("04");
 }
 
 QString parse_get_lbFirmwareVersion(QStringList pmuResponse) {

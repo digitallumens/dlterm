@@ -162,11 +162,9 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       break;
     case Qt::Key_Up:
       ui->commandLine->setText(m_cmdHistory->scrollBack());
-      ui->commandLine->end(false);
       break;
     case Qt::Key_Down:
       ui->commandLine->setText(m_cmdHistory->scrollForward());
-      ui->commandLine->end(false);
       break;
     case Qt::Key_Left:
       // SHIFT + LEFT clears the command line

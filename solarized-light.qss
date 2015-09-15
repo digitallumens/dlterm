@@ -41,3 +41,7 @@ QScrollBar {
 QScrollBar::handle {
   background: #eee8d5;
 }
+
+QFrame {
+  color: #93a1a1;
+}
