@@ -8,7 +8,7 @@
 /*** PMU register commands ***/
 QStringList cmd_get_firmwareVersion(QStringList argList) {
   (void) argList;
-  return QStringList("G0000");
+  return QStringList() << "G0000";
 }
 
 QString parse_get_firmwareVersion(QStringList pmuResponse) {
@@ -20,34 +20,34 @@ QString parse_get_firmwareVersion(QStringList pmuResponse) {
 
 QStringList cmd_get_productCode(QStringList argList) {
   (void) argList;
-  return QStringList("G0001");
+  return QStringList() << "G0001";
 }
 
 QStringList cmd_set_productCode(QStringList argList) {
-  return QStringList(QString("S0001 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0001 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_serialNumber(QStringList argList) {
   (void) argList;
-  return QStringList("G0002");
+  return QStringList() << "G0002";
 }
 
 QStringList cmd_set_serialNumber(QStringList argList) {
-  return QStringList(QString("S0002 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0002 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_unixTime(QStringList argList) {
   (void) argList;
-  return QStringList("G0003");
+  return QStringList() << "G0003";
 }
 
 QStringList cmd_set_unixTime(QStringList argList) {
-  return QStringList(QString("S0003 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0003 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_temperature(QStringList argList) {
   (void) argList;
-  return QStringList("G0004");
+  return QStringList() << "G0004";
 }
 
 QString parse_get_temperature(QStringList pmuResponse) {
@@ -56,787 +56,787 @@ QString parse_get_temperature(QStringList pmuResponse) {
 
 QStringList cmd_get_lightManualLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G0005");
+  return QStringList() << "G0005";
 }
 
 QStringList cmd_set_lightManualLevel(QStringList argList) {
-  return QStringList(QString("S0005 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0005 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_lightActiveLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G0006");
+  return QStringList() << "G0006";
 }
 
 QStringList cmd_get_lightInactiveLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G0007");
+  return QStringList() << "G0007";
 }
 
 QStringList cmd_get_lightOverrideActiveLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G0008");
+  return QStringList() << "G0008";
 }
 
 QStringList cmd_set_lightOverrideActiveLevel(QStringList argList) {
-  return QStringList(QString("S0008 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0008 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_lightOverrideInactiveLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G0009");
+  return QStringList() << "G0009";
 }
 
 QStringList cmd_set_lightOverrideInactiveLevel(QStringList argList) {
-  return QStringList(QString("S0009 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0009 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_sensorDelayTime(QStringList argList) {
   (void) argList;
-  return QStringList("G000A");
+  return QStringList() << "G000A";
 }
 
 QStringList cmd_get_sensorOverrideDelayTime(QStringList argList) {
   (void) argList;
-  return QStringList("G000B");
+  return QStringList() << "G000B";
 }
 
 QStringList cmd_set_sensorOverrideDelayTime(QStringList argList) {
-  return QStringList(QString("S000B %1").arg(argList.at(0)));
+  return QStringList() << QString("S000B %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerupTime(QStringList argList) {
   (void) argList;
-  return QStringList("G000C");
+  return QStringList() << "G000C";
 }
 
 QStringList cmd_get_usageActiveTime(QStringList argList) {
   (void) argList;
-  return QStringList("G000D");
+  return QStringList() << "G000D";
 }
 
 QStringList cmd_get_usageInactiveTime(QStringList argList) {
   (void) argList;
-  return QStringList("G000E");
+  return QStringList() << "G000E";
 }
 
 QStringList cmd_get_usagePermActiveTime(QStringList argList) {
   (void) argList;
-  return QStringList("G000F");
+  return QStringList() << "G000F";
 }
 
 QStringList cmd_get_usagePermInactiveTime(QStringList argList) {
   (void) argList;
-  return QStringList("G0010");
+  return QStringList() << "G0010";
 }
 
 QStringList cmd_get_usageWh(QStringList argList) {
   (void) argList;
-  return QStringList("G0011");
+  return QStringList() << "G0011";
 }
 
 QStringList cmd_get_usagePerm(QStringList argList) {
   (void) argList;
-  return QStringList("G0012");
+  return QStringList() << "G0012";
 }
 
 QStringList cmd_get_usageSensorEvents(QStringList argList) {
   (void) argList;
-  return QStringList("G0013");
+  return QStringList() << "G0013";
 }
 
 QStringList cmd_get_usagePermSensorEvents(QStringList argList) {
   (void) argList;
-  return QStringList("G0014");
+  return QStringList() << "G0014";
 }
 
 QStringList cmd_get_numberOfLogEntries(QStringList argList) {
   (void) argList;
-  return QStringList("G0015");
+  return QStringList() << "G0015";
 }
 
 QStringList cmd_get_configCalibrationP0(QStringList argList) {
   (void) argList;
-  return QStringList("G0016");
+  return QStringList() << "G0016";
 }
 
 QStringList cmd_set_configCalibrationP0(QStringList argList) {
-  return QStringList(QString("S0016 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0016 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_configCalibrationP1(QStringList argList) {
   (void) argList;
-  return QStringList("G0017");
+  return QStringList() << "G0017";
 }
 
 QStringList cmd_set_configCalibrationP1(QStringList argList) {
-  return QStringList(QString("S0017 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0017 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_configCalibrationP2(QStringList argList) {
   (void) argList;
-  return QStringList("G0018");
+  return QStringList() << "G0018";
 }
 
 QStringList cmd_set_configCalibrationP2(QStringList argList) {
-  return QStringList(QString("S0018 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0018 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_configCalibrationP3(QStringList argList) {
   (void) argList;
-  return QStringList("G0019");
+  return QStringList() << "G0019";
 }
 
 QStringList cmd_set_configCalibrationP3(QStringList argList) {
-  return QStringList(QString("S0019 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0019 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_buildTime(QStringList argList) {
   (void) argList;
-  return QStringList("G001A");
+  return QStringList() << "G001A";
 }
 
 QStringList cmd_set_buildTime(QStringList argList) {
-  return QStringList(QString("S001A %1").arg(argList.at(0)));
+  return QStringList() << QString("S001A %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_sensorTimeoutCountdown(QStringList argList) {
   (void) argList;
-  return QStringList("G001B");
+  return QStringList() << "G001B";
 }
 
 QStringList cmd_get_currentLightLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G001C");
+  return QStringList() << "G001C";
 }
 
 QStringList cmd_get_safeMode(QStringList argList) {
   (void) argList;
-  return QStringList("G001D");
+  return QStringList() << "G001D";
 }
 
 QStringList cmd_get_lightBarSelect(QStringList argList) {
   (void) argList;
-  return QStringList("G001E");
+  return QStringList() << "G001E";
 }
 
 QStringList cmd_set_lightBarSelect(QStringList argList) {
-  return QStringList(QString("S001E %1").arg(argList.at(0)));
+  return QStringList() << QString("S001E %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_currentPowerConsumption(QStringList argList) {
   (void) argList;
-  return QStringList("G001F");
+  return QStringList() << "G001F";
 }
 
 QStringList cmd_get_wirelessDataAggregator(QStringList argList) {
   (void) argList;
-  return QStringList("G0020");
+  return QStringList() << "G0020";
 }
 
 QStringList cmd_set_wirelessDataAggregator(QStringList argList) {
-  return QStringList(QString("S0020 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0020 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_resetUsageTimestamp(QStringList argList) {
   (void) argList;
-  return QStringList("G0021");
+  return QStringList() << "G0021";
 }
 
 QStringList cmd_get_pwmPeriodRegister(QStringList argList) {
   (void) argList;
-  return QStringList("G0022");
+  return QStringList() << "G0022";
 }
 
 QStringList cmd_set_pwmPeriodRegister(QStringList argList) {
-  return QStringList(QString("S0022 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0022 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_analogSensorValue(QStringList argList) {
   (void) argList;
-  return QStringList("G0023");
+  return QStringList() << "G0023";
 }
 
 QStringList cmd_get_analogReportingHysteresis(QStringList argList) {
   (void) argList;
-  return QStringList("G0024");
+  return QStringList() << "G0024";
 }
 
 QStringList cmd_get_zone(QStringList argList) {
   (void) argList;
-  return QStringList("G0025");
+  return QStringList() << "G0025";
 }
 
 QStringList cmd_set_zone(QStringList argList) {
-  return QStringList(QString("S0025 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0025 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_lightTemporaryActiveLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G0026");
+  return QStringList() << "G0026";
 }
 
 QStringList cmd_set_lightTemporaryActiveLevel(QStringList argList) {
-  return QStringList(QString("S0026 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0026 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_lightTemporaryInactiveLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G0027");
+  return QStringList() << "G0027";
 }
 
 QStringList cmd_set_lightTemporaryInactiveLevel(QStringList argList) {
-  return QStringList(QString("S0027 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0027 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_sensorTemporaryDelayTime(QStringList argList) {
   (void) argList;
-  return QStringList("G0028");
+  return QStringList() << "G0028";
 }
 
 QStringList cmd_set_sensorTemporaryDealyTime(QStringList argList) {
-  return QStringList(QString("S0028 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0028 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_temporaryOverrideTimeout(QStringList argList) {
   (void) argList;
-  return QStringList("G0029");
+  return QStringList() << "G0029";
 }
 
 QStringList cmd_set_temporaryOverrideTiemout(QStringList argList) {
-  return QStringList(QString("S0029 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0029 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_setRemoteState(QStringList argList) {
   (void) argList;
-  return QStringList("G002A");
+  return QStringList() << "G002A";
 }
 
 QStringList cmd_set_setRemoteState(QStringList argList) {
-  return QStringList(QString("S002A %1").arg(argList.at(0)));
+  return QStringList() << QString("S002A %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_remoteStateDelayTime(QStringList argList) {
   (void) argList;
-  return QStringList("G002B");
+  return QStringList() << "G002B";
 }
 
 QStringList cmd_set_remoteStateDelayTime(QStringList argList) {
-  return QStringList(QString("S002B %1").arg(argList.at(0)));
+  return QStringList() << QString("S002B %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_remoteSecondsCountdown(QStringList argList) {
   (void) argList;
-  return QStringList("G002C");
+  return QStringList() << "G002C";
 }
 
 QStringList cmd_get_minimumDimmingValue(QStringList argList) {
   (void) argList;
-  return QStringList("G002D");
+  return QStringList() << "G002D";
 }
 
 QStringList cmd_get_powerCalibrationA0(QStringList argList) {
   (void) argList;
-  return QStringList("G002E");
+  return QStringList() << "G002E";
 }
 
 QStringList cmd_set_powerCalibrationA0(QStringList argList) {
-  return QStringList(QString("S002E %1").arg(argList.at(0)));
+  return QStringList() << QString("S002E %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerCalibrationB0(QStringList argList) {
   (void) argList;
-  return QStringList("G002F");
+  return QStringList() << "G002F";
 }
 
 QStringList cmd_set_powerCalibrationB0(QStringList argList) {
-  return QStringList(QString("S002F %1").arg(argList.at(0)));
+  return QStringList() << QString("S002F %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerCalibrationC0(QStringList argList) {
   (void) argList;
-  return QStringList("G0030");
+  return QStringList() << "G0030";
 }
 
 QStringList cmd_set_powerCalibrationC0(QStringList argList) {
-  return QStringList(QString("S0030 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0030 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerCalibrationMA(QStringList argList) {
   (void) argList;
-  return QStringList("G0031");
+  return QStringList() << "G0031";
 }
 
 QStringList cmd_set_powerCalibrationMA(QStringList argList) {
-  return QStringList(QString("S0031 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0031 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerCalibrationMB(QStringList argList) {
   (void) argList;
-  return QStringList("G0032");
+  return QStringList() << "G0032";
 }
 
 QStringList cmd_set_powerCalibrationMB(QStringList argList) {
-  return QStringList(QString("S0032 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0032 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerCalibrationMC(QStringList argList) {
   (void) argList;
-  return QStringList("G0033");
+  return QStringList() << "G0033";
 }
 
 QStringList cmd_set_powerCalibrationMC(QStringList argList) {
-  return QStringList(QString("S0033 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0033 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerCalibrationPOff(QStringList argList) {
   (void) argList;
-  return QStringList("G0034");
+  return QStringList() << "G0034";
 }
 
 QStringList cmd_set_powerCalibrationPOff(QStringList argList) {
-  return QStringList(QString("S0034 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0034 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerCalibrationPOn(QStringList argList) {
   (void) argList;
-  return QStringList("G0035");
+  return QStringList() << "G0035";
 }
 
 QStringList cmd_set_powerCalibrationPOn(QStringList argList) {
-  return QStringList(QString("S0035 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0035 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerCalibrationT0(QStringList argList) {
   (void) argList;
-  return QStringList("G0036");
+  return QStringList() << "G0036";
 }
 
 QStringList cmd_set_powerCalibrationT0(QStringList argList) {
-  return QStringList(QString("S0036 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0036 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerEstimatorTemperatureOverride(QStringList argList) {
   (void) argList;
-  return QStringList("G0037");
+  return QStringList() << "G0037";
 }
 
 QStringList cmd_set_powerEstimatorTemperatureOverride(QStringList argList) {
-  return QStringList(QString("S0037 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0037 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_cachedTemperatureValue(QStringList argList) {
   (void) argList;
-  return QStringList("G0038");
+  return QStringList() << "G0038";
 }
 
 QStringList cmd_get_eepromSize(QStringList argList) {
   (void) argList;
-  return QStringList("G0039");
+  return QStringList() << "G0039";
 }
 
 QStringList cmd_get_hardwareRevision(QStringList argList) {
   (void) argList;
-  return QStringList("G003A");
+  return QStringList() << "G003A";
 }
 
 QStringList cmd_get_wirelessPanId(QStringList argList) {
   (void) argList;
-  return QStringList("G003B");
+  return QStringList() << "G003B";
 }
 
 QStringList cmd_set_wirelessPanId(QStringList argList) {
-  return QStringList(QString("S003B %1").arg(argList.at(0)));
+  return QStringList() << QString("S003B %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_wirelessChannelMask(QStringList argList) {
   (void) argList;
-  return QStringList("G003C");
+  return QStringList() << "G003C";
 }
 
 QStringList cmd_set_wirelessChannelMask(QStringList argList) {
-  return QStringList(QString("S003C %1").arg(argList.at(0)));
+  return QStringList() << QString("S003C %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_wirelessShortAddress(QStringList argList) {
   (void) argList;
-  return QStringList("G003D");
+  return QStringList() << "G003D";
 }
 
 QStringList cmd_set_wirelessShortAddress(QStringList argList) {
-  return QStringList(QString("S003D %1").arg(argList.at(0)));
+  return QStringList() << QString("S003D %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_wirelessRole(QStringList argList) {
   (void) argList;
-  return QStringList("G003E");
+  return QStringList() << "G003E";
 }
 
 QStringList cmd_set_wirelessRole(QStringList argList) {
-  return QStringList(QString("S003E %1").arg(argList.at(0)));
+  return QStringList() << QString("S003E %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_wirelessWatchdogHold(QStringList argList) {
   (void) argList;
-  return QStringList("G003F");
+  return QStringList() << "G003F";
 }
 
 QStringList cmd_set_wirelessWatchdogHold(QStringList argList) {
-  return QStringList(QString("S003F %1").arg(argList.at(0)));
+  return QStringList() << QString("S003F %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_wirelessWatchdogPeriod(QStringList argList) {
   (void) argList;
-  return QStringList("G0040");
+  return QStringList() << "G0040";
 }
 
 QStringList cmd_set_wirelessWatchdogPeriod(QStringList argList) {
-  return QStringList(QString("S0040 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0040 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_firmwareCode(QStringList argList) {
   (void) argList;
-  return QStringList("G0041");
+  return QStringList() << "G0041";
 }
 
 QStringList cmd_get_moduleFirmwareCode(QStringList argList) {
   (void) argList;
-  return QStringList("G0042");
+  return QStringList() << "G0042";
 }
 
 QStringList cmd_get_maxTemperatureObserved(QStringList argList) {
   (void) argList;
-  return QStringList("G0043");
+  return QStringList() << "G0043";
 }
 
 QStringList cmd_get_maxTemperatureObservedTime(QStringList argList) {
   (void) argList;
-  return QStringList("G0044");
+  return QStringList() << "G0044";
 }
 
 QStringList cmd_get_overTemperatureThresholdLow(QStringList argList) {
   (void) argList;
-  return QStringList("G0045");
+  return QStringList() << "G0045";
 }
 
 QStringList cmd_set_overTemperatureThresholdLow(QStringList argList) {
-  return QStringList(QString("S0045 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0045 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_overTemperatureThresholdHigh(QStringList argList) {
   (void) argList;
-  return QStringList("G0046");
+  return QStringList() << "G0046";
 }
 
 QStringList cmd_set_overTemperatureThresholdHigh(QStringList argList) {
-  return QStringList(QString("S0046 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0046 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_overTemperatureDimmingLimit(QStringList argList) {
   (void) argList;
-  return QStringList("G0047");
+  return QStringList() << "G0047";
 }
 
 QStringList cmd_set_overTemperatureDimmingLimit(QStringList argList) {
-  return QStringList(QString("S0047 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0047 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_analogDimmingMode(QStringList argList) {
   (void) argList;
-  return QStringList("G0048");
+  return QStringList() << "G0048";
 }
 
 QStringList cmd_set_analogDimmingMode(QStringList argList) {
-  return QStringList(QString("S0048 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0048 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_fixtureIdMode(QStringList argList) {
   (void) argList;
-  return QStringList("G0049");
+  return QStringList() << "G0049";
 }
 
 QStringList cmd_set_fixtureIdMode(QStringList argList) {
-  return QStringList(QString("S0049 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0049 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_acFrequency(QStringList argList) {
   (void) argList;
-  return QStringList("G004A");
+  return QStringList() << "G004A";
 }
 
 QStringList cmd_get_sensorBits(QStringList argList) {
   (void) argList;
-  return QStringList("G004B");
+  return QStringList() << "G004B";
 }
 
 QStringList cmd_get_powerMeterCommand(QStringList argList) {
   (void) argList;
-  return QStringList("G004C");
+  return QStringList() << "G004C";
 }
 
 QStringList cmd_set_powerMeterCommond(QStringList argList) {
-  return QStringList(QString("S004C %1").arg(argList.at(0)));
+  return QStringList() << QString("S004C %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerMeterRegister(QStringList argList) {
   (void) argList;
-  return QStringList("G004D");
+  return QStringList() << "G004D";
 }
 
 QStringList cmd_set_powerMetereRegister(QStringList argList) {
-  return QStringList(QString("S004D %1").arg(argList.at(0)));
+  return QStringList() << QString("S004D %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_ambientTemperature(QStringList argList) {
   (void) argList;
-  return QStringList("G004E");
+  return QStringList() << "G004E";
 }
 
 QStringList cmd_get_lightSensorLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G004F");
+  return QStringList() << "G004F";
 }
 
 QStringList cmd_get_sensor0Timeout(QStringList argList) {
   (void) argList;
-  return QStringList("G0050");
+  return QStringList() << "G0050";
 }
 
 QStringList cmd_set_sensor0Timeout(QStringList argList) {
-  return QStringList(QString("S0050 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0050 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_sensor0Offset(QStringList argList) {
   (void) argList;
-  return QStringList("G0051");
+  return QStringList() << "G0051";
 }
 
 QStringList cmd_set_sensor0Offset(QStringList argList) {
-  return QStringList(QString("S0051 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0051 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_sensor1Timeout(QStringList argList) {
   (void) argList;
-  return QStringList("G0052");
+  return QStringList() << "G0052";
 }
 
 QStringList cmd_set_sensor1Timeout(QStringList argList) {
-  return QStringList(QString("S0052 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0052 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_sensor1Offset(QStringList argList) {
   (void) argList;
-  return QStringList("G0053");
+  return QStringList() << "G0053";
 }
 
 QStringList cmd_set_sensor1Offset(QStringList argList) {
-  return QStringList(QString("S0053 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0053 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_analogDimmingLowValue(QStringList argList) {
   (void) argList;
-  return QStringList("G0054");
+  return QStringList() << "G0054";
 }
 
 QStringList cmd_set_analogDimmingLowValue(QStringList argList) {
-  return QStringList(QString("S0054 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0054 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_analogDimmingHighValue(QStringList argList) {
   (void) argList;
-  return QStringList("G0055");
+  return QStringList() << "G0055";
 }
 
 QStringList cmd_set_analogDimmingHighValue(QStringList argList) {
-  return QStringList(QString("S0055 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0055 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_analogDimmingOffValue(QStringList argList) {
   (void) argList;
-  return QStringList("G0056");
+  return QStringList() << "G0056";
 }
 
 QStringList cmd_set_analogDimmingOffValue(QStringList argList) {
-  return QStringList(QString("S0056 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0056 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerMeasurementMode(QStringList argList) {
   (void) argList;
-  return QStringList("G0057");
+  return QStringList() << "G0057";
 }
 
 QStringList cmd_set_powerMeasurementMode(QStringList argList) {
-  return QStringList(QString("S0057 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0057 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_externalPowerMeter(QStringList argList) {
   (void) argList;
-  return QStringList("G0058");
+  return QStringList() << "G0058";
 }
 
 QStringList cmd_set_externalPowerMeter(QStringList argList) {
-  return QStringList(QString("S0058 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0058 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_ambientSensorValue(QStringList argList) {
   (void) argList;
-  return QStringList("G0059");
+  return QStringList() << "G0059";
 }
 
 QStringList cmd_get_ambientActiveLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G005A");
+  return QStringList() << "G005A";
 }
 
 QStringList cmd_set_ambientActiveLevel(QStringList argList) {
-  return QStringList(QString("S005A %1").arg(argList.at(0)));
+  return QStringList() << QString("S005A %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_ambientInactiveLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G005B");
+  return QStringList() << "G005B";
 }
 
 QStringList cmd_set_ambientInactiveLevel(QStringList argList) {
-  return QStringList(QString("S005B %1").arg(argList.at(0)));
+  return QStringList() << QString("S005B %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_ambientEnvironmentalGain(QStringList argList) {
   (void) argList;
-  return QStringList("G005C");
+  return QStringList() << "G005C";
 }
 
 QStringList cmd_set_ambientEnvironmentalGain(QStringList argList) {
-  return QStringList(QString("S005C %1").arg(argList.at(0)));
+  return QStringList() << QString("S005C %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_ambientOffHysteresis(QStringList argList) {
   (void) argList;
-  return QStringList("G005D");
+  return QStringList() << "G005D";
 }
 
 QStringList cmd_set_ambientOffHysteresis(QStringList argList) {
-  return QStringList(QString("S005D %1").arg(argList.at(0)));
+  return QStringList() << QString("S005D %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_ambientOnHysteresis(QStringList argList) {
   (void) argList;
-  return QStringList("G005E");
+  return QStringList() << "G005E";
 }
 
 QStringList cmd_set_ambientOnHystereis(QStringList argList) {
-  return QStringList(QString("S005E %1").arg(argList.at(0)));
+  return QStringList() << QString("S005E %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerboardProtocol(QStringList argList) {
   (void) argList;
-  return QStringList("G005F");
+  return QStringList() << "G005F";
 }
 
 QStringList cmd_get_ledOverride(QStringList argList) {
   (void) argList;
-  return QStringList("G0060");
+  return QStringList() << "G0060";
 }
 
 QStringList cmd_set_ledOverride(QStringList argList) {
-  return QStringList(QString("S0060 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0060 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_fadeUpStep(QStringList argList) {
   (void) argList;
-  return QStringList("G0061");
+  return QStringList() << "G0061";
 }
 
 QStringList cmd_set_fadeUpStep(QStringList argList) {
-  return QStringList(QString("S0061 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0061 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_fadeDownStep(QStringList argList) {
   (void) argList;
-  return QStringList("G0062");
+  return QStringList() << "G0062";
 }
 
 QStringList cmd_set_fadeDownStep(QStringList argList) {
-  return QStringList(QString("S0062 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0062 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_maxBrightness(QStringList argList) {
   (void) argList;
-  return QStringList("G0063");
+  return QStringList() << "G0063";
 }
 
 QStringList cmd_set_maxBrightness(QStringList argList) {
-  return QStringList(QString("S0063 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0063 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_i2cResets(QStringList argList) {
   (void) argList;
-  return QStringList("G0064");
+  return QStringList() << "G0064";
 }
 
 QStringList cmd_get_sensorGuardTime(QStringList argList) {
   (void) argList;
-  return QStringList("G0065");
+  return QStringList() << "G0065";
 }
 
 QStringList cmd_set_sensorGuardTime(QStringList argList) {
-  return QStringList(QString("S0065 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0065 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_inputVoltage(QStringList argList) {
   (void) argList;
-  return QStringList("G0066");
+  return QStringList() << "G0066";
 }
 
 QStringList cmd_get_inputVoltageCalibration(QStringList argList) {
   (void) argList;
-  return QStringList("G0067");
+  return QStringList() << "G0067";
 }
 
 QStringList cmd_set_inputVoltageCalibration(QStringList argList) {
-  return QStringList(QString("S0067 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0067 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_numberOfLightbars(QStringList argList) {
   (void) argList;
-  return QStringList("G0068");
+  return QStringList() << "G0068";
 }
 
 QStringList cmd_set_numberOfLightbars(QStringList argList) {
-  return QStringList(QString("S0068 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0068 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_ambientDivisor(QStringList argList) {
   (void) argList;
-  return QStringList("G0069");
+  return QStringList() << "G0069";
 }
 
 QStringList cmd_get_currentLimit(QStringList argList) {
   (void) argList;
-  return QStringList("G006A");
+  return QStringList() << "G006A";
 }
 
 QStringList cmd_set_currentLimit(QStringList argList) {
-  return QStringList(QString("S006A %1").arg(argList.at(0)));
+  return QStringList() << QString("S006A %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_bootloaderCode(QStringList argList) {
   (void) argList;
-  return QStringList("G006B");
+  return QStringList() << "G006B";
 }
 
 QStringList cmd_get_xpressMode(QStringList argList) {
   (void) argList;
-  return QStringList("G006C");
+  return QStringList() << "G006C";
 }
 
 QStringList cmd_set_xpressMode(QStringList argList) {
-  return QStringList(QString("S006C %1").arg(argList.at(0)));
+  return QStringList() << QString("S006C %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_batteryBackupStatus(QStringList argList) {
   (void) argList;
-  return QStringList("G006D");
+  return QStringList() << "G006D";
 }
 
 QString parse_get_batteryBackupStatus(QStringList pmuResponse) {
@@ -879,144 +879,144 @@ QString parse_get_batteryBackupStatus(QStringList pmuResponse) {
 }
 
 QStringList cmd_set_batteryBackupStatus(QStringList argList) {
-  return QStringList(QString("S006D %1").arg(argList.at(0)));
+  return QStringList() << QString("S006D %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_sensorSeconds(QStringList argList) {
   (void) argList;
-  return QStringList("G006E");
+  return QStringList() << "G006E";
 }
 
 QStringList cmd_get_inputVoltageTwo(QStringList argList) {
   (void) argList;
-  return QStringList("G006F");
+  return QStringList() << "G006F";
 }
 
 QStringList cmd_get_inputVoltageTwoCalibration(QStringList argList) {
   (void) argList;
-  return QStringList("G0070");
+  return QStringList() << "G0070";
 }
 
 QStringList cmd_set_inputVoltageTwoCalibration(QStringList argList) {
-  return QStringList(QString("S0070 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0070 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_maxRampUpSpeed(QStringList argList) {
   (void) argList;
-  return QStringList("G0071");
+  return QStringList() << "G0071";
 }
 
 QStringList cmd_set_maxRampUpSpeed(QStringList argList) {
-  return QStringList(QString("S0071 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0071 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_maxRampDownSpeed(QStringList argList) {
   (void) argList;
-  return QStringList("G0072");
+  return QStringList() << "G0072";
 }
 
 QStringList cmd_set_maxRampDownSpeed(QStringList argList) {
-  return QStringList(QString("S0072 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0072 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_wirelessNetworkKey(QStringList argList) {
   (void) argList;
-  return QStringList("G0073");
+  return QStringList() << "G0073";
 }
 
 QStringList cmd_set_wirelessNetworkKey(QStringList argList) {
-  return QStringList(QString("S0073 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0073 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_emergentLightLevel(QStringList argList) {
   (void) argList;
-  return QStringList("G0074");
+  return QStringList() << "G0074";
 }
 
 QStringList cmd_get_batteryBackupPowerCalibration(QStringList argList) {
   (void) argList;
-  return QStringList("G0075");
+  return QStringList() << "G0075";
 }
 
 QStringList cmd_set_batteryBackupPowerCalibration(QStringList argList) {
-  return QStringList(QString("S0075 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0075 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_motionSensorProfile(QStringList argList) {
   (void) argList;
-  return QStringList("G0076");
+  return QStringList() << "G0076";
 }
 
 QStringList cmd_set_motionSensorProfile(QStringList argList) {
-  return QStringList(QString("S0076 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0076 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerMeterLevelAtOff(QStringList argList) {
   (void) argList;
-  return QStringList("G0077");
+  return QStringList() << "G0077";
 }
 
 QStringList cmd_set_powerMeterLevelAtOff(QStringList argList) {
-  return QStringList(QString("S0077 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0077 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerMeterLevelAtMin(QStringList argList) {
   (void) argList;
-  return QStringList("G0078");
+  return QStringList() << "G0078";
 }
 
 QStringList cmd_set_powerMeterLevelAtMin(QStringList argList) {
-  return QStringList(QString("S0078 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0078 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerMeterLevelAtMax(QStringList argList) {
   (void) argList;
-  return QStringList("G0079");
+  return QStringList() << "G0079";
 }
 
 QStringList cmd_set_powerMeterLevelAtMax(QStringList argList) {
-  return QStringList(QString("S0079 %1").arg(argList.at(0)));
+  return QStringList() << QString("S0079 %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_powerMeterType(QStringList argList) {
   (void) argList;
-  return QStringList("G007A");
+  return QStringList() << "G007A";
 }
 
 QStringList cmd_set_powerMeterType(QStringList argList) {
-  return QStringList(QString("S007C %1").arg(argList.at(0)));
+  return QStringList() << QString("S007C %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_DLAiSlaveMode(QStringList argList) {
   (void) argList;
-  return QStringList("G007B");
+  return QStringList() << "G007B";
 }
 
 QStringList cmd_set_DLAiSlaveMode(QStringList argList) {
-  return QStringList(QString("S007B %1").arg(argList.at(0)));
+  return QStringList() << QString("S007B %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_DALIBootlodingActive(QStringList argList) {
   (void) argList;
-  return QStringList("G007C");
+  return QStringList() << "G007C";
 }
 
 QStringList cmd_get_testingMode(QStringList argList) {
   (void) argList;
-  return QStringList("G007D");
+  return QStringList() << "G007D";
 }
 
 QStringList cmd_set_testingMode(QStringList argList) {
-  return QStringList(QString("S007D %1").arg(argList.at(0)));
+  return QStringList() << QString("S007D %1").arg(argList.at(0));
 }
 
 QStringList cmd_get_numberOfBatteriesSupported(QStringList argList) {
   (void) argList;
-  return QStringList("G007E");
+  return QStringList() << "G007E";
 }
 
 QStringList cmd_set_numberOfBatteriesSupported(QStringList argList) {
-  return QStringList(QString("S007E %1").arg(argList.at(0)));
+  return QStringList() << QString("S007E %1").arg(argList.at(0));
 }
 
 /*** lightbar register commands ***/
@@ -1042,99 +1042,99 @@ QString parse_get_lbFirmwareVersion(QStringList pmuResponse) {
 /*** reset commands ***/
 QStringList cmd_reset_usage(QStringList argList) {
   (void) argList;
-  return QStringList("!U");
+  return QStringList() << "!U";
 }
 
 QStringList cmd_reset_log(QStringList argList) {
   (void) argList;
-  return QStringList("!L");
+  return QStringList() << "!L";
 }
 
 QStringList cmd_reset_newLog(QStringList argList) {
   (void) argList;
-  return QStringList("!K");
+  return QStringList() << "!K";
 }
 
 QStringList cmd_reset_eeprom(QStringList argList) {
   (void) argList;
-  return QStringList("!Z");
+  return QStringList() << "!Z";
 }
 
 QStringList cmd_reset_eepromToDefault(QStringList argList) {
   (void) argList;
-  return QStringList("!C");
+  return QStringList() << "!C";
 }
 
 QStringList cmd_reset_eepromToLatestMapVersion(QStringList argList) {
   (void) argList;
-  return QStringList("!E");
+  return QStringList() << "!E";
 }
 
 QStringList cmd_reset_network(QStringList argList) {
   (void) argList;
-  return QStringList("!N");
+  return QStringList() << "!N";
 }
 
 QStringList cmd_reset_networkWithoutChecking(QStringList argList) {
   (void) argList;
-  return QStringList("!N1");
+  return QStringList() << "!N1";
 }
 
 QStringList cmd_reset_daliCommissioning(QStringList argList) {
   (void) argList;
-  return QStringList("!Y");
+  return QStringList() << "!Y";
 }
 
 QStringList cmd_reset_daliPowerMetering(QStringList argList) {
   (void) argList;
-  return QStringList("!A");
+  return QStringList() << "!A";
 }
 
 /*** reboot commands ***/
 QStringList cmd_reboot_pmu(QStringList argList) {
   (void) argList;
-  return QStringList("!R");
+  return QStringList() << "!R";
 }
 
 QStringList cmd_reboot_wirelessCard(QStringList argList) {
   (void) argList;
-  return QStringList("!W");
+  return QStringList() << "!W";
 }
 
 QStringList cmd_reboot_i2cDevices(QStringList argList) {
   (void) argList;
-  return QStringList("!X");
+  return QStringList() << "!X";
 }
 
 /*** reload commands ***/
 QStringList cmd_reload_dlaFirmware(QStringList argList) {
   (void) argList;
-  return QStringList("!B");
+  return QStringList() << "!B";
 }
 
 QStringList cmd_reload_wirelessModuleFirmware(QStringList argList) {
   (void) argList;
-  return QStringList("!M");
+  return QStringList() << "!M";
 }
 
 QStringList cmd_reload_powerboardFirmware(QStringList argList) {
   (void) argList;
-  return QStringList("!P");
+  return QStringList() << "!P";
 }
 
 QStringList cmd_reload_lightbarFirmware(QStringList argList) {
   (void) argList;
-  return QStringList("!P");
+  return QStringList() << "!P";
 }
 
 QStringList cmd_reload_batteryBackupFirmware(QStringList argList) {
   (void) argList;
-  return QStringList("!P");
+  return QStringList() << "!P";
 }
 
 QStringList cmd_reload_motionSensorFirmware(QStringList argList) {
   (void) argList;
-  return QStringList("!V");
+  return QStringList() << "!V";
 }
 
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
