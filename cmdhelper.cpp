@@ -1045,14 +1045,18 @@ QStringList cmd_reset_usage(QStringList argList) {
   return QStringList() << "!U";
 }
 
-QStringList cmd_reset_log(QStringList argList) {
+QStringList cmd_reset_oldLog(QStringList argList) {
   (void) argList;
   return QStringList() << "!L";
 }
 
-QStringList cmd_reset_newLog(QStringList argList) {
+QStringList cmd_reset_log(QStringList argList) {
   (void) argList;
   return QStringList() << "!K";
+}
+
+QStringList cmd_reset_logIndex(QStringList argList) {
+  return QStringList() << QString("J%1").arg(argList.at(0));
 }
 
 QStringList cmd_reset_eeprom(QStringList argList) {
@@ -1135,6 +1139,86 @@ QStringList cmd_reload_batteryBackupFirmware(QStringList argList) {
 QStringList cmd_reload_motionSensorFirmware(QStringList argList) {
   (void) argList;
   return QStringList() << "!V";
+}
+
+/*** log commands ***/
+QStringList cmd_get_logIndex(QStringList argList) {
+  (void) argList;
+  return QStringList() << "K";
+}
+
+QString parse_get_logIndex(QStringList pmuResponse) {
+  QString arg1 = pmuResponse.at(0);
+  QString head = arg1.left(4);
+  arg1.remove(0, 4);
+  QString tail = arg1.left(4);
+  arg1.remove(0, 4);
+  QString first = arg1.left(4);
+  if (first == "FFFF") {
+    first = "none";
+  }
+  return QString("head: %1<br>tail: %2<br>first recent: %3").arg(head).arg(tail).arg(first);
+}
+
+QStringList cmd_get_log(QStringList argList) {
+  QString index;
+  if (argList.length() == 0) {
+    index = "0000";
+  } else {
+    index = argList.at(0);
+  }
+  return QStringList() << QString("K%1").arg(index);
+}
+
+QString parse_get_log(QStringList pmuResponse) {
+  QMap <QString, QString> eventTypeMap;
+  // build a dictionary of event types
+  eventTypeMap.insert("00", "Power event");
+  eventTypeMap.insert("01", "Activity state transition");
+  eventTypeMap.insert("02", "Not implemented");
+  eventTypeMap.insert("03", "Sensor off");
+  eventTypeMap.insert("04", "SerialNet watchdog tripped");
+  eventTypeMap.insert("05", "Temperature state change");
+  eventTypeMap.insert("06", "Lightbar error");
+  eventTypeMap.insert("07", "RTC set event");
+  eventTypeMap.insert("08", "Battery backup event");
+  eventTypeMap.insert("09", "I2C watchdog reset");
+  eventTypeMap.insert("0A", "Registers restored from backup");
+  QString arg1;
+  int uptimeSize, valueSize, uptime;
+  QString eventType, eventValue;
+  QString log;
+  bool ok;
+  bool isLastEntry;
+  arg1 = pmuResponse.at(0);
+  do {    
+    uptimeSize = arg1.left(1).toInt(&ok, 10);
+    if (uptimeSize > 7) {
+      isLastEntry = true;
+      uptimeSize -= 8;
+    } else {
+      isLastEntry = false;
+    }
+    arg1.remove(0, 1);
+    valueSize = arg1.left(1).toInt(&ok, 10);
+    arg1.remove(0, 1);
+    eventType = arg1.left(2);
+    arg1.remove(0, 2);
+    uptime = arg1.left(uptimeSize * 2).toInt(&ok, 10);
+    arg1.remove(0, uptimeSize * 2);
+    eventValue = arg1.left(valueSize * 2);
+    arg1.remove(0, valueSize * 2);
+    eventType = eventTypeMap[eventType];
+    log += QString("%1 > %2 : %3").arg(uptime).arg(eventType).arg(eventValue);
+    if (isLastEntry == false) {
+      log += "<br>";
+    }
+  } while (isLastEntry == false);
+  return log;
+}
+
+QStringList cmd_insert_logEntry(QStringList argList) {
+  return QStringList() << QString("E%1").arg(argList.at(0));
 }
 
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
@@ -1355,8 +1439,9 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("get lbFirmwareVersion", new pmu(cmd_get_lbFirmwareVersion, parse_get_lbFirmwareVersion));
   // reset commands
   m_cmdTable.insert("reset usage", new pmu(cmd_reset_usage));
+  m_cmdTable.insert("reset oldLog", new pmu(cmd_reset_oldLog));
   m_cmdTable.insert("reset log", new pmu(cmd_reset_log));
-  m_cmdTable.insert("reset newLog", new pmu(cmd_reset_newLog));
+  m_cmdTable.insert("reset logIndex", new pmu(cmd_reset_logIndex));
   m_cmdTable.insert("reset eeprom", new pmu(cmd_reset_eeprom));
   m_cmdTable.insert("reset eepromToDefault", new pmu(cmd_reset_eepromToDefault));
   m_cmdTable.insert("reset eepromToLatestMapVersion", new pmu(cmd_reset_eepromToLatestMapVersion));
@@ -1375,6 +1460,10 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("reload lightbarFirmware", new pmu(cmd_reload_lightbarFirmware));
   m_cmdTable.insert("reload batteryBackupFirmware", new pmu(cmd_reload_batteryBackupFirmware));
   m_cmdTable.insert("reload motionSensorFirmware", new pmu(cmd_reload_motionSensorFirmware));
+  // log commands
+  m_cmdTable.insert("get logIndex", new pmu(cmd_get_logIndex, parse_get_logIndex));
+  m_cmdTable.insert("get log", new pmu(cmd_get_log, parse_get_log));
+  m_cmdTable.insert("insert logEntry", new pmu(cmd_insert_logEntry));
   // build the dictionary of helper commands
   m_cmdCompleter = new QCompleter(m_cmdTable.keys(), this);
   m_cmdCompleter->setCaseSensitivity(Qt::CaseInsensitive);
