@@ -1171,49 +1171,120 @@ QStringList cmd_get_log(QStringList argList) {
 }
 
 QString parse_get_log(QStringList pmuResponse) {
-  QMap <QString, QString> eventTypeMap;
-  // build a dictionary of event types
-  eventTypeMap.insert("00", "Power event");
-  eventTypeMap.insert("01", "Activity state transition");
-  eventTypeMap.insert("02", "Not implemented");
-  eventTypeMap.insert("03", "Sensor off");
-  eventTypeMap.insert("04", "SerialNet watchdog tripped");
-  eventTypeMap.insert("05", "Temperature state change");
-  eventTypeMap.insert("06", "Lightbar error");
-  eventTypeMap.insert("07", "RTC set event");
-  eventTypeMap.insert("08", "Battery backup event");
-  eventTypeMap.insert("09", "I2C watchdog reset");
-  eventTypeMap.insert("0A", "Registers restored from backup");
   QString arg1;
-  int uptimeSize, valueSize, uptime;
+  int uptimeSize, valueSize, baseTime, uptime;
   QString eventType, eventValue;
   QString log;
   bool ok;
   bool isLastEntry;
   arg1 = pmuResponse.at(0);
-  do {    
-    uptimeSize = arg1.left(1).toInt(&ok, 10);
+  baseTime = 0;
+  do {
+    // assemble log entry
+    uptimeSize = arg1.left(1).toInt(&ok, 16);
+    // most significant bit of uptime size is last entry indicator
     if (uptimeSize > 7) {
       isLastEntry = true;
       uptimeSize -= 8;
     } else {
       isLastEntry = false;
     }
+    // strip elements from the log entry
     arg1.remove(0, 1);
-    valueSize = arg1.left(1).toInt(&ok, 10);
+    valueSize = arg1.left(1).toInt(&ok, 16);
     arg1.remove(0, 1);
     eventType = arg1.left(2);
     arg1.remove(0, 2);
-    uptime = arg1.left(uptimeSize * 2).toInt(&ok, 10);
+    uptime = arg1.left(uptimeSize * 2).toInt(&ok, 16);
     arg1.remove(0, uptimeSize * 2);
     eventValue = arg1.left(valueSize * 2);
     arg1.remove(0, valueSize * 2);
-    eventType = eventTypeMap[eventType];
-    log += QString("%1 > %2 : %3").arg(uptime).arg(eventType).arg(eventValue);
-    if (isLastEntry == false) {
-      log += "<br>";
+    // compute uptime
+    if (uptimeSize == 4) {
+      baseTime = uptime;
+    } else {
+      uptime += baseTime;
+      baseTime = uptime;
     }
-  } while (isLastEntry == false);
+    // parse log entry
+    if (eventType == "00") {
+      // build a dictionary of power events
+      QMap <QString, QString> powerEventsMap;
+      powerEventsMap.insert("00", "Power down");
+      powerEventsMap.insert("01", "Power up");
+      powerEventsMap.insert("02", "Power restored");
+      powerEventsMap.insert("03", "Power soft reset");
+      log += QString("%1 > %2").arg(uptime).arg(powerEventsMap[eventValue]);
+    } else if (eventType == "01") {
+      // build a dictionary of activity state transition events
+      QMap <QString, QString> activityStateTransitionEventsMap;
+      activityStateTransitionEventsMap.insert("00", "Fixture inactive");
+      activityStateTransitionEventsMap.insert("01", "Sensor 0 active");
+      activityStateTransitionEventsMap.insert("02", "Sensor 1 active");
+      activityStateTransitionEventsMap.insert("03", "Sensor 0 & Sensor 1 active");
+      activityStateTransitionEventsMap.insert("04", "Remote sensor active");
+      activityStateTransitionEventsMap.insert("05", "Remote sensor & sensor 0 active");
+      activityStateTransitionEventsMap.insert("06", "Remote sensor & sensor 1 active");
+      activityStateTransitionEventsMap.insert("07", "Remote sensor, sensor 0, and sensor 1 active");
+      log += QString("%1 > %2").arg(uptime).arg(activityStateTransitionEventsMap[eventValue]);
+    } else if (eventType == "02") {
+      // type 2 events are not implemented
+      log += QString("%1 > Type 2 event: %2").arg(uptime).arg(eventValue);
+    } else if (eventType == "03") {
+      log += QString("%1 > Sensor off: %2").arg(uptime).arg(eventValue);
+    } else if (eventType == "04") {
+      // unspecified value
+      log += QString("%1 > SerialNet watchdog tripped").arg(uptime);
+    } else if (eventType == "05") {
+      log += QString("%1 > Temperature state change: %2").arg(uptime).arg(eventValue);
+    } else if (eventType == "06") {
+      log += QString("%1 > Lightbar error: %2").arg(uptime).arg(eventValue);
+    } else if (eventType == "07") {
+      log += QString("%1 > RTC set event: %2").arg(uptime).arg(eventValue);
+    } else if (eventType == "08") {
+      int batteryNumber;
+      // build a dictionary of battery backup events
+      QMap <QString, QString> batteryBackupEventsMap;
+      batteryBackupEventsMap.insert("00", "Power activated");
+      batteryBackupEventsMap.insert("01", "Power deactivated");
+      batteryBackupEventsMap.insert("02", "Power failure [battery disconnected]");
+      batteryBackupEventsMap.insert("03", "Power failure [battery over temperature]");
+      batteryBackupEventsMap.insert("04", "Power failure [lightbar current sourced from PSU, not battery]");
+      batteryBackupEventsMap.insert("05", "Power failure [backup power voltage out of range]");
+      batteryBackupEventsMap.insert("06", "Power failure [battery drained]");
+      batteryBackupEventsMap.insert("07", "Power failure [unexpected lightbar pattern or pattern could not be verified]");
+      batteryBackupEventsMap.insert("08", "Battery test started");
+      batteryBackupEventsMap.insert("09", "Battery test stopped");
+      batteryBackupEventsMap.insert("0A", "Error [battery disconnected]");
+      batteryBackupEventsMap.insert("0B", "Error [charge temperature exceeded]");
+      batteryBackupEventsMap.insert("0C", "Last error cleared");
+      batteryBackupEventsMap.insert("0D", "Power failure [UL/CE mismatch]");
+      // parse battery number from event value
+      if (eventValue.at(0) != '0') {
+        eventValue.replace(0, 1, "0");
+        batteryNumber = 1;
+      } else {
+        batteryNumber = 0;
+      }
+      log += QString("%1 > Battery backup %2 event: %3").arg(uptime).arg(batteryNumber).arg(batteryBackupEventsMap[eventValue]);
+    } else if (eventType == "09") {
+      log += QString("%1 > I2C watchdog reset event: %2").arg(uptime).arg(eventValue);
+    } else if (eventType == "0A") {
+      // unspecified value
+      log += QString("%1 > Registers restored from backup").arg(uptime);
+    } else {
+      // unknown event
+      log += QString("%1 > Type %2 event: %3").arg(uptime).arg(eventType).arg(eventValue);
+    }
+    // insert a break
+    log += "<br>";
+  } while (arg1.isEmpty() != true);
+  // notify the user that more logs are available
+  if (isLastEntry == true) {
+    log += "[End of log]";
+  } else {
+    log += "[More events available...]";
+  }
   return log;
 }
 
