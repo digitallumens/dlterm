@@ -63,12 +63,17 @@ QString MainWindow::processUserRequest(QString *request) {
   QStringList responseList;
   QString errorResponse;
   QString response;
-  // request format "verb object argList"
-  // ex: set serialNumber 0400DEAD
-  argList = request->split(" ");
-  cmd = argList.at(0) + " " + argList.at(1);
-  argList.removeFirst();
-  argList.removeFirst();
+  if (request->contains(" ")) {
+    // helper command format "verb object argList"
+    // ex: set serialNumber 0400DEAD
+    argList = request->split(" ");
+    cmd = argList.at(0) + " " + argList.at(1);
+    argList.removeFirst();
+    argList.removeFirst();
+  } else {
+    // doesn't look like a helper command...
+    cmd = *request;
+  }
   // find the associated helper entry
   struct pmu *pmu = m_cmdHelper->m_cmdTable[cmd];
   if (pmu == NULL) {
