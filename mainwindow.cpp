@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "preferencesdialog.h"
 #include "dllib.h"
 #include <QDate>
 #include <QTime>
@@ -7,6 +8,7 @@
 #include <QFileDialog>
 #include <QKeyEvent>
 #include <QScrollBar>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui(new Ui::MainWindow),
@@ -26,6 +28,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui->commandLine->setPlaceholderText("Press ⌘K to establish a connection.");
   // disable tab focus policy
   ui->outputFeed->setFocusPolicy(Qt::NoFocus);
+  // hint to OSX about the role of these menu items
+  ui->actionAbout->setMenuRole(QAction::AboutRole);
+  ui->actionPreferences->setMenuRole(QAction::PreferencesRole);
   // create the discovery agent
   m_discoveryAgent = new DiscoveryAgent();
   Q_CHECK_PTR(m_discoveryAgent);
@@ -218,13 +223,9 @@ void MainWindow::on_actionDisconnect_triggered() {
   ui->actionConnect->setVisible(true);
   ui->actionUseFTDICable->setDisabled(false);
   ui->actionUseTelegesisAdapter->setDisabled(false);
-  ui->actionConfigure->setDisabled(false);
+  ui->actionPreferences->setDisabled(false);
   ui->commandLine->setPlaceholderText("Press ⌘K to establish a connection.");
   this->setWindowTitle("DLTerm (Disconnected)");
-}
-
-void MainWindow::on_actionConfigure_triggered() {
-  qDebug() << "configure all the things!";
 }
 
 void MainWindow::on_actionClear_Output_triggered() {
@@ -250,7 +251,20 @@ void MainWindow::slotPMUDiscovered(PMU* pmu) {
   ui->actionDisconnect->setVisible(true);
   ui->actionUseFTDICable->setDisabled(true);
   ui->actionUseTelegesisAdapter->setDisabled(true);
-  ui->actionConfigure->setDisabled(true);
+  ui->actionPreferences->setDisabled(true);
   ui->commandLine->setPlaceholderText("Type a command here. Terminate by pressing ENTER.");
   this->setWindowTitle("DLTerm (Connected)");
+}
+
+void MainWindow::on_actionPreferences_triggered() {
+  connectionDialog d(this);
+  d.exec();
+}
+
+void MainWindow::on_actionAbout_triggered() {
+  QMessageBox::about(this, "About DLTerm",
+                     tr("<p><b>Digital Lumens Terminal</b></p>"
+                        "<p><small>Version 0.1.0</small></p>"
+                        "<p><small>Build date 9/22/15</small></p>"
+                        "<small>Copyright &copy; 2010-2014. All rights reserved.</small>"));
 }

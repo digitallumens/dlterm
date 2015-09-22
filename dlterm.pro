@@ -16,14 +16,17 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     cmdhelper.cpp \
     cmdhistory.cpp \
-    solarized.cpp
+    solarized.cpp \
+    preferencesdialog.cpp
 
 HEADERS  += mainwindow.h \
     cmdhelper.h \
     cmdhistory.h \
-    solarized.h
+    solarized.h \
+    preferencesdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    preferencesdialog.ui
 
 DLLIB_DIR = ../DLLib
 

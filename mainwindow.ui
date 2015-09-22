@@ -88,9 +88,9 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuConnection">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>Connection</string>
+     <string>File</string>
     </property>
     <addaction name="actionUseFTDICable"/>
     <addaction name="actionUseTelegesisAdapter"/>
@@ -98,13 +98,10 @@
     <addaction name="actionConnect"/>
     <addaction name="actionDisconnect"/>
     <addaction name="separator"/>
-    <addaction name="actionConfigure"/>
-   </widget>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
     <addaction name="actionSave_Output_to_File"/>
+    <addaction name="separator"/>
+    <addaction name="actionPreferences"/>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -116,7 +113,6 @@
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
-   <addaction name="menuConnection"/>
   </widget>
   <action name="actionUseFTDICable">
    <property name="checkable">
@@ -159,14 +155,6 @@
     <string>Ctrl+K</string>
    </property>
   </action>
-  <action name="actionConfigure">
-   <property name="text">
-    <string>Configure</string>
-   </property>
-   <property name="toolTip">
-    <string>Configure Connection</string>
-   </property>
-  </action>
   <action name="actionClear_Output">
    <property name="text">
     <string>Clear Output</string>
@@ -194,6 +182,22 @@
   <action name="actionSave_Output_to_File">
    <property name="text">
     <string>Save Output to File</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::PreferencesRole</enum>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
  </widget>
