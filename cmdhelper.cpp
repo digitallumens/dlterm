@@ -1021,13 +1021,17 @@ QStringList cmd_set_numberOfBatteriesSupported(QStringList argList) {
 
 /*** lightbar register commands ***/
 QStringList cmd_get_lbVersion(QStringList argList) {
+  QString barNum;
   QStringList cmdList;
-  if (argList.length() != 1) {
+  if (argList.length() == 0) {
+    barNum = "00";
+  } else if (argList.length() == 1) {
+   barNum = argList.at(0);
+  } else {
     cmdList << "ERROR: expected bar number<br>";
     cmdList << "Example: get lbVersion 00";
     return cmdList;
   }
-  QString barNum = argList.at(0);
   cmdList << QString("R%1%2").arg(barNum).arg("00"); // protocol version
   cmdList << QString("R%1%2").arg(barNum).arg("01"); // firmware code high
   cmdList << QString("R%1%2").arg(barNum).arg("02"); // firmware code low
@@ -1048,13 +1052,17 @@ QString parse_get_lbVersion(QStringList pmuResponse) {
 }
 
 QStringList cmd_get_lbStatus(QStringList argList) {
+  QString barNum;
   QStringList cmdList;
-  if (argList.length() != 1) {
+  if (argList.length() == 0) {
+    barNum = "00";
+  } else if (argList.length() == 1) {
+   barNum = argList.at(0);
+  } else {
     cmdList << "ERROR: expected bar number<br>";
     cmdList << "Example: get lbStatus 00";
     return cmdList;
   }
-  QString barNum = argList.at(0);
   cmdList << QString("R%1%2").arg(barNum).arg("40"); // status
   cmdList << QString("R%1%2").arg(barNum).arg("41"); // string 1 current
   cmdList << QString("R%1%2").arg(barNum).arg("42"); // string 2 current
@@ -1064,6 +1072,9 @@ QStringList cmd_get_lbStatus(QStringList argList) {
   cmdList << QString("R%1%2").arg(barNum).arg("46"); // temperature
   cmdList << QString("R%1%2").arg(barNum).arg("47"); // string current sum
   cmdList << QString("R%1%2").arg(barNum).arg("48"); // voltage reference
+  cmdList << QString("R%1%2").arg(barNum).arg("80"); // light level
+  cmdList << QString("R%1%2").arg(barNum).arg("81"); // light active slew rate
+  cmdList << QString("R%1%2").arg(barNum).arg("82"); // light inactive slew rate
   return cmdList;
 }
 
@@ -1087,11 +1098,200 @@ QString parse_get_lbStatus(QStringList pmuResponse) {
   statusInt = pmuResponse.at(5).toUShort(&ok, 16);
   parsedResponse += QString("String current minimum: %1 mA<br>").arg(statusInt);
   statusInt = pmuResponse.at(6).toUShort(&ok, 16);
-  parsedResponse += QString("Temperature: %1 Celsius<br>").arg(statusInt);
+  parsedResponse += QString("Temperature: %1 C<br>").arg(statusInt);
   statusInt = pmuResponse.at(7).toUShort(&ok, 16);
   parsedResponse += QString("String current sum: %1 mA<br>").arg(statusInt);
   statusInt = pmuResponse.at(8).toUShort(&ok, 16);
-  parsedResponse += QString("Voltage reference: %1 volts").arg(statusInt);
+  parsedResponse += QString("Voltage reference: %1 volts<br>").arg(statusInt);
+  parsedResponse += QString("Light level (0x029C = OFF): %1<br>").arg(pmuResponse.at(9));
+  parsedResponse += QString("Light active slew rate: %1<br>").arg(pmuResponse.at(10));
+  parsedResponse += QString("Light inactive slew rate: %1").arg(pmuResponse.at(11));
+  return parsedResponse;
+}
+
+QStringList cmd_get_lbConfig(QStringList argList) {
+  QString barNum;
+  QStringList cmdList;
+  if (argList.length() == 0) {
+    barNum = "00";
+  } else if (argList.length() == 1) {
+   barNum = argList.at(0);
+  } else {
+    cmdList << "ERROR: expected bar number<br>";
+    cmdList << "Example: get lbConfig 00";
+    return cmdList;
+  }
+  cmdList << QString("R%1%2").arg(barNum).arg("85"); // hardware rev
+  cmdList << QString("R%1%2").arg(barNum).arg("86"); // temperature cal
+  cmdList << QString("R%1%2").arg(barNum).arg("87"); // led device type
+  cmdList << QString("R%1%2").arg(barNum).arg("88"); // serial number high
+  cmdList << QString("R%1%2").arg(barNum).arg("89"); // serial number low
+  cmdList << QString("R%1%2").arg(barNum).arg("8A"); // current sense bypass threshold
+  cmdList << QString("R%1%2").arg(barNum).arg("8B"); // current sense bypass hystesis
+  cmdList << QString("R%1%2").arg(barNum).arg("8C"); // estimator current sense coefficient
+  cmdList << QString("R%1%2").arg(barNum).arg("8D"); // estimator current sense exponent
+  cmdList << QString("R%1%2").arg(barNum).arg("8E"); // bypass override temperature
+  cmdList << QString("R%1%2").arg(barNum).arg("8F"); // temperature throttle limit
+  return cmdList;
+}
+
+QString parse_get_lbConfig(QStringList pmuResponse) {
+  QString parsedResponse;
+  parsedResponse += QString("Hardware revision: %1<br>").arg(pmuResponse.at(0));
+  parsedResponse += QString("Temperature calibration: %1<br>").arg(pmuResponse.at(1));
+  parsedResponse += QString("LED device type: %1<br>").arg(pmuResponse.at(2));
+  parsedResponse += QString("Serial number: %1%2<br>").arg(pmuResponse.at(3)).arg(pmuResponse.at(4));
+  parsedResponse += QString("Current sense bypass threshold: %1<br>").arg(pmuResponse.at(5));
+  parsedResponse += QString("Current sense bypass hysteresis: %1<br>").arg(pmuResponse.at(6));
+  parsedResponse += QString("Estimator current sense coefficient: %1<br>").arg(pmuResponse.at(7));
+  parsedResponse += QString("Estimator current sense exponent: %1<br>").arg(pmuResponse.at(8));
+  parsedResponse += QString("Bypass override temperature: %1<br>").arg(pmuResponse.at(9));
+  parsedResponse += QString("Temperature throttle limit: %1").arg(pmuResponse.at(10));
+  return parsedResponse;
+}
+
+/*** battery backup register commands ***/
+QStringList cmd_get_bbVersion(QStringList argList) {
+  QString battNum;
+  QStringList cmdList;
+  if (argList.length() == 0) {
+    battNum = "C0";
+  } else if (argList.length() == 1) {
+    // map battery number to I2C address
+    if (argList.at(0) == "00") {
+      battNum = "C0";
+    } else {
+      battNum == "C2";
+    }
+  } else {
+    cmdList << "ERROR: expected battery number<br>";
+    cmdList << "Example: get bbVersion 00";
+    return cmdList;
+  }
+  cmdList << QString("R%1%2").arg(battNum).arg("00"); // protocol version
+  cmdList << QString("R%1%2").arg(battNum).arg("01"); // firmware code high
+  cmdList << QString("R%1%2").arg(battNum).arg("02"); // firmware code low
+  cmdList << QString("R%1%2").arg(battNum).arg("03"); // firmware version high
+  cmdList << QString("R%1%2").arg(battNum).arg("04"); // firmware version low
+  return cmdList;
+}
+
+QString parse_get_bbVersion(QStringList pmuResponse) {
+  bool ok;
+  QString parsedResponse;
+  quint16 verHiInt = pmuResponse.at(3).toUShort(&ok, 16);
+  quint16 verLoInt = pmuResponse.at(4).toUShort(&ok, 16);
+  parsedResponse += QString("Firmware version: %1.%2.%3<br>").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
+  parsedResponse += QString("Firmware code: %1%2<br>").arg(pmuResponse.at(1)).arg(pmuResponse.at(2));
+  parsedResponse += QString("Protocol version: %1").arg(pmuResponse.at(0));
+  return parsedResponse;
+}
+
+QStringList cmd_get_bbStatus(QStringList argList) {
+  QString battNum;
+  QStringList cmdList;
+  if (argList.length() == 0) {
+    battNum = "C0";
+  } else if (argList.length() == 1) {
+    // map battery number to I2C address
+    if (argList.at(0) == "00") {
+      battNum = "C0";
+    } else {
+      battNum == "C2";
+    }
+  } else {
+    cmdList << "ERROR: expected battery number<br>";
+    cmdList << "Example: get bbVersion 00";
+    return cmdList;
+  }
+  cmdList << QString("R%1%2").arg(battNum).arg("40"); // status
+  cmdList << QString("R%1%2").arg(battNum).arg("41"); // battery voltage
+  cmdList << QString("R%1%2").arg(battNum).arg("42"); // battery temperature
+  cmdList << QString("R%1%2").arg(battNum).arg("43"); // lightbar supply voltage
+  cmdList << QString("R%1%2").arg(battNum).arg("44"); // lightbar psu current
+  cmdList << QString("R%1%2").arg(battNum).arg("45"); // alarms
+  cmdList << QString("R%1%2").arg(battNum).arg("46"); // time to mode change
+  cmdList << QString("R%1%2").arg(battNum).arg("47"); // uptime minutes
+  cmdList << QString("R%1%2").arg(battNum).arg("48"); // uptime hours
+  cmdList << QString("R%1%2").arg(battNum).arg("49"); // error count
+  return cmdList;
+}
+
+QString parse_get_bbStatus(QStringList pmuResponse) {
+  bool ok;
+  QString parsedResponse;
+  QMap <int, QString> statusDict;
+  quint32 statusInt = pmuResponse.at(0).toLong(&ok, 16);
+  // parse mode bits
+  statusDict.insert(0, "Invalid");
+  statusDict.insert(1, "Charging");
+  statusDict.insert(2, "Standby");
+  statusDict.insert(3, "Error");
+  statusDict.insert(4, "Emergency");
+  statusDict.insert(5, "Test");
+  statusDict.insert(6, "Powerdown");
+  statusDict.insert(7, "Shutdown");
+  parsedResponse += QString("Mode: %1<br>").arg(statusDict[statusInt & 0xF]);
+  // parse battery status bits
+  statusDict.clear();
+  statusDict.insert(0, "Good");
+  statusDict.insert(1, "Disconnected");
+  statusDict.insert(2, "Fully charged");
+  statusDict.insert(3, "Fully discharged");
+  statusDict.insert(4, "Needs charge");
+  statusDict.insert(5, "Needs powerdown");
+  parsedResponse += QString("Battery status: %1<br>").arg(statusDict[(statusInt >> 4) & 0xF]);
+  // parse temperature status bits
+  statusDict.clear();
+  statusDict.insert(0, "Good");
+  statusDict.insert(1, "Charge limit exceeded");
+  statusDict.insert(2, "Emergency limit exceeded");
+  parsedResponse += QString("Temperature status: %1<br>").arg(statusDict[(statusInt >> 8) & 0x3]);
+  // parse lightbar voltage status bits
+  statusDict.clear();
+  statusDict.insert(0, "Good");
+  statusDict.insert(1, "Exceeded limits");
+  parsedResponse += QString("Lightbar voltage status: %1<br>").arg(statusDict[(statusInt >> 10) & 0x1]);
+  // parse lightbar current status bits
+  statusDict.clear();
+  statusDict.insert(0, "Good");
+  statusDict.insert(1, "Exceeded limits");
+  parsedResponse += QString("Lightbar current status: %1<br>").arg(statusDict[(statusInt >> 11) & 0x1]);
+  // parse test button status bits
+  statusDict.clear();
+  statusDict.insert(0, "Released");
+  statusDict.insert(1, "Pressed");
+  parsedResponse += QString("Test button status: %1<br>").arg(statusDict[(statusInt >> 12) & 0x1]);
+  // parse PSU status bits
+  statusDict.clear();
+  statusDict.insert(0, "Good");
+  statusDict.insert(1, "Failed");
+  parsedResponse += QString("PSU status: %1<br>").arg(statusDict[(statusInt >> 13) & 0x1]);
+  // parse certification mark status
+  statusDict.clear();
+  statusDict.insert(0, "UL");
+  statusDict.insert(1, "CE");
+  parsedResponse += QString("Certification mark: %1<br>").arg(statusDict[(statusInt >> 15) & 0x1]);
+  // other regs
+  statusInt = pmuResponse.at(1).toUShort(&ok, 16);
+  parsedResponse += QString("Battery voltage: %1 volts<br>").arg(0.04 * statusInt);
+  statusInt = pmuResponse.at(2).toUShort(&ok, 16);
+  parsedResponse += QString("Battery temperature: %1 C<br>").arg(0.125 * (statusInt - 164));
+  statusInt = pmuResponse.at(3).toUShort(&ok, 16);
+  parsedResponse += QString("Lightbar supply voltage: %1 volts<br>").arg(0.05 * statusInt);
+  statusInt = pmuResponse.at(4).toUShort(&ok, 16);
+  parsedResponse += QString("Lightbar PSU current: %1 mA<br>").arg(2.44 * statusInt);
+  statusInt = pmuResponse.at(5).toUShort(&ok, 16);
+  statusDict.clear();
+  statusDict.insert(0, "None");
+  statusDict.insert(1, "Battery voltage crossed max limit");
+  statusDict.insert(2, "Battery voltage crossed recharge limit");
+  parsedResponse += QString("Alarms: %1<br>").arg(statusDict[statusInt]);
+  statusInt = pmuResponse.at(6).toUShort(&ok, 16);
+  parsedResponse += QString("Time to mode change: %1 minutes<br>").arg(statusInt);
+  parsedResponse += QString("Uptime: %1 hours, %2 minutes<br>").arg(pmuResponse.at(8).toUShort(&ok, 16)).arg(pmuResponse.at(7).toUShort(&ok, 16));
+  statusInt = pmuResponse.at(9).toUShort(&ok, 16);
+  parsedResponse += QString("Error count: %1").arg(statusInt);
   return parsedResponse;
 }
 
@@ -1563,6 +1763,11 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   // get & set lightbar commands
   m_cmdTable.insert("get lbVersion", new pmu(cmd_get_lbVersion, parse_get_lbVersion));
   m_cmdTable.insert("get lbStatus", new pmu(cmd_get_lbStatus, parse_get_lbStatus));
+  m_cmdTable.insert("get lbConfig", new pmu(cmd_get_lbConfig, parse_get_lbConfig));
+  // get & set battery backup commands
+  m_cmdTable.insert("get bbVersion", new pmu(cmd_get_bbVersion, parse_get_bbVersion));
+  m_cmdTable.insert("get bbStatus", new pmu(cmd_get_bbStatus, parse_get_bbStatus));
+  //m_cmdTable.insert("get bbConfig", new pmu(cmd_get_bbConfig, parse_get_bbConfig));
   // reset commands
   m_cmdTable.insert("reset usage", new pmu(cmd_reset_usage));
   m_cmdTable.insert("reset oldLog", new pmu(cmd_reset_oldLog));
