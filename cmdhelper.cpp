@@ -1273,25 +1273,80 @@ QString parse_get_bbStatus(QStringList pmuResponse) {
   statusDict.insert(1, "CE");
   parsedResponse += QString("Certification mark: %1<br>").arg(statusDict[(statusInt >> 15) & 0x1]);
   // other regs
-  statusInt = pmuResponse.at(1).toUShort(&ok, 16);
-  parsedResponse += QString("Battery voltage: %1 volts<br>").arg(0.04 * statusInt);
-  statusInt = pmuResponse.at(2).toUShort(&ok, 16);
-  parsedResponse += QString("Battery temperature: %1 C<br>").arg(0.125 * (statusInt - 164));
-  statusInt = pmuResponse.at(3).toUShort(&ok, 16);
-  parsedResponse += QString("Lightbar supply voltage: %1 volts<br>").arg(0.05 * statusInt);
-  statusInt = pmuResponse.at(4).toUShort(&ok, 16);
-  parsedResponse += QString("Lightbar PSU current: %1 mA<br>").arg(2.44 * statusInt);
-  statusInt = pmuResponse.at(5).toUShort(&ok, 16);
+  parsedResponse += QString("Battery voltage: %1 volts<br>").arg(0.04 * pmuResponse.at(1).toUShort(&ok, 16));
+  parsedResponse += QString("Battery temperature: %1 C<br>").arg(0.125 * (pmuResponse.at(2).toUShort(&ok, 16) - 164));
+  parsedResponse += QString("Lightbar supply voltage: %1 volts<br>").arg(0.05 * pmuResponse.at(3).toUShort(&ok, 16));
+  parsedResponse += QString("Lightbar PSU current: %1 mA<br>").arg(2.44 * pmuResponse.at(4).toUShort(&ok, 16));
   statusDict.clear();
   statusDict.insert(0, "None");
   statusDict.insert(1, "Battery voltage crossed max limit");
   statusDict.insert(2, "Battery voltage crossed recharge limit");
-  parsedResponse += QString("Alarms: %1<br>").arg(statusDict[statusInt]);
-  statusInt = pmuResponse.at(6).toUShort(&ok, 16);
-  parsedResponse += QString("Time to mode change: %1 minutes<br>").arg(statusInt);
+  parsedResponse += QString("Alarms: %1<br>").arg(statusDict[pmuResponse.at(5).toUShort(&ok, 16)]);
+  parsedResponse += QString("Time to mode change: %1 minutes<br>").arg(pmuResponse.at(6).toUShort(&ok, 16));
   parsedResponse += QString("Uptime: %1 hours, %2 minutes<br>").arg(pmuResponse.at(8).toUShort(&ok, 16)).arg(pmuResponse.at(7).toUShort(&ok, 16));
-  statusInt = pmuResponse.at(9).toUShort(&ok, 16);
-  parsedResponse += QString("Error count: %1").arg(statusInt);
+  parsedResponse += QString("Error count: %1").arg(pmuResponse.at(9).toUShort(&ok, 16));
+  return parsedResponse;
+}
+
+QStringList cmd_get_bbConfig(QStringList argList) {
+  QString battNum;
+  QStringList cmdList;
+  if (argList.length() == 0) {
+    battNum = "C0";
+  } else if (argList.length() == 1) {
+    // map battery number to I2C address
+    if (argList.at(0) == "00") {
+      battNum = "C0";
+    } else {
+      battNum == "C2";
+    }
+  } else {
+    cmdList << "ERROR: expected battery number<br>";
+    cmdList << "Example: get bbConfig 00";
+    return cmdList;
+  }
+  cmdList << QString("R%1%2").arg(battNum).arg("82"); // hardware rev
+  cmdList << QString("R%1%2").arg(battNum).arg("83"); // temperature cal
+  cmdList << QString("R%1%2").arg(battNum).arg("84"); // serial number low word
+  cmdList << QString("R%1%2").arg(battNum).arg("85"); // serial number high word
+  cmdList << QString("R%1%2").arg(battNum).arg("86"); // charge time
+  cmdList << QString("R%1%2").arg(battNum).arg("87"); // trickle time
+  cmdList << QString("R%1%2").arg(battNum).arg("88"); // standby time
+  cmdList << QString("R%1%2").arg(battNum).arg("89"); // max battery voltage
+  cmdList << QString("R%1%2").arg(battNum).arg("8A"); // min battery voltage
+  cmdList << QString("R%1%2").arg(battNum).arg("8B"); // recharge battery voltage
+  cmdList << QString("R%1%2").arg(battNum).arg("8C"); // max charge temperature
+  cmdList << QString("R%1%2").arg(battNum).arg("8D"); // max emergency temperature
+  cmdList << QString("R%1%2").arg(battNum).arg("8E"); // min emergency verify voltage
+  cmdList << QString("R%1%2").arg(battNum).arg("8F"); // max emergency verify voltage
+  cmdList << QString("R%1%2").arg(battNum).arg("90"); // max lightbar PSU current
+  cmdList << QString("R%1%2").arg(battNum).arg("91"); // certification mark
+  cmdList << QString("R%1%2").arg(battNum).arg("92"); // shutdown time
+  cmdList << QString("R%1%2").arg(battNum).arg("93"); // product code low word
+  cmdList << QString("R%1%2").arg(battNum).arg("94"); // product code high word
+  return cmdList;
+}
+
+QString parse_get_bbConfig(QStringList pmuResponse) {
+  bool ok;
+  QString parsedResponse;
+  parsedResponse += QString("Hardware revision: %1<br>").arg(pmuResponse.at(0));
+  parsedResponse += QString("Temperature calibration: %1<br>").arg(pmuResponse.at(1));
+  parsedResponse += QString("Serial number: %1%2<br>").arg(pmuResponse.at(2)).arg(pmuResponse.at(3));
+  parsedResponse += QString("Charge time: %1 minutes<br>").arg(pmuResponse.at(4).toUShort(&ok, 16));
+  parsedResponse += QString("Trickle time: %1 minutes<br>").arg(pmuResponse.at(5).toUShort(&ok, 16));
+  parsedResponse += QString("Standby time: %1 minutes<br>").arg(pmuResponse.at(6).toUShort(&ok, 16));
+  parsedResponse += QString("Shutdown time: %1 minutes<br>").arg(pmuResponse.at(16).toUShort(&ok, 16));
+  parsedResponse += QString("Max battery voltage: %1 volts<br>").arg(pmuResponse.at(7).toUShort(&ok, 16) * 0.04);
+  parsedResponse += QString("Min battery voltage: %1 volts<br>").arg(pmuResponse.at(8).toUShort(&ok, 16) * 0.04);
+  parsedResponse += QString("Recharge battery voltage: %1 volts<br>").arg(pmuResponse.at(9).toUShort(&ok, 16) * 0.04);
+  parsedResponse += QString("Max charge temperature: %1 C<br>").arg((pmuResponse.at(10).toUShort(&ok, 16) - 164) * 0.125);
+  parsedResponse += QString("Max emergency temperature: %1 C<br>").arg((pmuResponse.at(11).toUShort(&ok, 16) - 164) * 0.125);
+  parsedResponse += QString("Min emergency verify voltage: %1 volts<br>").arg(pmuResponse.at(12).toUShort(&ok, 16) * 0.05);
+  parsedResponse += QString("Max emergency verify voltage: %1 volts<br>").arg(pmuResponse.at(13).toUShort(&ok, 16) * 0.05);
+  parsedResponse += QString("Max lightbar PSU current: %1 mA<br>").arg(pmuResponse.at(14).toUShort(&ok, 16) * 2.44);
+  parsedResponse += QString("Certification mark: %1<br>").arg((pmuResponse.at(15) == "0000") ? "UL" : "CE");
+  parsedResponse += QString("Product code: %1%2").arg(pmuResponse.at(17)).arg(pmuResponse.at(18));
   return parsedResponse;
 }
 
@@ -1767,7 +1822,7 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   // get & set battery backup commands
   m_cmdTable.insert("get bbVersion", new pmu(cmd_get_bbVersion, parse_get_bbVersion));
   m_cmdTable.insert("get bbStatus", new pmu(cmd_get_bbStatus, parse_get_bbStatus));
-  //m_cmdTable.insert("get bbConfig", new pmu(cmd_get_bbConfig, parse_get_bbConfig));
+  m_cmdTable.insert("get bbConfig", new pmu(cmd_get_bbConfig, parse_get_bbConfig));
   // reset commands
   m_cmdTable.insert("reset usage", new pmu(cmd_reset_usage));
   m_cmdTable.insert("reset oldLog", new pmu(cmd_reset_oldLog));
