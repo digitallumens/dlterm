@@ -88,6 +88,14 @@ QString MainWindow::processUserRequest(QString *request) {
   } else {
     // translate helper command
     cmdList = pmu->cmd(argList);
+    // command translator returned an error
+    if (cmdList.at(0).startsWith("ERROR")) {
+      QString errorResponse = cmdList.at(0);
+      QString helpResponse = cmdList.at(1);
+      m_solarized->setColor(&errorResponse, SOLAR_RED);
+      m_solarized->setColor(&helpResponse, SOLAR_BLUE);
+      return (errorResponse + helpResponse);
+    }
     m_solarized->setColor(request, SOLAR_YELLOW);
   }
   // send commands & get responses

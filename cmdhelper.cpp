@@ -1020,23 +1020,79 @@ QStringList cmd_set_numberOfBatteriesSupported(QStringList argList) {
 }
 
 /*** lightbar register commands ***/
-QStringList cmd_get_lbProtocolVersion(QStringList argList) {
-  return QStringList() << QString("R%1%2").arg(argList.at(0)).arg("00");
+QStringList cmd_get_lbVersion(QStringList argList) {
+  QStringList cmdList;
+  if (argList.length() != 1) {
+    cmdList << "ERROR: expected bar number<br>";
+    cmdList << "Example: get lbVersion 00";
+    return cmdList;
+  }
+  QString barNum = argList.at(0);
+  cmdList << QString("R%1%2").arg(barNum).arg("00"); // protocol version
+  cmdList << QString("R%1%2").arg(barNum).arg("01"); // firmware code high
+  cmdList << QString("R%1%2").arg(barNum).arg("02"); // firmware code low
+  cmdList << QString("R%1%2").arg(barNum).arg("03"); // firmware version high
+  cmdList << QString("R%1%2").arg(barNum).arg("04"); // firmware version low
+  return cmdList;
 }
 
-QStringList cmd_get_lbFirmwareCode(QStringList argList) {
-  return QStringList() << QString("R%1%2").arg(argList.at(0)).arg("01") << QString("R%1%2").arg(argList.at(0)).arg("02");
-}
-
-QStringList cmd_get_lbFirmwareVersion(QStringList argList) {
-  return QStringList() << QString("R%1%2").arg(argList.at(0)).arg("03") << QString("R%1%2").arg(argList.at(0)).arg("04");
-}
-
-QString parse_get_lbFirmwareVersion(QStringList pmuResponse) {
+QString parse_get_lbVersion(QStringList pmuResponse) {
   bool ok;
-  quint16 verHiInt = pmuResponse.at(0).toUShort(&ok, 16);
-  quint16 verLoInt = pmuResponse.at(1).toUShort(&ok, 16);
-  return QString("%1.%2.%3").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
+  QString parsedResponse;
+  quint16 verHiInt = pmuResponse.at(3).toUShort(&ok, 16);
+  quint16 verLoInt = pmuResponse.at(4).toUShort(&ok, 16);
+  parsedResponse += QString("Firmware version: %1.%2.%3<br>").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
+  parsedResponse += QString("Firmware code: %1%2<br>").arg(pmuResponse.at(1)).arg(pmuResponse.at(2));
+  parsedResponse += QString("Protocol version: %1").arg(pmuResponse.at(0));
+  return parsedResponse;
+}
+
+QStringList cmd_get_lbStatus(QStringList argList) {
+  QStringList cmdList;
+  if (argList.length() != 1) {
+    cmdList << "ERROR: expected bar number<br>";
+    cmdList << "Example: get lbStatus 00";
+    return cmdList;
+  }
+  QString barNum = argList.at(0);
+  cmdList << QString("R%1%2").arg(barNum).arg("40"); // status
+  cmdList << QString("R%1%2").arg(barNum).arg("41"); // string 1 current
+  cmdList << QString("R%1%2").arg(barNum).arg("42"); // string 2 current
+  cmdList << QString("R%1%2").arg(barNum).arg("43"); // string 3 current
+  cmdList << QString("R%1%2").arg(barNum).arg("44"); // string 4 current
+  cmdList << QString("R%1%2").arg(barNum).arg("45"); // string current minimum
+  cmdList << QString("R%1%2").arg(barNum).arg("46"); // temperature
+  cmdList << QString("R%1%2").arg(barNum).arg("47"); // string current sum
+  cmdList << QString("R%1%2").arg(barNum).arg("48"); // voltage reference
+  return cmdList;
+}
+
+QString parse_get_lbStatus(QStringList pmuResponse) {
+  bool ok;
+  quint16 statusInt = pmuResponse.at(0).toUShort(&ok, 16);
+  QString parsedResponse;
+  if (statusInt & 4) {
+    parsedResponse += "Bypass: activate<br>";
+  } else {
+    parsedResponse += "Bypass: inactive<br>";
+  }
+  statusInt = pmuResponse.at(1).toUShort(&ok, 16);
+  parsedResponse += QString("String 1 current: %1 mA<br>").arg(statusInt);
+  statusInt = pmuResponse.at(2).toUShort(&ok, 16);
+  parsedResponse += QString("String 2 current: %1 mA<br>").arg(statusInt);
+  statusInt = pmuResponse.at(3).toUShort(&ok, 16);
+  parsedResponse += QString("String 3 current: %1 mA<br>").arg(statusInt);
+  statusInt = pmuResponse.at(4).toUShort(&ok, 16);
+  parsedResponse += QString("String 4 current: %1 mA<br>").arg(statusInt);
+  statusInt = pmuResponse.at(5).toUShort(&ok, 16);
+  parsedResponse += QString("String current minimum: %1 mA<br>").arg(statusInt);
+  statusInt = pmuResponse.at(6).toUShort(&ok, 16);
+  parsedResponse += QString("Temperature: %1 Celsius<br>").arg(statusInt);
+  statusInt = pmuResponse.at(7).toUShort(&ok, 16);
+  parsedResponse += QString("String current sum: %1 mA<br>").arg(statusInt);
+  statusInt = pmuResponse.at(8).toUShort(&ok, 16);
+  parsedResponse += QString("Voltage reference: %1 volts").arg(statusInt);
+  return parsedResponse;
 }
 
 /*** reset commands ***/
@@ -1505,9 +1561,8 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("get numberOfBatteriesSupported", new pmu(cmd_get_numberOfBatteriesSupported));
   m_cmdTable.insert("set numberOfBatteriesSupported", new pmu(cmd_set_numberOfBatteriesSupported));
   // get & set lightbar commands
-  m_cmdTable.insert("get lbProtocolVersion", new pmu(cmd_get_lbProtocolVersion));
-  m_cmdTable.insert("get lbFirmwareCode", new pmu(cmd_get_lbFirmwareCode));
-  m_cmdTable.insert("get lbFirmwareVersion", new pmu(cmd_get_lbFirmwareVersion, parse_get_lbFirmwareVersion));
+  m_cmdTable.insert("get lbVersion", new pmu(cmd_get_lbVersion, parse_get_lbVersion));
+  m_cmdTable.insert("get lbStatus", new pmu(cmd_get_lbStatus, parse_get_lbStatus));
   // reset commands
   m_cmdTable.insert("reset usage", new pmu(cmd_reset_usage));
   m_cmdTable.insert("reset oldLog", new pmu(cmd_reset_oldLog));
