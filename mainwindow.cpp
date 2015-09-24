@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "preferencesdialog.h"
 #include "dllib.h"
+#include "globalgateway.h"
 #include <QDate>
 #include <QTime>
 #include <QDebug>
@@ -31,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   // hint to OSX about the role of these menu items
   ui->actionAbout->setMenuRole(QAction::AboutRole);
   ui->actionPreferences->setMenuRole(QAction::PreferencesRole);
+  // set up the model
+  m_model = LRModel::Instance();
+  Q_CHECK_PTR(m_model);
   // create the discovery agent
   m_discoveryAgent = new DiscoveryAgent();
   Q_CHECK_PTR(m_discoveryAgent);
@@ -222,7 +226,10 @@ void MainWindow::on_actionConnect_triggered() {
     }
     while (m_discoveryAgent->m_pmuList.isEmpty());
   } else if (ui->actionUseTelegesisAdapter) {
-    // todo
+    QString m_networkStr = "Z01";
+    m_panid = LRNetwork::panidFromNwid(m_networkStr);
+    m_chmask = LRNetwork::chmaskFromNwid(m_networkStr);
+    joinAndConnectWirelessly();
   }
 }
 
@@ -264,8 +271,89 @@ void MainWindow::slotPMUDiscovered(PMU* pmu) {
   this->setWindowTitle("DLTerm (Connected)");
 }
 
+void MainWindow::joinAndConnectWirelessly(void) {
+    GlobalGateway *ggw = GlobalGateway::Instance();
+    Gateway *gw = ggw->getGateway(this);
+    if (!gw) return;
+
+    if (m_joined && m_joinedNetworkStr != m_networkStr) {
+        DLDebug(100, DL_FUNC_INFO) << "Leaving" << m_joinedNetworkStr << "to join" << m_networkStr;
+        gw->leaveNetwork();
+        m_joined = false;
+        m_joinedNetworkStr = "";
+    }
+
+    if (m_joined || join()) {
+
+        connectToFixture();
+
+        QApplication::processEvents();
+    }
+}
+
+bool MainWindow::join(void) {
+    report(tr("Joining network..."));
+
+    GlobalGateway *ggw = GlobalGateway::Instance();
+    DLResult ret = ggw->joinNetwork(m_panid, m_chmask);
+
+    if (ret == DLLIB_SUCCESS) {
+        // Successfully joined network.
+        report(tr("Joined network %1").arg(m_networkStr));
+        m_joined = true;
+        m_joinedNetworkStr = m_networkStr;
+        return true;
+    } else {
+        m_joined = false;
+        if (ret == DLLIB_USB_DISCONNECTED) {
+            report(tr("USB Wireless Adapter disconnected"));
+        } else {
+            report(tr("Failed to join network %1").arg(m_networkStr));
+        }
+    }
+    return false;
+}
+
+void CoolTermDialog::connectToFixture(void) {
+    DLResult ret;
+
+    GlobalGateway *ggw = GlobalGateway::Instance();
+    Gateway *gw = ggw->getGateway(this);
+
+    if (!m_joined)
+        return;
+
+    // Create a fake PMU bound to m_gateway
+    if (m_pmuRemote != NULL) {
+        delete m_pmuRemote;
+    }
+    m_pmuRemote = new PMU_Remote(m_pmu->getEESN(), m_pmu->getEEShortAddress());
+    m_pmuRemote->setGateway(gw);
+
+    // Attempt to connect to it
+    QString ignoreStr;
+    m_connected = false;
+    ret = m_pmuRemote->getRegister(PMU_FIRMWARE_VERSION, ignoreStr);
+    if (ret == DLLIB_USB_DISCONNECTED) {
+        report(tr("USB Wireless Adapter disconnected"));
+        ggw->deleteGateway();
+        m_joined = false;
+    } else if (ret != DLLIB_SUCCESS) {
+        report(tr("Failed to connect to Fixture %1.").arg(m_pmu->getEESNStr()));
+    } else {
+        report(tr("Fixture %1 connected.").arg(m_pmu->getEESNStr()));
+        m_connected = true;
+    }
+
+    ui->sendCommand_pushButton->setEnabled(m_connected);
+
+    // Give the UI an incentive to update
+    QApplication::processEvents();
+
+}
+
 void MainWindow::on_actionPreferences_triggered() {
-  connectionDialog d(this);
+  preferencesDialog d(m_model, this);
   d.exec();
 }
 

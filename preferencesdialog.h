@@ -1,22 +1,27 @@
-#ifndef CONNECTIONDIALOG_H
-#define CONNECTIONDIALOG_H
+#ifndef PREFERENCESDIALOG_H
+#define PREFERENCESDIALOG_H
 
 #include <QDialog>
 
+class LRModel;
+class LRZone;
+
 namespace Ui {
-class connectionDialog;
+class preferencesDialog;
 }
 
-class connectionDialog : public QDialog
+class preferencesDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  explicit connectionDialog(QWidget *parent = 0);
-  ~connectionDialog();
+  explicit preferencesDialog(LRModel *model, QList<LRZone*> *zoneList, QWidget *parent = 0);
+  ~preferencesDialog();
 
 private:
-  Ui::connectionDialog *ui;
+  Ui::preferencesDialog *ui;
+  LRModel *m_model;
+  QList<LRZone*> *m_zoneList;
 };
 
-#endif // CONNECTIONDIALOG_H
+#endif // PREFERENCESDIALOG_H

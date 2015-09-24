@@ -10,6 +10,8 @@
 class DiscoveryAgent;
 class PMU;
 class PMU_USB;
+class LRModel;
+class LRZone;
 
 namespace Ui {
   class MainWindow;
@@ -44,6 +46,10 @@ private:
   QString queryPmu(QStringList cmdList, QStringList *responseList);
   QString processUserRequest(QString *request);
   QString buildPrompt(void);
+  LRModel *m_model;
+  void joinAndConnectWirelessly(void);
+  bool join(void);
+  void connectToFixture(void);
 
 private slots:
   void slotPMUDiscovered(PMU* pmu);

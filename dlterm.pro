@@ -23,9 +23,11 @@ HEADERS  += mainwindow.h \
     cmdhelper.h \
     cmdhistory.h \
     solarized.h \
+    preferencesdialog.h \
     preferencesdialog.h
 
 FORMS    += mainwindow.ui \
+    preferencesdialog.ui \
     preferencesdialog.ui
 
 DLLIB_DIR = ../DLLib

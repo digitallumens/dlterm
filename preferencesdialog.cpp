@@ -1,14 +1,16 @@
 #include "preferencesdialog.h"
-#include "ui_connectionDialog.h"
+#include "ui_preferencesdialog.h"
 
-connectionDialog::connectionDialog(QWidget *parent) :
+preferencesDialog::preferencesDialog(LRModel *model, QList<LRZone*> *zoneList, QWidget *parent) :
   QDialog(parent),
-  ui(new Ui::connectionDialog)
+  ui(new Ui::preferencesDialog),
+  m_model(model),
+  m_zoneList(zoneList)
 {
   ui->setupUi(this);
 }
 
-connectionDialog::~connectionDialog()
+preferencesDialog::~preferencesDialog()
 {
   delete ui;
 }
