@@ -17,14 +17,16 @@ SOURCES += main.cpp\
     cmdhelper.cpp \
     cmdhistory.cpp \
     solarized.cpp \
-    preferencesdialog.cpp
+    preferencesdialog.cpp \
+    interface.cpp
 
 HEADERS  += mainwindow.h \
     cmdhelper.h \
     cmdhistory.h \
     solarized.h \
     preferencesdialog.h \
-    preferencesdialog.h
+    preferencesdialog.h \
+    interface.h
 
 FORMS    += mainwindow.ui \
     preferencesdialog.ui \

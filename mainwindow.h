@@ -2,16 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
 #include "cmdhelper.h"
 #include "cmdhistory.h"
 #include "solarized.h"
-
-class DiscoveryAgent;
-class PMU;
-class PMU_USB;
-class LRModel;
-class LRZone;
+#include "interface.h"
 
 namespace Ui {
   class MainWindow;
@@ -34,25 +28,17 @@ public slots:
   void on_actionSave_Output_to_File_triggered();
   void on_actionPreferences_triggered();
   void on_actionAbout_triggered();
+  void on_connectionEstablished();
 
 private:
   Ui::MainWindow *ui;
   bool eventFilter(QObject *target, QEvent *event);
+  QString processUserRequest(QString *request);
+  QString buildPrompt(void);
   cmdHelper *m_cmdHelper;
   cmdHistory *m_cmdHistory;
   solarized *m_solarized;
-  PMU_USB *m_pmuUSB;
-  DiscoveryAgent *m_discoveryAgent;
-  QString queryPmu(QStringList cmdList, QStringList *responseList);
-  QString processUserRequest(QString *request);
-  QString buildPrompt(void);
-  LRModel *m_model;
-  void joinAndConnectWirelessly(void);
-  bool join(void);
-  void connectToFixture(void);
-
-private slots:
-  void slotPMUDiscovered(PMU* pmu);
+  interface *m_interface;
 };
 
 #endif // MAINWINDOW_H
