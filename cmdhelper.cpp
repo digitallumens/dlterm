@@ -1226,11 +1226,11 @@ QString parse_get_bbStatus(QStringList pmuResponse) {
   statusDict.insert(0, "Invalid");
   statusDict.insert(1, "Charging");
   statusDict.insert(2, "Standby");
-  statusDict.insert(3, "Error");
-  statusDict.insert(4, "Emergency");
-  statusDict.insert(5, "Test");
-  statusDict.insert(6, "Powerdown");
-  statusDict.insert(7, "Shutdown");
+  statusDict.insert(3, "Shutdown");
+  statusDict.insert(4, "Error");
+  statusDict.insert(5, "Emergency");
+  statusDict.insert(6, "Test");
+  statusDict.insert(7, "Powerdown");
   parsedResponse += QString("Mode: %1<br>").arg(statusDict[statusInt & 0xF]);
   // parse battery status bits
   statusDict.clear();
