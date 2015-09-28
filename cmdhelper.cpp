@@ -1264,8 +1264,8 @@ QString parse_get_bbStatus(QStringList pmuResponse) {
   parsedResponse += QString("Test button status: %1<br>").arg(statusDict[(statusInt >> 12) & 0x1]);
   // parse PSU status bits
   statusDict.clear();
-  statusDict.insert(0, "Good");
-  statusDict.insert(1, "Failed");
+  statusDict.insert(0, "42v active");
+  statusDict.insert(1, "42v inactive");
   parsedResponse += QString("PSU status: %1<br>").arg(statusDict[(statusInt >> 13) & 0x1]);
   // parse certification mark status
   statusDict.clear();

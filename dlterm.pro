@@ -18,7 +18,10 @@ SOURCES += main.cpp\
     cmdhistory.cpp \
     solarized.cpp \
     preferencesdialog.cpp \
-    interface.cpp
+    interface.cpp \
+    bifurcationdialog.cpp \
+    emberdialog.cpp \
+    globalgateway.cpp
 
 HEADERS  += mainwindow.h \
     cmdhelper.h \
@@ -26,11 +29,16 @@ HEADERS  += mainwindow.h \
     solarized.h \
     preferencesdialog.h \
     preferencesdialog.h \
-    interface.h
+    interface.h \
+    bifurcationdialog.h \
+    emberdialog.h \
+    globalgateway.h
 
 FORMS    += mainwindow.ui \
     preferencesdialog.ui \
-    preferencesdialog.ui
+    preferencesdialog.ui \
+    bifurcationdialog.ui \
+    emberdialog.ui
 
 DLLIB_DIR = ../DLLib
 
@@ -49,7 +57,6 @@ macx {
     #LIBS += /Applications/Xcode.app//Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework/Foundation
 }
 
-DISTFILES += \
-    solarized-light.qss
+DISTFILES +=
 
 RESOURCES +=
