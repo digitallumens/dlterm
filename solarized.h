@@ -4,6 +4,10 @@
 #include <QObject>
 #include <QHash>
 
+class QTextEdit;
+class QLineEdit;
+class QFrame;
+
 typedef enum {
   // background tones
   SOLAR_BASE_03, SOLAR_BASE_02, SOLAR_BASE_01, SOLAR_BASE_00,
@@ -20,7 +24,10 @@ class solarized : public QObject
   Q_OBJECT
 public:
   explicit solarized(QObject *parent = 0);
-  void setColor(QString *text, solarizedColor_t color);
+  void setStyleSheetQLineEdit(QLineEdit *lineEdit);
+  void setStyleSheetQTextEdit(QTextEdit *textEdit);
+  void setStyleSheetQFrame(QFrame *frame);
+  void setTextColor(QString *text, solarizedColor_t color);
 
 signals:
 
