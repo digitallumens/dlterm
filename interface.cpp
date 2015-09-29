@@ -8,6 +8,11 @@ interface::interface(QObject *parent) : QObject(parent)
 
 }
 
+void interface::configure(QString networkStr, quint32 serialNumber) {
+  m_networkStr = networkStr;
+  m_serialNumber = serialNumber;
+}
+
 void interface::connectFTDI(void) {
   m_discoveryAgent = new DiscoveryAgent();
   connect(m_discoveryAgent, SIGNAL(signalPMUDiscovered(PMU*)), this, SLOT(slotPMUDiscovered(PMU*)));
@@ -21,8 +26,8 @@ void interface::connectFTDI(void) {
 }
 
 void interface::disconnect(void) {
-  m_discoveryAgent->clearLists();
   if (m_discoveryAgent) {
+    m_discoveryAgent->clearLists();
     delete m_discoveryAgent;
   }
   GlobalGateway::Instance()->leaveAnyNetwork();
@@ -43,12 +48,7 @@ void interface::slotPMUDiscovered(PMU* pmu) {
   emit connectionEstablished();
 }
 
-void interface::connectTelegesis(QString networkStr) {
-  if (networkStr == "") {
-    m_networkStr = LRNetwork::s_FactoryDefaultNwidStr;
-  } else {
-    m_networkStr = networkStr;
-  }
+void interface::connectTelegesis(void) {
   m_panid = LRNetwork::panidFromNwid(m_networkStr);
   m_chmask = LRNetwork::chmaskFromNwid(m_networkStr);
   joinAndConnectWirelessly();
@@ -100,7 +100,7 @@ void interface::connectToFixture(void) {
   if (m_pmuRemote != NULL) {
     delete m_pmuRemote;
   }
-  m_pmuRemote = new PMU_Remote(0x04FACE15, 0x8A61);
+  m_pmuRemote = new PMU_Remote(m_serialNumber, 0);
   m_pmuRemote->setGateway(gw);
   // attempt to connect to it
   QString ignoreStr;

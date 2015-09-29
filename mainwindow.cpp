@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "preferencesdialog.h"
-#include "interface.h"
 #include <QDate>
 #include <QTime>
 #include <QDebug>
@@ -15,7 +13,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   m_cmdHelper(new cmdHelper::cmdHelper),
   m_cmdHistory(new cmdHistory::cmdHistory),
   m_solarized(new solarized::solarized),
-  m_interface(new interface::interface) {
+  m_interface(new interface::interface),
+  m_preferencesDialog(new preferencesDialog::preferencesDialog) {
   ui->setupUi(this);
   // remove the ugly focus border
   ui->commandLine->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -199,7 +198,8 @@ void MainWindow::on_actionConnect_triggered() {
   if (ui->actionUseFTDICable->isChecked()) {
     m_interface->connectFTDI();
   } else if (ui->actionUseTelegesisAdapter->isChecked()) {
-    m_interface->connectTelegesis("F05");
+    m_interface->configure(m_preferencesDialog->m_networkStr, m_preferencesDialog->m_serialNumber);
+    m_interface->connectTelegesis();
   }
 }
 
@@ -243,8 +243,7 @@ void MainWindow::on_connectionEstablished(void) {
 }
 
 void MainWindow::on_actionPreferences_triggered() {
-  preferencesDialog d(this);
-  d.exec();
+  m_preferencesDialog->exec();
 }
 
 void MainWindow::on_actionAbout_triggered() {

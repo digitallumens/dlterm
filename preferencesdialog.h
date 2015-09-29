@@ -14,6 +14,12 @@ class preferencesDialog : public QDialog
 public:
   explicit preferencesDialog(QWidget *parent = 0);
   ~preferencesDialog();
+  void createNetworkCombos(const bool encryptionOn);
+  QString m_networkStr;
+  quint32 m_serialNumber;
+
+private slots:
+  void accept();
 
 private:
   Ui::preferencesDialog *ui;

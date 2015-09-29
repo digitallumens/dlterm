@@ -6,6 +6,7 @@
 #include "cmdhistory.h"
 #include "solarized.h"
 #include "interface.h"
+#include "preferencesdialog.h"
 
 namespace Ui {
   class MainWindow;
@@ -39,6 +40,7 @@ private:
   cmdHistory *m_cmdHistory;
   solarized *m_solarized;
   interface *m_interface;
+  preferencesDialog *m_preferencesDialog;
 };
 
 #endif // MAINWINDOW_H

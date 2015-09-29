@@ -14,8 +14,9 @@ class interface : public QObject
   Q_OBJECT
 public:
   explicit interface(QObject *parent = 0);
+  void configure(QString network, quint32 serialNumber);
   void connectFTDI(void);
-  void connectTelegesis(QString networkStr);
+  void connectTelegesis(void);
   void disconnect(void);
   bool isConnected(void);
   QString queryPmu(QStringList cmdList, QStringList *responseList);
@@ -26,10 +27,10 @@ signals:
 public slots:
 
 private:
-  PMU* m_pmu;
   PMU_Remote *m_pmuRemote;
   PMU_USB *m_pmuUSB;
   DiscoveryAgent *m_discoveryAgent;
+  quint32 m_serialNumber;
   unsigned long long m_panid;
   unsigned long m_chmask;
   QString m_networkStr;

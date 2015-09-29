@@ -20,7 +20,6 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QWidget>
 
@@ -32,22 +31,21 @@ public:
     QDialogButtonBox *buttonBox;
     QWidget *gridLayoutWidget;
     QGridLayout *gridLayout;
-    QLineEdit *findNetwork;
-    QLabel *label;
-    QComboBox *zoneNetworkGroup_comboBox;
-    QComboBox *zoneNetworkFreq_comboBox;
-    QLabel *_zoneNetwork_label;
+    QLabel *network_label;
+    QComboBox *netGroup_comboBox;
+    QComboBox *netFreq_comboBox;
+    QLabel *serialNumber_label;
     QSpacerItem *horizontalSpacer;
-    QPushButton *pushButton;
+    QLineEdit *serialNumber_lineEdit;
 
     void setupUi(QDialog *preferencesDialog)
     {
         if (preferencesDialog->objectName().isEmpty())
             preferencesDialog->setObjectName(QStringLiteral("preferencesDialog"));
-        preferencesDialog->resize(492, 123);
+        preferencesDialog->resize(370, 120);
         buttonBox = new QDialogButtonBox(preferencesDialog);
         buttonBox->setObjectName(QStringLiteral("buttonBox"));
-        buttonBox->setGeometry(QRect(10, 90, 471, 21));
+        buttonBox->setGeometry(QRect(190, 90, 171, 20));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
         gridLayoutWidget = new QWidget(preferencesDialog);
@@ -56,46 +54,43 @@ public:
         gridLayout = new QGridLayout(gridLayoutWidget);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
-        findNetwork = new QLineEdit(gridLayoutWidget);
-        findNetwork->setObjectName(QStringLiteral("findNetwork"));
+        network_label = new QLabel(gridLayoutWidget);
+        network_label->setObjectName(QStringLiteral("network_label"));
+        network_label->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
-        gridLayout->addWidget(findNetwork, 0, 1, 1, 1);
+        gridLayout->addWidget(network_label, 1, 0, 1, 1);
 
-        label = new QLabel(gridLayoutWidget);
-        label->setObjectName(QStringLiteral("label"));
-
-        gridLayout->addWidget(label, 0, 0, 1, 1);
-
-        zoneNetworkGroup_comboBox = new QComboBox(gridLayoutWidget);
-        zoneNetworkGroup_comboBox->setObjectName(QStringLiteral("zoneNetworkGroup_comboBox"));
+        netGroup_comboBox = new QComboBox(gridLayoutWidget);
+        netGroup_comboBox->setObjectName(QStringLiteral("netGroup_comboBox"));
         QSizePolicy sizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(zoneNetworkGroup_comboBox->sizePolicy().hasHeightForWidth());
-        zoneNetworkGroup_comboBox->setSizePolicy(sizePolicy);
+        sizePolicy.setHeightForWidth(netGroup_comboBox->sizePolicy().hasHeightForWidth());
+        netGroup_comboBox->setSizePolicy(sizePolicy);
 
-        gridLayout->addWidget(zoneNetworkGroup_comboBox, 1, 1, 1, 1);
+        gridLayout->addWidget(netGroup_comboBox, 1, 1, 1, 1);
 
-        zoneNetworkFreq_comboBox = new QComboBox(gridLayoutWidget);
-        zoneNetworkFreq_comboBox->setObjectName(QStringLiteral("zoneNetworkFreq_comboBox"));
-        sizePolicy.setHeightForWidth(zoneNetworkFreq_comboBox->sizePolicy().hasHeightForWidth());
-        zoneNetworkFreq_comboBox->setSizePolicy(sizePolicy);
+        netFreq_comboBox = new QComboBox(gridLayoutWidget);
+        netFreq_comboBox->setObjectName(QStringLiteral("netFreq_comboBox"));
+        sizePolicy.setHeightForWidth(netFreq_comboBox->sizePolicy().hasHeightForWidth());
+        netFreq_comboBox->setSizePolicy(sizePolicy);
 
-        gridLayout->addWidget(zoneNetworkFreq_comboBox, 1, 2, 1, 1);
+        gridLayout->addWidget(netFreq_comboBox, 1, 2, 1, 1);
 
-        _zoneNetwork_label = new QLabel(gridLayoutWidget);
-        _zoneNetwork_label->setObjectName(QStringLiteral("_zoneNetwork_label"));
-        _zoneNetwork_label->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        serialNumber_label = new QLabel(gridLayoutWidget);
+        serialNumber_label->setObjectName(QStringLiteral("serialNumber_label"));
 
-        gridLayout->addWidget(_zoneNetwork_label, 1, 0, 1, 1);
+        gridLayout->addWidget(serialNumber_label, 0, 0, 1, 1);
 
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer, 0, 2, 1, 1);
 
-        pushButton = new QPushButton(preferencesDialog);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(380, 50, 101, 31));
+        serialNumber_lineEdit = new QLineEdit(gridLayoutWidget);
+        serialNumber_lineEdit->setObjectName(QStringLiteral("serialNumber_lineEdit"));
+
+        gridLayout->addWidget(serialNumber_lineEdit, 0, 1, 1, 1);
+
 
         retranslateUi(preferencesDialog);
         QObject::connect(buttonBox, SIGNAL(accepted()), preferencesDialog, SLOT(accept()));
@@ -107,9 +102,8 @@ public:
     void retranslateUi(QDialog *preferencesDialog)
     {
         preferencesDialog->setWindowTitle(QApplication::translate("preferencesDialog", "Dialog", 0));
-        label->setText(QApplication::translate("preferencesDialog", "Serial Number", 0));
-        _zoneNetwork_label->setText(QApplication::translate("preferencesDialog", "Network:", 0));
-        pushButton->setText(QApplication::translate("preferencesDialog", "Find", 0));
+        network_label->setText(QApplication::translate("preferencesDialog", "Network:", 0));
+        serialNumber_label->setText(QApplication::translate("preferencesDialog", "Serial Number", 0));
     } // retranslateUi
 
 };
