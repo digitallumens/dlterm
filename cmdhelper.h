@@ -4,15 +4,15 @@
 #include <QObject>
 #include <QCompleter>
 
-typedef QStringList(*cmd_t)(QStringList argList);
-typedef QString(*parser_t)(QStringList pmuResponse);
+typedef QStringList(*buildCmd_t)(QStringList argList);
+typedef QString(*parseResponse_t)(QStringList pmuResponse);
 
-struct pmu {
-  pmu(){}
-  pmu(cmd_t default_cmd) : cmd(default_cmd), parser(NULL) {}
-  pmu(cmd_t default_cmd, parser_t default_parser) : cmd(default_cmd), parser(default_parser) {}
-  cmd_t cmd;
-  parser_t parser;
+struct cmdEntry {
+  cmdEntry(){}
+  cmdEntry(buildCmd_t default_buildCmd) : buildCmd(default_buildCmd), parseResponse(NULL) {}
+  cmdEntry(buildCmd_t default_buildCmd, parseResponse_t default_parseResponse) : buildCmd(default_buildCmd), parseResponse(default_parseResponse) {}
+  buildCmd_t buildCmd;
+  parseResponse_t parseResponse;
 };
 
 class cmdHelper : public QObject
@@ -21,7 +21,7 @@ class cmdHelper : public QObject
 
 public:
   explicit cmdHelper(QObject *parent = 0);
-  QHash <QString, struct pmu*> m_cmdTable;
+  QHash <QString, struct cmdEntry*> m_cmdTable;
   QCompleter *m_cmdCompleter;
   QMap <QString, QString> m_errorResponses;
   QString getNextCompletion(void);

@@ -8,7 +8,7 @@ interface::interface(QObject *parent) : QObject(parent)
 
 }
 
-void interface::ftdiConnect(void) {
+void interface::connectFTDI(void) {
   m_discoveryAgent = new DiscoveryAgent();
   connect(m_discoveryAgent, SIGNAL(signalPMUDiscovered(PMU*)), this, SLOT(slotPMUDiscovered(PMU*)));
   Q_CHECK_PTR(m_discoveryAgent);
@@ -20,51 +20,30 @@ void interface::ftdiConnect(void) {
   } while (m_discoveryAgent->m_pmuList.isEmpty());
 }
 
-void interface::ftdiDisconnect(void) {
+void interface::disconnect(void) {
   m_discoveryAgent->clearLists();
   if (m_discoveryAgent) {
     delete m_discoveryAgent;
   }
+  GlobalGateway::Instance()->leaveAnyNetwork();
+  m_connected = false;
 }
 
-QString interface::ftdiQueryPmu(QStringList cmdList, QStringList *responseList) {
-  QString response;
-  foreach (const QString &cmd, cmdList) {
-    // figure out the length NOT including the space
-    int len = cmd.length();
-    int i = cmd.indexOf(' ');
-    if (i != -1) {
-      len = cmd.left(i).length();
-    }
-    if (m_pmuUSB->issueCommand(cmd, response, len) != DLLIB_SUCCESS) {
-      // return error
-      return response;
-    } else {
-      responseList->append(response);
-    }
-  }
-  return NULL;
-}
-
-bool interface::ftdiIsDisconnected(void) {
-  if (m_discoveryAgent == NULL) {
-    return true;
-  } else if (m_discoveryAgent->m_pmuList.isEmpty()) {
-    return true;
-  } else {
-    return false;
-  }
+bool interface::isConnected(void) {
+  return m_connected;
 }
 
 void interface::slotPMUDiscovered(PMU* pmu) {
   m_pmuUSB = qobject_cast<PMU_USB*>(pmu);
   if (!m_pmuUSB) {
+    m_connected = false;
     return;
   }
-  emit ftdiConnectionEstablished();
+  m_connected = true;
+  emit connectionEstablished();
 }
 
-void interface::telegesisConnect(QString networkStr) {
+void interface::connectTelegesis(QString networkStr) {
   if (networkStr == "") {
     m_networkStr = LRNetwork::s_FactoryDefaultNwidStr;
   } else {
@@ -121,7 +100,7 @@ void interface::connectToFixture(void) {
   if (m_pmuRemote != NULL) {
     delete m_pmuRemote;
   }
-  m_pmuRemote = new PMU_Remote(m_pmu->getEESN(), m_pmu->getEEShortAddress());
+  m_pmuRemote = new PMU_Remote(0x04FACE15, 0x8A61);
   m_pmuRemote->setGateway(gw);
   // attempt to connect to it
   QString ignoreStr;
@@ -136,6 +115,33 @@ void interface::connectToFixture(void) {
   } else {
     //report(tr("Fixture %1 connected.").arg(m_pmu->getEESNStr()));
     m_connected = true;
-    emit telegesisConnectionEstablished();
+    emit connectionEstablished();
   }
+}
+
+QString interface::queryPmu(QStringList cmdList, QStringList *responseList) {
+  DLResult ret;
+  QString response;
+  foreach (const QString &cmd, cmdList) {
+    // figure out the length NOT including the space
+    int len = cmd.length();
+    int i = cmd.indexOf(' ');
+    if (i != -1) {
+      len = cmd.left(i).length();
+    }
+    if (m_pmuUSB == NULL) {
+      GlobalGateway *ggw = GlobalGateway::Instance();
+      Gateway *gw = ggw->getGateway(0);
+      ret = gw->issuePMUCommand(m_pmuRemote, cmd, response, len);
+    } else {
+      ret = m_pmuUSB->issueCommand(cmd, response, len);
+    }
+    if (ret != DLLIB_SUCCESS) {
+      // return error
+      return response;
+    } else {
+      responseList->append(response);
+    }
+  }
+  return NULL;
 }

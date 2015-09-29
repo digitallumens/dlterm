@@ -37,8 +37,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui->actionAbout->setMenuRole(QAction::AboutRole);
   ui->actionPreferences->setMenuRole(QAction::PreferencesRole);
   // connect signals and slots
-  connect(m_interface, SIGNAL(ftdiConnectionEstablished()), this, SLOT(on_connectionEstablished()));
-  connect(m_interface, SIGNAL(telegesisConnectionEstablished()), this, SLOT(on_telegesis()));
+  connect(m_interface, SIGNAL(connectionEstablished()), this, SLOT(on_connectionEstablished()));
   this->setWindowTitle("DLTerm (Disconnected)");
 }
 
@@ -65,14 +64,14 @@ QString MainWindow::processUserRequest(QString *request) {
     cmd = *request;
   }
   // find the associated helper entry
-  struct pmu *pmu = m_cmdHelper->m_cmdTable[cmd];
-  if (pmu == NULL) {
+  struct cmdEntry *cmdEntry = m_cmdHelper->m_cmdTable[cmd];
+  if (cmdEntry == NULL) {
     // not a helper command
     cmdList << *request;
     m_solarized->setTextColor(request, SOLAR_BASE_01);
   } else {
     // translate helper command
-    cmdList = pmu->cmd(argList);
+    cmdList = cmdEntry->buildCmd(argList);
     // command translator returned an error
     if (cmdList.at(0).startsWith("ERROR")) {
       QString errorResponse = cmdList.at(0);
@@ -84,13 +83,13 @@ QString MainWindow::processUserRequest(QString *request) {
     m_solarized->setTextColor(request, SOLAR_YELLOW);
   }
   // send commands & get responses
-  errorResponse = m_interface->ftdiQueryPmu(cmdList, &responseList);
+  errorResponse = m_interface->queryPmu(cmdList, &responseList);
   // parse responses
   if (errorResponse != NULL) {
     // translate error response
     response = m_cmdHelper->m_errorResponses[errorResponse];
     m_solarized->setTextColor(&response, SOLAR_RED);
-  } else if (pmu == NULL) {
+  } else if (cmdEntry == NULL) {
     // not a helper command, flatten responses
     foreach (QString s, responseList) {
       response.append(s);
@@ -100,7 +99,7 @@ QString MainWindow::processUserRequest(QString *request) {
     } else {
       m_solarized->setTextColor(&response, SOLAR_VIOLET);
     }
-  } else if (pmu->parser == NULL) {
+  } else if (cmdEntry->parseResponse == NULL) {
     // no helper parser available, flatten responses
     foreach (QString s, responseList) {
       response.append(s);
@@ -112,7 +111,7 @@ QString MainWindow::processUserRequest(QString *request) {
     }
   } else {
     // use helper parser
-    response = pmu->parser(responseList);
+    response = cmdEntry->parseResponse(responseList);
     m_solarized->setTextColor(&response, SOLAR_BLUE);
   }
   return response;
@@ -142,7 +141,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       // scrub the input
       userRequest = ui->commandLine->text().simplified();
       // ignore requests until a connection is established
-      if (userRequest.isEmpty() || m_interface->ftdiIsDisconnected()) {
+      if (userRequest.isEmpty() || (m_interface->isConnected() == false)) {
         ui->commandLine->clear();
         break;
       }
@@ -197,15 +196,15 @@ void MainWindow::on_actionUseTelegesisAdapter_triggered() {
 }
 
 void MainWindow::on_actionConnect_triggered() {
-  // establish a connection
   if (ui->actionUseFTDICable->isChecked()) {
-    m_interface->ftdiConnect();
+    m_interface->connectFTDI();
   } else if (ui->actionUseTelegesisAdapter->isChecked()) {
-    m_interface->telegesisConnect("F06");
+    m_interface->connectTelegesis("F05");
   }
 }
 
 void MainWindow::on_actionDisconnect_triggered() {
+  m_interface->disconnect();
   ui->actionDisconnect->setVisible(false);
   ui->actionConnect->setVisible(true);
   ui->actionUseFTDICable->setDisabled(false);
@@ -236,18 +235,11 @@ void MainWindow::on_connectionEstablished(void) {
   ui->actionUseTelegesisAdapter->setDisabled(true);
   ui->actionPreferences->setDisabled(true);
   ui->commandLine->setPlaceholderText("Type a command here. Terminate by pressing ENTER.");
-  this->setWindowTitle("DLTerm (Connection: FTDI)");
-}
-
-void MainWindow::on_telegesis(void) {
-  // update controls
-  ui->actionConnect->setVisible(false);
-  ui->actionDisconnect->setVisible(true);
-  ui->actionUseFTDICable->setDisabled(true);
-  ui->actionUseTelegesisAdapter->setDisabled(true);
-  ui->actionPreferences->setDisabled(true);
-  ui->commandLine->setPlaceholderText("Type a command here. Terminate by pressing ENTER.");
-  this->setWindowTitle("DLTerm (Connection: Telegesis)");
+  if (ui->actionUseFTDICable->isChecked()) {
+    this->setWindowTitle("DLTerm (Connection: FTDI)");
+  } else {
+    this->setWindowTitle("DLTerm (Connection: Telegesis)");
+  }
 }
 
 void MainWindow::on_actionPreferences_triggered() {

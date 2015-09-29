@@ -14,15 +14,14 @@ class interface : public QObject
   Q_OBJECT
 public:
   explicit interface(QObject *parent = 0);
-  void ftdiConnect(void);
-  void ftdiDisconnect(void);
-  QString ftdiQueryPmu(QStringList cmdList, QStringList *responseList);
-  bool ftdiIsDisconnected(void);
-  void telegesisConnect(QString networkStr);
+  void connectFTDI(void);
+  void connectTelegesis(QString networkStr);
+  void disconnect(void);
+  bool isConnected(void);
+  QString queryPmu(QStringList cmdList, QStringList *responseList);
 
 signals:
-  void ftdiConnectionEstablished(void);
-  void telegesisConnectionEstablished(void);
+  void connectionEstablished(void);
 
 public slots:
 
