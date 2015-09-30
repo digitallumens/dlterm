@@ -21,9 +21,8 @@ public:
   ~MainWindow();
 
 public slots:
-  void on_actionUseFTDICable_triggered();
-  void on_actionUseTelegesisAdapter_triggered();
-  void on_actionConnect_triggered();
+  void on_actionConnect_Using_FTDI_triggered();
+  void on_actionConnect_Using_Telegesis_triggered();
   void on_actionDisconnect_triggered();
   void on_actionClear_Output_triggered();
   void on_actionSave_Output_to_File_triggered();

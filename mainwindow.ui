@@ -92,10 +92,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionUseFTDICable"/>
-    <addaction name="actionUseTelegesisAdapter"/>
-    <addaction name="separator"/>
-    <addaction name="actionConnect"/>
+    <addaction name="actionConnect_Using_FTDI"/>
+    <addaction name="actionConnect_Using_Telegesis"/>
     <addaction name="actionDisconnect"/>
     <addaction name="separator"/>
     <addaction name="actionSave_Output_to_File"/>
@@ -114,28 +112,9 @@
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
   </widget>
-  <action name="actionUseFTDICable">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
+  <action name="actionConnect_Using_FTDI">
    <property name="text">
-    <string>Use FTDI Cable</string>
-   </property>
-  </action>
-  <action name="actionUseTelegesisAdapter">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Use Telegesis Adapter</string>
-   </property>
-  </action>
-  <action name="actionConnect">
-   <property name="text">
-    <string>Connect</string>
+    <string>Connect Using FTDI</string>
    </property>
    <property name="toolTip">
     <string>Connect to Device</string>
@@ -198,6 +177,14 @@
    </property>
    <property name="menuRole">
     <enum>QAction::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionConnect_Using_Telegesis">
+   <property name="text">
+    <string>Connect Using Telegesis</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+K</string>
    </property>
   </action>
  </widget>

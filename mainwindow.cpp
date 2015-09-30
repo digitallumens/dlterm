@@ -186,18 +186,14 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
   return QObject::eventFilter(target, event); 
 }
 
-void MainWindow::on_actionUseFTDICable_triggered() {
-  ui->actionUseTelegesisAdapter->setChecked(false);
+void MainWindow::on_actionConnect_Using_FTDI_triggered() {
+  m_interface->connectFTDI();
 }
 
-void MainWindow::on_actionUseTelegesisAdapter_triggered() {
-  ui->actionUseFTDICable->setChecked(false);
-}
-
-void MainWindow::on_actionConnect_triggered() {
-  if (ui->actionUseFTDICable->isChecked()) {
-    m_interface->connectFTDI();
-  } else if (ui->actionUseTelegesisAdapter->isChecked()) {
+void MainWindow::on_actionConnect_Using_Telegesis_triggered() {
+  if (m_preferencesDialog->m_serialNumber == 0) {
+    QMessageBox::about(this, "Error", "Please configure the fixture serial number under Preferences.");
+  } else {
     m_interface->configure(m_preferencesDialog->m_networkStr, m_preferencesDialog->m_serialNumber);
     m_interface->connectTelegesis();
   }
@@ -206,12 +202,20 @@ void MainWindow::on_actionConnect_triggered() {
 void MainWindow::on_actionDisconnect_triggered() {
   m_interface->disconnect();
   ui->actionDisconnect->setVisible(false);
-  ui->actionConnect->setVisible(true);
-  ui->actionUseFTDICable->setDisabled(false);
-  ui->actionUseTelegesisAdapter->setDisabled(false);
+  ui->actionConnect_Using_FTDI->setVisible(true);
+  ui->actionConnect_Using_Telegesis->setVisible(true);
   ui->actionPreferences->setDisabled(false);
   ui->commandLine->setPlaceholderText("Press ⌘K to establish a connection.");
   this->setWindowTitle("DLTerm (Disconnected)");
+}
+
+void MainWindow::on_connectionEstablished(void) {
+  ui->actionConnect_Using_FTDI->setVisible(false);
+  ui->actionConnect_Using_Telegesis->setVisible(false);
+  ui->actionDisconnect->setVisible(true);
+  ui->actionPreferences->setDisabled(true);
+  ui->commandLine->setPlaceholderText("Type a command here. Terminate by pressing ENTER.");
+  this->setWindowTitle("DLTerm (Connected)");
 }
 
 void MainWindow::on_actionClear_Output_triggered() {
@@ -224,21 +228,6 @@ void MainWindow::on_actionSave_Output_to_File_triggered() {
   if (file.open(QFile::WriteOnly | QFile::Truncate)) {
     QTextStream out(&file);
     out << ui->outputFeed->toPlainText();
-  }
-}
-
-void MainWindow::on_connectionEstablished(void) {
-  // update controls
-  ui->actionConnect->setVisible(false);
-  ui->actionDisconnect->setVisible(true);
-  ui->actionUseFTDICable->setDisabled(true);
-  ui->actionUseTelegesisAdapter->setDisabled(true);
-  ui->actionPreferences->setDisabled(true);
-  ui->commandLine->setPlaceholderText("Type a command here. Terminate by pressing ENTER.");
-  if (ui->actionUseFTDICable->isChecked()) {
-    this->setWindowTitle("DLTerm (Connection: FTDI)");
-  } else {
-    this->setWindowTitle("DLTerm (Connection: Telegesis)");
   }
 }
 

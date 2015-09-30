@@ -92,6 +92,7 @@ bool interface::join(void) {
 
 void interface::connectToFixture(void) {
   DLResult ret;
+  unsigned short shortAddr = 0xBAAD;
   GlobalGateway *ggw = GlobalGateway::Instance();
   Gateway *gw = ggw->getGateway(0);
   if (!m_joined)
@@ -100,7 +101,7 @@ void interface::connectToFixture(void) {
   if (m_pmuRemote != NULL) {
     delete m_pmuRemote;
   }
-  m_pmuRemote = new PMU_Remote(m_serialNumber, 0);
+  m_pmuRemote = new PMU_Remote(m_serialNumber, shortAddr);
   m_pmuRemote->setGateway(gw);
   // attempt to connect to it
   QString ignoreStr;

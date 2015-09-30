@@ -28,9 +28,7 @@ QT_BEGIN_NAMESPACE
 class Ui_MainWindow
 {
 public:
-    QAction *actionUseFTDICable;
-    QAction *actionUseTelegesisAdapter;
-    QAction *actionConnect;
+    QAction *actionConnect_Using_FTDI;
     QAction *actionDisconnect;
     QAction *actionClear_Output;
     QAction *actionShow_Timestamp;
@@ -38,6 +36,7 @@ public:
     QAction *actionSave_Output_to_File;
     QAction *actionPreferences;
     QAction *actionAbout;
+    QAction *actionConnect_Using_Telegesis;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     QTextEdit *outputFeed;
@@ -58,15 +57,8 @@ public:
         sizePolicy.setHeightForWidth(MainWindow->sizePolicy().hasHeightForWidth());
         MainWindow->setSizePolicy(sizePolicy);
         MainWindow->setStyleSheet(QStringLiteral(""));
-        actionUseFTDICable = new QAction(MainWindow);
-        actionUseFTDICable->setObjectName(QStringLiteral("actionUseFTDICable"));
-        actionUseFTDICable->setCheckable(true);
-        actionUseFTDICable->setChecked(true);
-        actionUseTelegesisAdapter = new QAction(MainWindow);
-        actionUseTelegesisAdapter->setObjectName(QStringLiteral("actionUseTelegesisAdapter"));
-        actionUseTelegesisAdapter->setCheckable(true);
-        actionConnect = new QAction(MainWindow);
-        actionConnect->setObjectName(QStringLiteral("actionConnect"));
+        actionConnect_Using_FTDI = new QAction(MainWindow);
+        actionConnect_Using_FTDI->setObjectName(QStringLiteral("actionConnect_Using_FTDI"));
         actionDisconnect = new QAction(MainWindow);
         actionDisconnect->setObjectName(QStringLiteral("actionDisconnect"));
         actionClear_Output = new QAction(MainWindow);
@@ -86,6 +78,8 @@ public:
         actionAbout = new QAction(MainWindow);
         actionAbout->setObjectName(QStringLiteral("actionAbout"));
         actionAbout->setMenuRole(QAction::NoRole);
+        actionConnect_Using_Telegesis = new QAction(MainWindow);
+        actionConnect_Using_Telegesis->setObjectName(QStringLiteral("actionConnect_Using_Telegesis"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -130,10 +124,8 @@ public:
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
-        menuFile->addAction(actionUseFTDICable);
-        menuFile->addAction(actionUseTelegesisAdapter);
-        menuFile->addSeparator();
-        menuFile->addAction(actionConnect);
+        menuFile->addAction(actionConnect_Using_FTDI);
+        menuFile->addAction(actionConnect_Using_Telegesis);
         menuFile->addAction(actionDisconnect);
         menuFile->addSeparator();
         menuFile->addAction(actionSave_Output_to_File);
@@ -152,13 +144,11 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QString());
-        actionUseFTDICable->setText(QApplication::translate("MainWindow", "Use FTDI Cable", 0));
-        actionUseTelegesisAdapter->setText(QApplication::translate("MainWindow", "Use Telegesis Adapter", 0));
-        actionConnect->setText(QApplication::translate("MainWindow", "Connect", 0));
+        actionConnect_Using_FTDI->setText(QApplication::translate("MainWindow", "Connect Using FTDI", 0));
 #ifndef QT_NO_TOOLTIP
-        actionConnect->setToolTip(QApplication::translate("MainWindow", "Connect to Device", 0));
+        actionConnect_Using_FTDI->setToolTip(QApplication::translate("MainWindow", "Connect to Device", 0));
 #endif // QT_NO_TOOLTIP
-        actionConnect->setShortcut(QApplication::translate("MainWindow", "Ctrl+K", 0));
+        actionConnect_Using_FTDI->setShortcut(QApplication::translate("MainWindow", "Ctrl+K", 0));
         actionDisconnect->setText(QApplication::translate("MainWindow", "Disconnect", 0));
 #ifndef QT_NO_TOOLTIP
         actionDisconnect->setToolTip(QApplication::translate("MainWindow", "Disconnect from Device", 0));
@@ -170,6 +160,8 @@ public:
         actionSave_Output_to_File->setText(QApplication::translate("MainWindow", "Save Output to File", 0));
         actionPreferences->setText(QApplication::translate("MainWindow", "Preferences", 0));
         actionAbout->setText(QApplication::translate("MainWindow", "About", 0));
+        actionConnect_Using_Telegesis->setText(QApplication::translate("MainWindow", "Connect Using Telegesis", 0));
+        actionConnect_Using_Telegesis->setShortcut(QApplication::translate("MainWindow", "Ctrl+Shift+K", 0));
         commandLine->setPlaceholderText(QString());
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0));
