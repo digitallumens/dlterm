@@ -193,7 +193,8 @@ void MainWindow::on_actionConnect_Using_FTDI_triggered() {
 
 void MainWindow::on_actionConnect_Using_Telegesis_triggered() {
   if (m_preferencesDialog->m_serialNumber == 0) {
-    QMessageBox::about(this, "Error", "Please configure the fixture serial number under Preferences.");
+    // open the preferences dialog so the user can input the missing info
+    m_preferencesDialog->exec();
   } else {
     m_interface->configure(m_preferencesDialog->m_networkStr, m_preferencesDialog->m_serialNumber);
     m_interface->connectTelegesis();
