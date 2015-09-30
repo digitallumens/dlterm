@@ -13,7 +13,7 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+    mainwindow.cpp \
     cmdhelper.cpp \
     cmdhistory.cpp \
     solarized.cpp \
@@ -28,7 +28,6 @@ HEADERS  += mainwindow.h \
     cmdhistory.h \
     solarized.h \
     preferencesdialog.h \
-    preferencesdialog.h \
     interface.h \
     bifurcationdialog.h \
     emberdialog.h \
@@ -36,9 +35,15 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     preferencesdialog.ui \
-    preferencesdialog.ui \
     bifurcationdialog.ui \
     emberdialog.ui
+
+RESOURCES += \
+    Icons.qrc \
+
+OTHER_FILES += DL.icns DL.ico
+
+ICON += DL.icns
 
 DLLIB_DIR = ../DLLib
 
@@ -57,11 +62,7 @@ macx {
     #LIBS += /Applications/Xcode.app//Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework/Foundation
 }
 
-DISTFILES +=
-
 OBJECTS_DIR = temp
 MOC_DIR = temp
 UI_DIR = temp
 RCC_DIR = temp
-
-RESOURCES +=

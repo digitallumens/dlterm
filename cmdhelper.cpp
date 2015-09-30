@@ -51,6 +51,7 @@ QStringList build_get_temperature(QStringList argList) {
 }
 
 QString parse_get_temperature(QStringList pmuResponse) {
+  (void) pmuResponse;
   return "todo";
 }
 
@@ -1161,7 +1162,7 @@ QStringList build_get_bbVersion(QStringList argList) {
     if (argList.at(0) == "00") {
       battNum = "C0";
     } else {
-      battNum == "C2";
+      battNum = "C2";
     }
   } else {
     cmdList << "ERROR: expected battery number<br>";
@@ -1197,7 +1198,7 @@ QStringList build_get_bbStatus(QStringList argList) {
     if (argList.at(0) == "00") {
       battNum = "C0";
     } else {
-      battNum == "C2";
+      battNum = "C2";
     }
   } else {
     cmdList << "ERROR: expected battery number<br>";
@@ -1298,7 +1299,7 @@ QStringList build_get_bbConfig(QStringList argList) {
     if (argList.at(0) == "00") {
       battNum = "C0";
     } else {
-      battNum == "C2";
+      battNum = "C2";
     }
   } else {
     cmdList << "ERROR: expected battery number<br>";

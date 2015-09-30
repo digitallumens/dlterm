@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   m_interface(new interface::interface),
   m_preferencesDialog(new preferencesDialog::preferencesDialog) {
   ui->setupUi(this);
+  QApplication::setWindowIcon(QIcon(QString::fromUtf8(":/DL.png")));
   // remove the ugly focus border
   ui->commandLine->setAttribute(Qt::WA_MacShowFocusRect, 0);
   // set solarized theme
