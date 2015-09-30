@@ -59,4 +59,9 @@ macx {
 
 DISTFILES +=
 
+OBJECTS_DIR = temp
+MOC_DIR = temp
+UI_DIR = temp
+RCC_DIR = temp
+
 RESOURCES +=
