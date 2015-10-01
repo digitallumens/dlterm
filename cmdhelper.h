@@ -6,13 +6,15 @@
 
 typedef QStringList(*buildCmd_t)(QStringList argList);
 typedef QString(*parseResponse_t)(QStringList pmuResponse);
+typedef QString(*getHelp_t)(void);
 
 struct cmdEntry {
   cmdEntry(){}
-  cmdEntry(buildCmd_t default_buildCmd) : buildCmd(default_buildCmd), parseResponse(NULL) {}
-  cmdEntry(buildCmd_t default_buildCmd, parseResponse_t default_parseResponse) : buildCmd(default_buildCmd), parseResponse(default_parseResponse) {}
+  cmdEntry(buildCmd_t def_buildCmd, getHelp_t def_getHelp) : buildCmd(def_buildCmd), parseResponse(NULL), getHelp(def_getHelp) {}
+  cmdEntry(buildCmd_t def_buildCmd, parseResponse_t def_parseResponse, getHelp_t def_getHelp) : buildCmd(def_buildCmd), parseResponse(def_parseResponse), getHelp(def_getHelp) {}
   buildCmd_t buildCmd;
   parseResponse_t parseResponse;
+  getHelp_t getHelp;
 };
 
 class cmdHelper : public QObject

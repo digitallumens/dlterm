@@ -70,15 +70,19 @@ QString MainWindow::processUserRequest(QString *request) {
     cmdList << *request;
     m_solarized->setTextColor(request, SOLAR_BASE_01);
   } else {
+    // show help
+    if (request->contains("help")) {
+      response = cmdEntry->getHelp();
+      m_solarized->setTextColor(&response, SOLAR_CYAN);
+      return response;
+    }
     // translate helper command
     cmdList = cmdEntry->buildCmd(argList);
     // command translator returned an error
     if (cmdList.at(0).startsWith("ERROR")) {
-      QString errorResponse = cmdList.at(0);
-      QString helpResponse = cmdList.at(1);
-      m_solarized->setTextColor(&errorResponse, SOLAR_RED);
-      m_solarized->setTextColor(&helpResponse, SOLAR_BLUE);
-      return (errorResponse + helpResponse);
+      response = cmdList.at(0);
+      m_solarized->setTextColor(&response, SOLAR_RED);
+      return response;
     }
     m_solarized->setTextColor(request, SOLAR_YELLOW);
   }
