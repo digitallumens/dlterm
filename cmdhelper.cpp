@@ -28,6 +28,9 @@ QStringList build_get_productCode(QStringList argList) {
 }
 
 QStringList build_set_productCode(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0001 %1").arg(argList.at(0));
 }
 
@@ -41,6 +44,9 @@ QStringList build_get_serialNumber(QStringList argList) {
 }
 
 QStringList build_set_serialNumber(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0002 %1").arg(argList.at(0));
 }
 
@@ -54,6 +60,9 @@ QStringList build_get_unixTime(QStringList argList) {
 }
 
 QStringList build_set_unixTime(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0003 %1").arg(argList.at(0));
 }
 
@@ -81,6 +90,9 @@ QStringList build_get_lightManualLevel(QStringList argList) {
 }
 
 QStringList build_set_lightManualLevel(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0005 %1").arg(argList.at(0));
 }
 
@@ -112,6 +124,9 @@ QStringList build_get_lightOverrideActiveLevel(QStringList argList) {
 }
 
 QStringList build_set_lightOverrideActiveLevel(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0008 %1").arg(argList.at(0));
 }
 
@@ -125,6 +140,9 @@ QStringList build_get_lightOverrideInactiveLevel(QStringList argList) {
 }
 
 QStringList build_set_lightOverrideInactiveLevel(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0009 %1").arg(argList.at(0));
 }
 
@@ -151,6 +169,9 @@ QString help_sensorOverrideDelayTime(void) {
 }
 
 QStringList build_set_sensorOverrideDelayTime(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S000B %1").arg(argList.at(0));
 }
 
@@ -263,6 +284,9 @@ QStringList build_get_configCalibrationP1(QStringList argList) {
 }
 
 QStringList build_set_configCalibrationP1(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0017 %1").arg(argList.at(0));
 }
 
@@ -276,6 +300,9 @@ QStringList build_get_configCalibrationP2(QStringList argList) {
 }
 
 QStringList build_set_configCalibrationP2(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0018 %1").arg(argList.at(0));
 }
 
@@ -289,6 +316,9 @@ QStringList build_get_configCalibrationP3(QStringList argList) {
 }
 
 QStringList build_set_configCalibrationP3(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0019 %1").arg(argList.at(0));
 }
 
@@ -302,6 +332,9 @@ QStringList build_get_buildTime(QStringList argList) {
 }
 
 QStringList build_set_buildTime(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S001A %1").arg(argList.at(0));
 }
 
@@ -364,6 +397,9 @@ QStringList build_get_wirelessDataAggregator(QStringList argList) {
 }
 
 QStringList build_set_wirelessDataAggregator(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0020 %1").arg(argList.at(0));
 }
 
@@ -386,6 +422,9 @@ QStringList build_get_pwmPeriodRegister(QStringList argList) {
 }
 
 QStringList build_set_pwmPeriodRegister(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0022 %1").arg(argList.at(0));
 }
 
@@ -417,6 +456,9 @@ QStringList build_get_zone(QStringList argList) {
 }
 
 QStringList build_set_zone(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0025 %1").arg(argList.at(0));
 }
 
@@ -430,6 +472,9 @@ QStringList build_get_lightTemporaryActiveLevel(QStringList argList) {
 }
 
 QStringList build_set_lightTemporaryActiveLevel(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0026 %1").arg(argList.at(0));
 }
 
@@ -443,6 +488,9 @@ QStringList build_get_lightTemporaryInactiveLevel(QStringList argList) {
 }
 
 QStringList build_set_lightTemporaryInactiveLevel(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0027 %1").arg(argList.at(0));
 }
 
@@ -456,6 +504,9 @@ QStringList build_get_sensorTemporaryDelayTime(QStringList argList) {
 }
 
 QStringList build_set_sensorTemporaryDealyTime(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0028 %1").arg(argList.at(0));
 }
 
@@ -469,6 +520,9 @@ QStringList build_get_temporaryOverrideTimeout(QStringList argList) {
 }
 
 QStringList build_set_temporaryOverrideTiemout(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0029 %1").arg(argList.at(0));
 }
 
@@ -482,6 +536,9 @@ QStringList build_get_setRemoteState(QStringList argList) {
 }
 
 QStringList build_set_setRemoteState(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S002A %1").arg(argList.at(0));
 }
 
@@ -495,6 +552,9 @@ QStringList build_get_remoteStateDelayTime(QStringList argList) {
 }
 
 QStringList build_set_remoteStateDelayTime(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S002B %1").arg(argList.at(0));
 }
 
@@ -526,6 +586,9 @@ QStringList build_get_powerCalibrationA0(QStringList argList) {
 }
 
 QStringList build_set_powerCalibrationA0(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S002E %1").arg(argList.at(0));
 }
 
@@ -539,6 +602,9 @@ QStringList build_get_powerCalibrationB0(QStringList argList) {
 }
 
 QStringList build_set_powerCalibrationB0(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S002F %1").arg(argList.at(0));
 }
 
@@ -552,6 +618,9 @@ QStringList build_get_powerCalibrationC0(QStringList argList) {
 }
 
 QStringList build_set_powerCalibrationC0(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0030 %1").arg(argList.at(0));
 }
 
@@ -565,6 +634,9 @@ QStringList build_get_powerCalibrationMA(QStringList argList) {
 }
 
 QStringList build_set_powerCalibrationMA(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0031 %1").arg(argList.at(0));
 }
 
@@ -578,6 +650,9 @@ QStringList build_get_powerCalibrationMB(QStringList argList) {
 }
 
 QStringList build_set_powerCalibrationMB(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0032 %1").arg(argList.at(0));
 }
 
@@ -591,6 +666,9 @@ QStringList build_get_powerCalibrationMC(QStringList argList) {
 }
 
 QStringList build_set_powerCalibrationMC(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0033 %1").arg(argList.at(0));
 }
 
@@ -604,6 +682,9 @@ QStringList build_get_powerCalibrationPOff(QStringList argList) {
 }
 
 QStringList build_set_powerCalibrationPOff(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0034 %1").arg(argList.at(0));
 }
 
@@ -617,6 +698,9 @@ QStringList build_get_powerCalibrationPOn(QStringList argList) {
 }
 
 QStringList build_set_powerCalibrationPOn(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0035 %1").arg(argList.at(0));
 }
 
@@ -630,6 +714,9 @@ QStringList build_get_powerCalibrationT0(QStringList argList) {
 }
 
 QStringList build_set_powerCalibrationT0(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0036 %1").arg(argList.at(0));
 }
 
@@ -643,6 +730,9 @@ QStringList build_get_powerEstimatorTemperatureOverride(QStringList argList) {
 }
 
 QStringList build_set_powerEstimatorTemperatureOverride(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0037 %1").arg(argList.at(0));
 }
 
@@ -683,6 +773,9 @@ QStringList build_get_wirelessPanId(QStringList argList) {
 }
 
 QStringList build_set_wirelessPanId(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S003B %1").arg(argList.at(0));
 }
 
@@ -696,6 +789,9 @@ QStringList build_get_wirelessChannelMask(QStringList argList) {
 }
 
 QStringList build_set_wirelessChannelMask(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S003C %1").arg(argList.at(0));
 }
 
@@ -709,6 +805,9 @@ QStringList build_get_wirelessShortAddress(QStringList argList) {
 }
 
 QStringList build_set_wirelessShortAddress(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S003D %1").arg(argList.at(0));
 }
 
@@ -722,6 +821,9 @@ QStringList build_get_wirelessRole(QStringList argList) {
 }
 
 QStringList build_set_wirelessRole(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S003E %1").arg(argList.at(0));
 }
 
@@ -735,6 +837,9 @@ QStringList build_get_wirelessWatchdogHold(QStringList argList) {
 }
 
 QStringList build_set_wirelessWatchdogHold(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S003F %1").arg(argList.at(0));
 }
 
@@ -748,6 +853,9 @@ QStringList build_get_wirelessWatchdogPeriod(QStringList argList) {
 }
 
 QStringList build_set_wirelessWatchdogPeriod(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0040 %1").arg(argList.at(0));
 }
 
@@ -797,6 +905,9 @@ QStringList build_get_overTemperatureThresholdLow(QStringList argList) {
 }
 
 QStringList build_set_overTemperatureThresholdLow(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0045 %1").arg(argList.at(0));
 }
 
@@ -810,6 +921,9 @@ QStringList build_get_overTemperatureThresholdHigh(QStringList argList) {
 }
 
 QStringList build_set_overTemperatureThresholdHigh(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0046 %1").arg(argList.at(0));
 }
 
@@ -823,6 +937,9 @@ QStringList build_get_overTemperatureDimmingLimit(QStringList argList) {
 }
 
 QStringList build_set_overTemperatureDimmingLimit(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0047 %1").arg(argList.at(0));
 }
 
@@ -836,6 +953,9 @@ QStringList build_get_analogDimmingMode(QStringList argList) {
 }
 
 QStringList build_set_analogDimmingMode(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0048 %1").arg(argList.at(0));
 }
 
@@ -849,6 +969,9 @@ QStringList build_get_fixtureIdMode(QStringList argList) {
 }
 
 QStringList build_set_fixtureIdMode(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0049 %1").arg(argList.at(0));
 }
 
@@ -880,6 +1003,9 @@ QStringList build_get_powerMeterCommand(QStringList argList) {
 }
 
 QStringList build_set_powerMeterCommand(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S004C %1").arg(argList.at(0));
 }
 
@@ -893,6 +1019,9 @@ QStringList build_get_powerMeterRegister(QStringList argList) {
 }
 
 QStringList build_set_powerMeterRegister(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S004D %1").arg(argList.at(0));
 }
 
@@ -924,6 +1053,9 @@ QStringList build_get_sensor0Timeout(QStringList argList) {
 }
 
 QStringList build_set_sensor0Timeout(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0050 %1").arg(argList.at(0));
 }
 
@@ -937,6 +1069,9 @@ QStringList build_get_sensor0Offset(QStringList argList) {
 }
 
 QStringList build_set_sensor0Offset(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0051 %1").arg(argList.at(0));
 }
 
@@ -950,6 +1085,9 @@ QStringList build_get_sensor1Timeout(QStringList argList) {
 }
 
 QStringList build_set_sensor1Timeout(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0052 %1").arg(argList.at(0));
 }
 
@@ -963,6 +1101,9 @@ QStringList build_get_sensor1Offset(QStringList argList) {
 }
 
 QStringList build_set_sensor1Offset(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0053 %1").arg(argList.at(0));
 }
 
@@ -976,6 +1117,9 @@ QStringList build_get_analogDimmingLowValue(QStringList argList) {
 }
 
 QStringList build_set_analogDimmingLowValue(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0054 %1").arg(argList.at(0));
 }
 
@@ -989,6 +1133,9 @@ QStringList build_get_analogDimmingHighValue(QStringList argList) {
 }
 
 QStringList build_set_analogDimmingHighValue(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0055 %1").arg(argList.at(0));
 }
 
@@ -1002,6 +1149,9 @@ QStringList build_get_analogDimmingOffValue(QStringList argList) {
 }
 
 QStringList build_set_analogDimmingOffValue(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0056 %1").arg(argList.at(0));
 }
 
@@ -1015,6 +1165,9 @@ QStringList build_get_powerMeasurementMode(QStringList argList) {
 }
 
 QStringList build_set_powerMeasurementMode(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0057 %1").arg(argList.at(0));
 }
 
@@ -1028,6 +1181,9 @@ QStringList build_get_externalPowerMeter(QStringList argList) {
 }
 
 QStringList build_set_externalPowerMeter(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0058 %1").arg(argList.at(0));
 }
 
@@ -1051,6 +1207,9 @@ QStringList build_get_ambientActiveLevel(QStringList argList) {
 }
 
 QStringList build_set_ambientActiveLevel(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S005A %1").arg(argList.at(0));
 }
 
@@ -1064,6 +1223,9 @@ QStringList build_get_ambientInactiveLevel(QStringList argList) {
 }
 
 QStringList build_set_ambientInactiveLevel(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S005B %1").arg(argList.at(0));
 }
 
@@ -1077,6 +1239,9 @@ QStringList build_get_ambientEnvironmentalGain(QStringList argList) {
 }
 
 QStringList build_set_ambientEnvironmentalGain(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S005C %1").arg(argList.at(0));
 }
 
@@ -1090,6 +1255,9 @@ QStringList build_get_ambientOffHysteresis(QStringList argList) {
 }
 
 QStringList build_set_ambientOffHysteresis(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S005D %1").arg(argList.at(0));
 }
 
@@ -1103,6 +1271,9 @@ QStringList build_get_ambientOnHysteresis(QStringList argList) {
 }
 
 QStringList build_set_ambientOnHysteresis(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S005E %1").arg(argList.at(0));
 }
 
@@ -1125,6 +1296,9 @@ QStringList build_get_ledOverride(QStringList argList) {
 }
 
 QStringList build_set_ledOverride(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0060 %1").arg(argList.at(0));
 }
 
@@ -1138,6 +1312,9 @@ QStringList build_get_fadeUpStep(QStringList argList) {
 }
 
 QStringList build_set_fadeUpStep(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0061 %1").arg(argList.at(0));
 }
 
@@ -1151,6 +1328,9 @@ QStringList build_get_fadeDownStep(QStringList argList) {
 }
 
 QStringList build_set_fadeDownStep(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0062 %1").arg(argList.at(0));
 }
 
@@ -1164,6 +1344,9 @@ QStringList build_get_maxBrightness(QStringList argList) {
 }
 
 QStringList build_set_maxBrightness(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0063 %1").arg(argList.at(0));
 }
 
@@ -1186,6 +1369,9 @@ QStringList build_get_sensorGuardTime(QStringList argList) {
 }
 
 QStringList build_set_sensorGuardTime(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0065 %1").arg(argList.at(0));
 }
 
@@ -1208,6 +1394,9 @@ QStringList build_get_inputVoltageCalibration(QStringList argList) {
 }
 
 QStringList build_set_inputVoltageCalibration(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0067 %1").arg(argList.at(0));
 }
 
@@ -1221,6 +1410,9 @@ QStringList build_get_numberOfLightbars(QStringList argList) {
 }
 
 QStringList build_set_numberOfLightbars(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0068 %1").arg(argList.at(0));
 }
 
@@ -1243,6 +1435,9 @@ QStringList build_get_currentLimit(QStringList argList) {
 }
 
 QStringList build_set_currentLimit(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S006A %1").arg(argList.at(0));
 }
 
@@ -1265,6 +1460,9 @@ QStringList build_get_xpressMode(QStringList argList) {
 }
 
 QStringList build_set_xpressMode(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S006C %1").arg(argList.at(0));
 }
 
@@ -1317,6 +1515,9 @@ QString parse_get_batteryBackupStatus(QStringList pmuResponse) {
 }
 
 QStringList build_set_batteryBackupStatus(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S006D %1").arg(argList.at(0));
 }
 
@@ -1348,6 +1549,9 @@ QStringList build_get_inputVoltageTwoCalibration(QStringList argList) {
 }
 
 QStringList build_set_inputVoltageTwoCalibration(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0070 %1").arg(argList.at(0));
 }
 
@@ -1361,6 +1565,9 @@ QStringList build_get_maxRampUpSpeed(QStringList argList) {
 }
 
 QStringList build_set_maxRampUpSpeed(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0071 %1").arg(argList.at(0));
 }
 
@@ -1374,6 +1581,9 @@ QStringList build_get_maxRampDownSpeed(QStringList argList) {
 }
 
 QStringList build_set_maxRampDownSpeed(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0072 %1").arg(argList.at(0));
 }
 
@@ -1387,6 +1597,9 @@ QStringList build_get_wirelessNetworkKey(QStringList argList) {
 }
 
 QStringList build_set_wirelessNetworkKey(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0073 %1").arg(argList.at(0));
 }
 
@@ -1410,6 +1623,9 @@ QStringList build_get_batteryBackupPowerCalibration(QStringList argList) {
 }
 
 QStringList build_set_batteryBackupPowerCalibration(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0075 %1").arg(argList.at(0));
 }
 
@@ -1423,6 +1639,9 @@ QStringList build_get_motionSensorProfile(QStringList argList) {
 }
 
 QStringList build_set_motionSensorProfile(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0076 %1").arg(argList.at(0));
 }
 
@@ -1436,6 +1655,9 @@ QStringList build_get_powerMeterLevelAtOff(QStringList argList) {
 }
 
 QStringList build_set_powerMeterLevelAtOff(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0077 %1").arg(argList.at(0));
 }
 
@@ -1449,6 +1671,9 @@ QStringList build_get_powerMeterLevelAtMin(QStringList argList) {
 }
 
 QStringList build_set_powerMeterLevelAtMin(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0078 %1").arg(argList.at(0));
 }
 
@@ -1462,6 +1687,9 @@ QStringList build_get_powerMeterLevelAtMax(QStringList argList) {
 }
 
 QStringList build_set_powerMeterLevelAtMax(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S0079 %1").arg(argList.at(0));
 }
 
@@ -1475,6 +1703,9 @@ QStringList build_get_powerMeterType(QStringList argList) {
 }
 
 QStringList build_set_powerMeterType(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S007A %1").arg(argList.at(0));
 }
 
@@ -1488,6 +1719,9 @@ QStringList build_get_DLAiSlaveMode(QStringList argList) {
 }
 
 QStringList build_set_DLAiSlaveMode(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S007B %1").arg(argList.at(0));
 }
 
@@ -1510,6 +1744,9 @@ QStringList build_get_testingMode(QStringList argList) {
 }
 
 QStringList build_set_testingMode(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S007D %1").arg(argList.at(0));
 }
 
@@ -1523,6 +1760,9 @@ QStringList build_get_numberOfBatteriesSupported(QStringList argList) {
 }
 
 QStringList build_set_numberOfBatteriesSupported(QStringList argList) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
   return QStringList() << QString("S007E %1").arg(argList.at(0));
 }
 
