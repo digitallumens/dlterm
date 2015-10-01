@@ -73,6 +73,7 @@ QString MainWindow::processUserRequest(QString *request) {
     // show help
     if (request->contains("help")) {
       response = cmdEntry->getHelp();
+      m_solarized->setTextColor(request, SOLAR_YELLOW);
       m_solarized->setTextColor(&response, SOLAR_CYAN);
       return response;
     }

@@ -165,7 +165,8 @@ QStringList build_get_sensorOverrideDelayTime(QStringList argList) {
 }
 
 QString help_sensorOverrideDelayTime(void) {
-  return "000B Sensor Override Delay Time (FFFF is no override, FFF1 is \"always on\", FFF0 does not count down) -- 2B -- RW";
+  return "000B Sensor Override Delay Time<br>"
+         "(FFFF is no override, FFF1 is \"always on\", FFF0 does not count down) -- 2B -- RW";
 }
 
 QStringList build_set_sensorOverrideDelayTime(QStringList argList) {
@@ -262,7 +263,8 @@ QStringList build_get_numberOfLogEntries(QStringList argList) {
 }
 
 QString help_numberOfLogEntries(void) {
-  return "0015 Number of Log entries -- 2B -- R (Does not increment in Gen 3)";
+  return "0015 Number of Log entries -- 2B -- R<br>"
+         "(Does not increment in Gen 3)";
 }
 
 QStringList build_get_configCalibrationP0(QStringList argList) {
@@ -275,7 +277,8 @@ QStringList build_set_configCalibrationP0(QStringList argList) {
 }
 
 QString help_configCalibrationP0(void) {
-  return "0016 Config Calibration P0 -- 4B -- RW (ES/EP 0x00000384) Idle Power (mW) **Dropped in 1.0.7**";
+  return "0016 Config Calibration P0 -- 4B -- RW<br>"
+         "(ES/EP 0x00000384) Idle Power (mW) **Dropped in 1.0.7**";
 }
 
 QStringList build_get_configCalibrationP1(QStringList argList) {
@@ -291,7 +294,8 @@ QStringList build_set_configCalibrationP1(QStringList argList) {
 }
 
 QString help_configCalibrationP1(void) {
-  return "0017 Config Calibration P1 -- 4B -- RW (ES/EP 0x00000C80) Power (mW) at Min Dimming 0x7A00 **Dropped in 1.0.7**";
+  return "0017 Config Calibration P1 -- 4B -- RW<br>"
+         "(ES/EP 0x00000C80) Power (mW) at Min Dimming 0x7A00 **Dropped in 1.0.7**";
 }
 
 QStringList build_get_configCalibrationP2(QStringList argList) {
@@ -307,7 +311,8 @@ QStringList build_set_configCalibrationP2(QStringList argList) {
 }
 
 QString help_configCalibrationP2(void) {
-  return "0018 Config Calibration P2 -- 4B -- RW (ES/EP 0x0004D45D) Power slope (mW * 65536 per bit) **Dropped in 1.0.7**";
+  return "0018 Config Calibration P2 -- 4B -- RW<br>"
+         "(ES/EP 0x0004D45D) Power slope (mW * 65536 per bit) **Dropped in 1.0.7**";
 }
 
 QStringList build_get_configCalibrationP3(QStringList argList) {
@@ -323,7 +328,8 @@ QStringList build_set_configCalibrationP3(QStringList argList) {
 }
 
 QString help_configCalibrationP3(void) {
-  return "0019 Config Calibration P3 -- 4B -- RW (ES/EP 0x00028D84) Power (mw) at Max **Dropped in 1.0.7**";
+  return "0019 Config Calibration P3 -- 4B -- RW<br>"
+         "(ES/EP 0x00028D84) Power (mw) at Max **Dropped in 1.0.7**";
 }
 
 QStringList build_get_buildTime(QStringList argList) {
@@ -348,7 +354,9 @@ QStringList build_get_sensorTimeoutCountdown(QStringList argList) {
 }
 
 QString help_sensorTimeoutCountdown(void) {
-  return "001B Sensor Timeout Countdown -- 2B -- R (Seconds left until turnoff. 0 is off, 0xffff is on)";
+  return "001B Sensor Timeout Countdown -- 2B -- R<br>"
+         "Version 1.0+<br>"
+         "(Seconds left until turnoff. 0 is off, 0xffff is on)";
 }
 
 QStringList build_get_currentLightLevel(QStringList argList) {
@@ -357,7 +365,8 @@ QStringList build_get_currentLightLevel(QStringList argList) {
 }
 
 QString help_currentLightLevel(void) {
-  return "001C Current Light Level -- 4B -- R";
+  return "001C Current Light Level -- 4B -- R<br>"
+         "Version 1.0+";
 }
 
 QStringList build_get_safeMode(QStringList argList) {
@@ -366,7 +375,9 @@ QStringList build_get_safeMode(QStringList argList) {
 }
 
 QString help_safeMode(void) {
-  return "001D Safe Mode -- 1B -- R (0 normal, 1 safe due to EEPROM failure, 2 safe due to DIPS)";
+  return "001D Safe Mode -- 1B -- R<br>"
+         "Version 1.0+<br>"
+         "(0 normal, 1 safe due to EEPROM failure, 2 safe due to DIPS)";
 }
 
 QStringList build_get_lightBarSelect(QStringList argList) {
@@ -379,7 +390,9 @@ QStringList build_set_lightBarSelect(QStringList argList) {
 }
 
 QString help_lightBarSelect(void) {
-  return "001E Light Bar Select -- 1B -- RW (bit mask for what light bars should be used. Development use only, not EEPROM backed)";
+  return "001E Light Bar Select -- 1B -- RW<br>"
+         "Version 1.0+<br>"
+         "(bit mask for what light bars should be used. Development use only, not EEPROM backed)";
 }
 
 QStringList build_get_currentPowerConsumption(QStringList argList) {
@@ -388,7 +401,8 @@ QStringList build_get_currentPowerConsumption(QStringList argList) {
 }
 
 QString help_currentPowerConsumption(void) {
-  return "001F Current Power Consumption -- 4B -- R (Power in mW)";
+  return "001F Current Power Consumption -- 4B -- R (Power in mW)<br>"
+         "Version 1.0+<br>";
 }
 
 QStringList build_get_wirelessDataAggregator(QStringList argList) {
@@ -404,7 +418,9 @@ QStringList build_set_wirelessDataAggregator(QStringList argList) {
 }
 
 QString help_wirelessDataAggregator(void) {
-  return "0020 Wireless Data Aggregator -- 2B -- RW (Wireless 16 bit address of data aggregator to send events to)";
+  return "0020 Wireless Data Aggregator -- 2B -- RW<br>"
+         "Version 1.0+<br>"
+         "(Wireless 16 bit address of data aggregator to send events to)";
 }
 
 QStringList build_get_resetUsageTimestamp(QStringList argList) {
@@ -413,7 +429,8 @@ QStringList build_get_resetUsageTimestamp(QStringList argList) {
 }
 
 QString help_resetUsageTimestamp(void) {
-  return "0021 Reset Usage Timestamp -- 4B -- R";
+  return "0021 Reset Usage Timestamp -- 4B -- R<br>"
+         "Version 1.0+";
 }
 
 QStringList build_get_pwmPeriodRegister(QStringList argList) {
@@ -429,7 +446,9 @@ QStringList build_set_pwmPeriodRegister(QStringList argList) {
 }
 
 QString help_pwmPeriodRegister(void) {
-  return "0022 PWM period register -- 2B -- RW (default of 0x8000 gives ~500Hz period, not EEPROM backed)";
+  return "0022 PWM period register -- 2B -- RW<br>"
+         "Version 1.0+<br>"
+         "(default of 0x8000 gives ~500Hz period, not EEPROM backed)";
 }
 
 QStringList build_get_analogSensorValue(QStringList argList) {
@@ -438,7 +457,9 @@ QStringList build_get_analogSensorValue(QStringList argList) {
 }
 
 QString help_analogSensorValue(void) {
-  return "0023 Analog Sensor Value -- 2B -- R (0 - 1024)";
+  return "0023 Analog Sensor Value -- 2B -- R<br>"
+         "Version 1.0.3+<br>"
+         "(0 - 1024)";
 }
 
 QStringList build_get_analogReportingHysteresis(QStringList argList) {
@@ -447,7 +468,9 @@ QStringList build_get_analogReportingHysteresis(QStringList argList) {
 }
 
 QString help_analogReportingHysteresis(void) {
-  return "0024 Analog Reporting Hysteresis -- 2B -- RW (Required change in value before an analog event is fired with the new value)";
+  return "0024 Analog Reporting Hysteresis -- 2B -- RW<br>"
+         "Version 1.0.3+<br>"
+         "(Required change in value before an analog event is fired with the new value)";
 }
 
 QStringList build_get_zone(QStringList argList) {
@@ -463,7 +486,8 @@ QStringList build_set_zone(QStringList argList) {
 }
 
 QString help_zone(void) {
-  return "0025 Zone -- 2B -- RW (EEPROM backed Zone)";
+  return "0025 Zone -- 2B -- RW (EEPROM backed Zone)<br>"
+         "Version 1.0.3+";
 }
 
 QStringList build_get_lightTemporaryActiveLevel(QStringList argList) {
@@ -479,7 +503,8 @@ QStringList build_set_lightTemporaryActiveLevel(QStringList argList) {
 }
 
 QString help_lightTemporaryActiveLevel(void) {
-  return "0026 Light Temporary Active Level (FFFF is no override) -- 2B -- RW";
+  return "0026 Light Temporary Active Level (FFFF is no override) -- 2B -- RW<br>"
+         "Version 1.0.3+";
 }
 
 QStringList build_get_lightTemporaryInactiveLevel(QStringList argList) {
@@ -495,7 +520,8 @@ QStringList build_set_lightTemporaryInactiveLevel(QStringList argList) {
 }
 
 QString help_lightTemporaryInactiveLevel(void) {
-  return "0027 Light Temporary Inactive Level (FFFF is no override) -- 2B -- RW";
+  return "0027 Light Temporary Inactive Level (FFFF is no override) -- 2B -- RW>br>"
+         "Version 1.0.3+<br>";
 }
 
 QStringList build_get_sensorTemporaryDelayTime(QStringList argList) {
@@ -511,7 +537,8 @@ QStringList build_set_sensorTemporaryDealyTime(QStringList argList) {
 }
 
 QString help_sensorTemporaryDelayTime(void) {
-  return "0028 Sensor Temporary Delay Time (FFFF is no override) -- 2B -- RW";
+  return "0028 Sensor Temporary Delay Time (FFFF is no override) -- 2B -- RW<br>"
+         "Version 1.0.3+<br>";
 }
 
 QStringList build_get_temporaryOverrideTimeout(QStringList argList) {
@@ -527,7 +554,9 @@ QStringList build_set_temporaryOverrideTiemout(QStringList argList) {
 }
 
 QString help_temporaryOverrideTimeout(void) {
-  return "0029 Temporary Override Timeout (FFFFFFFF is off) -- 4B -- RW (number of seconds until Temporary Overrides are wiped)";
+  return "0029 Temporary Override Timeout (FFFFFFFF is off) -- 4B -- RW<br>"
+         "Version 1.0.3+<br>"
+         "Number of seconds until Temporary Overrides are wiped";
 }
 
 QStringList build_get_setRemoteState(QStringList argList) {
@@ -543,7 +572,8 @@ QStringList build_set_setRemoteState(QStringList argList) {
 }
 
 QString help_setRemoteState(void) {
-  return "002A Set Remote State (00 inactive, 01 active) -- 1B -- RW";
+  return "002A Set Remote State (00 inactive, 01 active) -- 1B -- RW<br>"
+         "Version 1.0.3+";
 }
 
 QStringList build_get_remoteStateDelayTime(QStringList argList) {
@@ -559,7 +589,9 @@ QStringList build_set_remoteStateDelayTime(QStringList argList) {
 }
 
 QString help_remoteStateDelayTime(void) {
-  return "002B Remote Set Delay Time -- 2B -- RW (number of seconds that Remote Set state sticks)";
+  return "002B Remote Set Delay Time -- 2B -- RW<br>"
+         "Version 1.0.3+<br>"
+         "Number of seconds that Remote Set state sticks";
 }
 
 QStringList build_get_remoteSecondsCountdown(QStringList argList) {
@@ -568,7 +600,9 @@ QStringList build_get_remoteSecondsCountdown(QStringList argList) {
 }
 
 QString help_remoteSecondsCountdown(void) {
-  return "002C Remote Seconds Countdown -- 2B -- R (number of seconds left that Remote Set state has left)";
+  return "002C Remote Seconds Countdown -- 2B -- R<br>"
+         "Version 1.0.3+<br>"
+         "(number of seconds left that Remote Set state has left)";
 }
 
 QStringList build_get_minimumDimmingValue(QStringList argList) {
@@ -577,7 +611,9 @@ QStringList build_get_minimumDimmingValue(QStringList argList) {
 }
 
 QString help_minimumDimmingValue(void) {
-  return "002D Minimum Dimming Value -- 2B -- R (Direct impact on register 0017 as this is used as the start of the linear power regime)";
+  return "002D Minimum Dimming Value -- 2B -- R<br>"
+         "Version 1.0.3+<br>"
+         "(Direct impact on register 0017 as this is used as the start of the linear power regime)";
 }
 
 QStringList build_get_powerCalibrationA0(QStringList argList) {
@@ -593,7 +629,9 @@ QStringList build_set_powerCalibrationA0(QStringList argList) {
 }
 
 QString help_powerCalibrationA0(void) {
-  return "002E Power Calibration A0 -- 2B -- RW -- BAK -- (a_0 * 1000 * 1073741824).round (equivalent to shift left 30)";
+  return "002E Power Calibration A0 -- 2B -- RW -- BAK<br>"
+         "Version 1.0.7+<br>"
+         "(a_0 * 1000 * 1073741824).round (equivalent to shift left 30)";
 }
 
 QStringList build_get_powerCalibrationB0(QStringList argList) {
@@ -609,7 +647,9 @@ QStringList build_set_powerCalibrationB0(QStringList argList) {
 }
 
 QString help_powerCalibrationB0(void) {
-  return "002F Power Calibration B0 -- 2B -- RW -- BAK -(b_0 * 1000 * 4096).round (equivalent to shift left 12 and negate)";
+  return "002F Power Calibration B0 -- 2B -- RW -- BAK<br>"
+         "Version 1.0.7+<br>"
+         "-(b_0 * 1000 * 4096).round (equivalent to shift left 12 and negate)";
 }
 
 QStringList build_get_powerCalibrationC0(QStringList argList) {
@@ -625,7 +665,9 @@ QStringList build_set_powerCalibrationC0(QStringList argList) {
 }
 
 QString help_powerCalibrationC0(void) {
-  return "0030 Power Calibration C0 -- 2B -- RW -- BAK -- (c_0 * 1000 / 4).round (equivalent to shift right 2)";
+  return "0030 Power Calibration C0 -- 2B -- RW -- BAK<br>"
+         "Version 1.0.7+<br>"
+         "(c_0 * 1000 / 4).round (equivalent to shift right 2)";
 }
 
 QStringList build_get_powerCalibrationMA(QStringList argList) {
@@ -641,7 +683,9 @@ QStringList build_set_powerCalibrationMA(QStringList argList) {
 }
 
 QString help_powerCalibrationMA(void) {
-  return "0031 Power Calibration MA -- 2B -- RW -- BAK -- (m_a * 1000 * 549755813888).round (equivalent to shift left 39) -- XPG: 0x4061";
+  return "0031 Power Calibration MA -- 2B -- RW -- BAK<br>"""
+         "Version 1.0.7+<br>"
+         "(m_a * 1000 * 549755813888).round (equivalent to shift left 39) -- XPG: 0x4061";
 }
 
 QStringList build_get_powerCalibrationMB(QStringList argList) {
@@ -657,7 +701,9 @@ QStringList build_set_powerCalibrationMB(QStringList argList) {
 }
 
 QString help_powerCalibrationMB(void) {
-  return "0032 Power Calibration MB -- 2B -- RW -- BAK -- (m_b * 1000 * 2097152).round (equivalent to shift left 21) -- XPG: 0x4FAF";
+  return "0032 Power Calibration MB -- 2B -- RW -- BAK<br>"
+         "Version 1.0.7+<br>"
+         "(m_b * 1000 * 2097152).round (equivalent to shift left 21) -- XPG: 0x4FAF";
 }
 
 QStringList build_get_powerCalibrationMC(QStringList argList) {
@@ -673,7 +719,9 @@ QStringList build_set_powerCalibrationMC(QStringList argList) {
 }
 
 QString help_powerCalibrationMC(void) {
-  return "0033 Power Calibration MC -- 2B -- RW -- BAK -(m_c * 1000 * 32).round (equivalent to shift left 5 and negate) -- XPG: 0x2D23";
+  return "0033 Power Calibration MC -- 2B -- RW -- BAK<br>"
+         "Version 1.0.7+<br>"
+         "-(m_c * 1000 * 32).round (equivalent to shift left 5 and negate) -- XPG: 0x2D23";
 }
 
 QStringList build_get_powerCalibrationPOff(QStringList argList) {
@@ -689,7 +737,9 @@ QStringList build_set_powerCalibrationPOff(QStringList argList) {
 }
 
 QString help_powerCalibrationPOff(void) {
-  return "0034 Power Calibration POff -- 2B -- RW -- BAK -- (P_Off * 1000).round";
+  return "0034 Power Calibration POff -- 2B -- RW -- BAK<br>"
+         "Version 1.0.7+<br>"
+         "(P_Off * 1000).round";
 }
 
 QStringList build_get_powerCalibrationPOn(QStringList argList) {
@@ -705,7 +755,9 @@ QStringList build_set_powerCalibrationPOn(QStringList argList) {
 }
 
 QString help_powerCalibrationPOn(void) {
-  return "0035 Power Calibration POn -- 2B -- RW -- BAK -- (P_On * 1000 / 4).round (equivalent to shift right 2)";
+  return "0035 Power Calibration POn -- 2B -- RW -- BAK<br>"
+         "Version 1.0.7+<br>"
+         "(P_On * 1000 / 4).round (equivalent to shift right 2)";
 }
 
 QStringList build_get_powerCalibrationT0(QStringList argList) {
@@ -721,7 +773,9 @@ QStringList build_set_powerCalibrationT0(QStringList argList) {
 }
 
 QString help_powerCalibrationT0(void) {
-  return "0036 Power Calibration T0 -- 2B -- RW -- BAK -- (t_0 * 128).round (equivalent to shift left 7) or just put register 0004 straight into this.";
+  return "0036 Power Calibration T0 -- 2B -- RW -- BAK<br>"
+         "Version 1.0.7+<br>"
+         "(t_0 * 128).round (equivalent to shift left 7) or just put register 0004 straight into this.";
 }
 
 QStringList build_get_powerEstimatorTemperatureOverride(QStringList argList) {
@@ -737,7 +791,9 @@ QStringList build_set_powerEstimatorTemperatureOverride(QStringList argList) {
 }
 
 QString help_powerEstimatorTemperatureOverride(void) {
-  return "0037 Power Estimator Temperature Override -- 2B -- RW Set to 0x7FFF to disable override. Otherwise estimator will use this temperature.";
+  return "0037 Power Estimator Temperature Override -- 2B -- RW<br>"
+         "Version 1.0.7+<br>"
+         "Set to 0x7FFF to disable override. Otherwise estimator will use this temperature.";
 }
 
 QStringList build_get_cachedTemperatureValue(QStringList argList) {
@@ -746,7 +802,9 @@ QStringList build_get_cachedTemperatureValue(QStringList argList) {
 }
 
 QString help_cachedTemperatureValue(void) {
-  return "0038 Cached Temperature Value -- 2B -- R The cached temperature used for power calculations. Updated once per minute.";
+  return "0038 Cached Temperature Value -- 2B -- R<br>"
+         "Version 1.0.7+<br>"
+         "The cached temperature used for power calculations. Updated once per minute.";
 }
 
 QStringList build_get_eepromSize(QStringList argList) {
@@ -755,7 +813,9 @@ QStringList build_get_eepromSize(QStringList argList) {
 }
 
 QString help_eepromSize(void) {
-  return "0039 EEPROM Size -- 1B -- R -- The EEPROM size in log(2) (in bytes not bits)";
+  return "0039 EEPROM Size -- 1B -- R<br>"
+         "Version 1.0.8+<br>"
+         "The EEPROM size in log(2) (in bytes not bits)";
 }
 
 QStringList build_get_hardwareRevision(QStringList argList) {
@@ -764,7 +824,9 @@ QStringList build_get_hardwareRevision(QStringList argList) {
 }
 
 QString help_hardwareRevision(void) {
-  return "003A Hardware Revision -- 4B -- RW -- BAK -- Revision of the hardware for the unit (EEPROM)";
+  return "003A Hardware Revision -- 4B -- RW -- BAK<br>"
+         "Version 1.0.8+<br>"
+         "Revision of the hardware for the unit (EEPROM)";
 }
 
 QStringList build_get_wirelessPanId(QStringList argList) {
@@ -780,7 +842,9 @@ QStringList build_set_wirelessPanId(QStringList argList) {
 }
 
 QString help_wirelessPanId(void) {
-  return "003B Wireless Pan ID -- 8B -- RW -- -- BAK -- The Wireless PAN ID to set the wireless to with !N";
+  return "003B Wireless Pan ID -- 8B -- RW -- -- BAK<br>"
+         "Version 1.0.10+<br>"
+         "The Wireless PAN ID to set the wireless to with !N";
 }
 
 QStringList build_get_wirelessChannelMask(QStringList argList) {
@@ -796,7 +860,9 @@ QStringList build_set_wirelessChannelMask(QStringList argList) {
 }
 
 QString help_wirelessChannelMask(void) {
-  return "003C Wireless Channel Mask -- 4B -- RW -- BAK -- The Wireless Channel Mask to set the wireless to with !N";
+  return "003C Wireless Channel Mask -- 4B -- RW -- BAK<br>"
+         "Version 1.0.10+<br>"
+         "The Wireless Channel Mask to set the wireless to with !N";
 }
 
 QStringList build_get_wirelessShortAddress(QStringList argList) {
@@ -812,7 +878,9 @@ QStringList build_set_wirelessShortAddress(QStringList argList) {
 }
 
 QString help_wirelessShortAddress(void) {
-  return "003D Wireless Short Address -- 2B -- RW -- The Wireless Short Source Address to set the wireless to with !N";
+  return "003D Wireless Short Address -- 2B -- RW<br>"
+         "Version 1.0.10+<br>"
+         "The Wireless Short Source Address to set the wireless to with !N";
 }
 
 QStringList build_get_wirelessRole(QStringList argList) {
@@ -828,7 +896,9 @@ QStringList build_set_wirelessRole(QStringList argList) {
 }
 
 QString help_wirelessRole(void) {
-  return "003E Wireless Role -- 1B -- RW -- The Wireless Role to set the wireless to with !N";
+  return "003E Wireless Role -- 1B -- RW<br>"
+         "Version 1.0.10+<br>"
+         "The Wireless Role to set the wireless to with !N";
 }
 
 QStringList build_get_wirelessWatchdogHold(QStringList argList) {
@@ -844,7 +914,9 @@ QStringList build_set_wirelessWatchdogHold(QStringList argList) {
 }
 
 QString help_wirelessWatchdogHold(void) {
-  return "003F Wireless Watchdog Hold -- 1B -- RW -- The hold time in minutes for the SerialNet watchdog. (0xFF becomes 0 minutes) Setting this or 0040 to 0 will disable watchdog. (EEPROM)";
+  return "003F Wireless Watchdog Hold -- 1B -- RW<br>"
+         "Version 1.0.11+<br>"
+         "The hold time in minutes for the SerialNet watchdog. (0xFF becomes 0 minutes) Setting this or 0040 to 0 will disable watchdog. (EEPROM)";
 }
 
 QStringList build_get_wirelessWatchdogPeriod(QStringList argList) {
@@ -860,7 +932,9 @@ QStringList build_set_wirelessWatchdogPeriod(QStringList argList) {
 }
 
 QString help_wirelessWatchdogPeriod(void) {
-  return "0040 Wireless Watchdog Period -- 2B -- RW -- The period in minutes to watchdog SerialNet at. Resets will occur at times divisible by this value. (0xFFFF becomes 0 hours) (EEPROM)";
+  return "0040 Wireless Watchdog Period -- 2B -- RW<br>"
+         "Version 1.0.11+<br>"
+         "The period in minutes to watchdog SerialNet at. Resets will occur at times divisible by this value. (0xFFFF becomes 0 hours) (EEPROM)";
 }
 
 QStringList build_get_firmwareCode(QStringList argList) {
@@ -869,7 +943,9 @@ QStringList build_get_firmwareCode(QStringList argList) {
 }
 
 QString help_firmwareCode(void) {
-  return "0041 Firmware Code -- 4B -- R -- A unique identifier for compatible firmware. Only firmware with this Firmware Code can be bootloaded.";
+  return "0041 Firmware Code -- 4B -- R<br>"
+         "Version 1.1.0+<br>"
+         "A unique identifier for compatible firmware. Only firmware with this Firmware Code can be bootloaded.";
 }
 
 QStringList build_get_moduleFirmwareCode(QStringList argList) {
@@ -878,7 +954,9 @@ QStringList build_get_moduleFirmwareCode(QStringList argList) {
 }
 
 QString help_moduleFirmwareCode(void) {
-  return "0042 Module Firmware Code -- 4B -- R -- A unique identifier for compatible firmware. Only firmware with this Firmware Code can be bootloaded.";
+  return "0042 Module Firmware Code -- 4B -- R<br>"
+         "Version 1.1.0+<br>"
+         "A unique identifier for compatible firmware. Only firmware with this Firmware Code can be bootloaded.";
 }
 
 QStringList build_get_maxTemperatureObserved(QStringList argList) {
@@ -887,7 +965,9 @@ QStringList build_get_maxTemperatureObserved(QStringList argList) {
 }
 
 QString help_maxTemperatureObserved(void) {
-  return "0043 Max Temperature Observed -- 2B -- R -- Highest temperature observed. (EEPROM)";
+  return "0043 Max Temperature Observed -- 2B -- R<br>"
+         "Version 1.1.4+<br>"
+         "Highest temperature observed. (EEPROM)";
 }
 
 QStringList build_get_maxTemperatureObservedTime(QStringList argList) {
@@ -896,7 +976,9 @@ QStringList build_get_maxTemperatureObservedTime(QStringList argList) {
 }
 
 QString help_maxTemperatureObservedTime(void) {
-  return "0044 Max Temperature Observed Time -- 4B -- R -- Time that highest temperature was observed. (EEPROM)";
+  return "0044 Max Temperature Observed Time -- 4B -- R<br>"
+         "Version 1.1.4+<br>"
+         "Time that highest temperature was observed. (EEPROM)";
 }
 
 QStringList build_get_overTemperatureThresholdLow(QStringList argList) {
@@ -912,7 +994,9 @@ QStringList build_set_overTemperatureThresholdLow(QStringList argList) {
 }
 
 QString help_overTemperatureThresholdLow(void) {
-  return "0045 Over Temp Threshold Low -- 2B -- RW -- BAK -- Maximum Temperature allowed for full brightness. (EEPROM)";
+  return "0045 Over Temp Threshold Low -- 2B -- RW -- BAK<br>"
+         "Version 1.1.4+<br>"
+         "Maximum Temperature allowed for full brightness. (EEPROM)";
 }
 
 QStringList build_get_overTemperatureThresholdHigh(QStringList argList) {
@@ -928,7 +1012,9 @@ QStringList build_set_overTemperatureThresholdHigh(QStringList argList) {
 }
 
 QString help_overTemperatureThresholdHigh(void) {
-  return "0046 Over Temp Threshold High -- 2B -- RW -- BAK -- Temperature at which the maximum allowed brightness reaches Over Temp Dim Limit. (EEPROM)";
+  return "0046 Over Temp Threshold High -- 2B -- RW -- BAK<br>"
+         "Version 1.1.4+<br>"
+         "Temperature at which the maximum allowed brightness reaches Over Temp Dim Limit. (EEPROM)";
 }
 
 QStringList build_get_overTemperatureDimmingLimit(QStringList argList) {
@@ -944,7 +1030,9 @@ QStringList build_set_overTemperatureDimmingLimit(QStringList argList) {
 }
 
 QString help_overTemperatureDimmingLimit(void) {
-  return "0047 Over Temp Dimming Limit -- 2B -- RW -- BAK -- Minimum dimming level that the protection is allowed to reduce the maximum brightness to. (EEPROM)";
+  return "0047 Over Temp Dimming Limit -- 2B -- RW -- BAK<br>"
+         "Version 1.1.4+<br>"
+         "Minimum dimming level that the protection is allowed to reduce the maximum brightness to. (EEPROM)";
 }
 
 QStringList build_get_analogDimmingMode(QStringList argList) {
@@ -960,7 +1048,14 @@ QStringList build_set_analogDimmingMode(QStringList argList) {
 }
 
 QString help_analogDimmingMode(void) {
-  return "0048 Analog Dimming Mode -- 1B -- RW -- 00 = Analog Dimming OFF, 01 = Analog DImming On, 02 = Analog Dimming On w/ ability to go full off, 03 = Analog Dimming using registers 54-56, 04 = Analog Dimming using registers 54-56 w/ full off suport, 05 = Ambient Sensor Dimming. (EEPROM)";
+  return "0048 Analog Dimming Mode -- 1B -- RW<br>"
+         "Version 1.1.4+<br>"
+         "00 = Analog Dimming OFF<br>"
+         "01 = Analog DImming On<br>"
+         "02 = Analog Dimming On w/ ability to go full off<br>"
+         "03 = Analog Dimming using registers 54-56<br>"
+         "04 = Analog Dimming using registers 54-56 w/ full off suport<br>"
+         "05 = Ambient Sensor Dimming. (EEPROM)";
 }
 
 QStringList build_get_fixtureIdMode(QStringList argList) {
@@ -976,7 +1071,14 @@ QStringList build_set_fixtureIdMode(QStringList argList) {
 }
 
 QString help_fixtureIdMode(void) {
-  return "0049 Fixture ID Mode -- 3B -- RW -- (1B mode, 2B time in seconds) 00 = Off, 01 = Status LEDs, 02 = Full Flash, 03 = Safe Flash, 04 = Middle Flash";
+  return "0049 Fixture ID Mode -- 3B -- RW<br>"
+         "Version 1.1.4+<br>"
+         "(1B mode, 2B time in seconds)<br>"
+         "00 = Off<br>"
+         "01 = Status LEDs<br>"
+         "02 = Full Flash<br>"
+         "03 = Safe Flash<br>"
+         "04 = Middle Flash";
 }
 
 QStringList build_get_acFrequency(QStringList argList) {
@@ -985,7 +1087,9 @@ QStringList build_get_acFrequency(QStringList argList) {
 }
 
 QString help_acFrequency(void) {
-  return "004A AC Frequency -- 2B -- R -- frequency in 250kHz increments. f = 250kHz/value";
+  return "004A AC Frequency -- 2B -- R<br>"
+         "Version 1.1.4+<br>"
+         "frequency in 250kHz increments. f = 250kHz/value";
 }
 
 QStringList build_get_sensorBits(QStringList argList) {
@@ -994,7 +1098,9 @@ QStringList build_get_sensorBits(QStringList argList) {
 }
 
 QString help_sensorBits(void) {
-  return "004B Sensor Bits -- 1B -- R -- The current digital sensor bits";
+  return "004B Sensor Bits -- 1B -- R<br>"
+         "Version 1.2.0+<br>"
+         "The current digital sensor bits";
 }
 
 QStringList build_get_powerMeterCommand(QStringList argList) {
@@ -1010,7 +1116,9 @@ QStringList build_set_powerMeterCommand(QStringList argList) {
 }
 
 QString help_powerMeterCommand(void) {
-  return "004C Power Meter Command -- 1B -- RW -- Command to execute on the power meter chip. AJAX only";
+  return "004C Power Meter Command -- 1B -- RW<br>"
+         "Version 1.2.1+<br>"
+         "Command to execute on the power meter chip. AJAX only";
 }
 
 QStringList build_get_powerMeterRegister(QStringList argList) {
@@ -1026,7 +1134,9 @@ QStringList build_set_powerMeterRegister(QStringList argList) {
 }
 
 QString help_powerMeterRegister(void) {
-  return "004D Power Meter Register -- 4B -- RW -- Read or Write register on power meter chip. AJAX only";
+  return "004D Power Meter Register -- 4B -- RW<br>"
+         "Version 1.2.1+<br>"
+         "Read or Write register on power meter chip. AJAX only";
 }
 
 QStringList build_get_ambientTemperature(QStringList argList) {
@@ -1035,7 +1145,9 @@ QStringList build_get_ambientTemperature(QStringList argList) {
 }
 
 QString help_ambientTemperature(void) {
-  return "004E Ambient Temperature -- 2B -- R -- Temperature from Ambient junction. 128ths of a deg C. SWAN only";
+  return "004E Ambient Temperature -- 2B -- R<br>"
+         "Version 1.2.1+<br>"
+         "Temperature from Ambient junction. 128ths of a deg C. SWAN only";
 }
 
 QStringList build_get_lightSensorLevel(QStringList argList) {
@@ -1044,7 +1156,9 @@ QStringList build_get_lightSensorLevel(QStringList argList) {
 }
 
 QString help_lightSensorLevel(void) {
-  return "004F Light Sensor Level -- 2B -- R -- SWAN Light Sensor (Analog, OBSOLETE!)";
+  return "004F Light Sensor Level -- 2B -- R<br>"
+         "Version 1.2.1+<br>"
+         "SWAN Light Sensor (Analog, OBSOLETE!)";
 }
 
 QStringList build_get_sensor0Timeout(QStringList argList) {
@@ -1060,7 +1174,9 @@ QStringList build_set_sensor0Timeout(QStringList argList) {
 }
 
 QString help_sensor0Timeout(void) {
-  return "0050 Sensor 0 Timeout -- 1B -- RW -- The timeout of the hardware installed at Sensor 0. (Also 1.1.6)";
+  return "0050 Sensor 0 Timeout -- 1B -- RW<br>"
+         "Version 1.2.1+<br>"
+         "The timeout of the hardware installed at Sensor 0. (Also 1.1.6)";
 }
 
 QStringList build_get_sensor0Offset(QStringList argList) {
@@ -1076,7 +1192,9 @@ QStringList build_set_sensor0Offset(QStringList argList) {
 }
 
 QString help_sensor0Offset(void) {
-  return "0051 Sensor 0 Offset -- 1B -- RW -- Additional delay added to hardware Sensor 0 before starting normal countdown. (Allow new sensor to act like old sensor) (Also 1.1.6)";
+  return "0051 Sensor 0 Offset -- 1B -- RW<br>"
+         "Version 1.2.1+<br>"
+         "Additional delay added to hardware Sensor 0 before starting normal countdown. (Allow new sensor to act like old sensor) (Also 1.1.6)";
 }
 
 QStringList build_get_sensor1Timeout(QStringList argList) {
@@ -1092,7 +1210,9 @@ QStringList build_set_sensor1Timeout(QStringList argList) {
 }
 
 QString help_sensor1Timeout(void) {
-  return "0052 Sensor 1 Timeout -- 1B -- RW -- The timeout of the hardware installed at Sensor 1 (not AJAX) (Also 1.1.6)";
+  return "0052 Sensor 1 Timeout -- 1B -- RW<br>"
+         "Version 1.2.1+<br>"
+         "The timeout of the hardware installed at Sensor 1 (not AJAX) (Also 1.1.6)";
 }
 
 QStringList build_get_sensor1Offset(QStringList argList) {
@@ -1108,7 +1228,9 @@ QStringList build_set_sensor1Offset(QStringList argList) {
 }
 
 QString help_sensor1Offset(void) {
-  return "0053 Sensor 1 Offset -- 1B -- RW -- Same as 0051 but for Sensor 1 (not AJAX) (Also 1.1.6)";
+  return "0053 Sensor 1 Offset -- 1B -- RW<br>"
+         "Version 1.2.1+<br>"
+         "Same as 0051 but for Sensor 1 (not AJAX) (Also 1.1.6)";
 }
 
 QStringList build_get_analogDimmingLowValue(QStringList argList) {
@@ -1124,7 +1246,9 @@ QStringList build_set_analogDimmingLowValue(QStringList argList) {
 }
 
 QString help_analogDimmingLowValue(void) {
-  return "0054 Analog Dimming Low Value -- 2B -- RW -- Value at which minimum dimming is reached. (Also 1.1.6)";
+  return "0054 Analog Dimming Low Value -- 2B -- RW<br>"
+         "Version 1.2.4+<br>"
+         "Value at which minimum dimming is reached. (Also 1.1.6)";
 }
 
 QStringList build_get_analogDimmingHighValue(QStringList argList) {
@@ -1140,7 +1264,9 @@ QStringList build_set_analogDimmingHighValue(QStringList argList) {
 }
 
 QString help_analogDimmingHighValue(void) {
-  return "0055 Analog Dimming High Value -- 2B -- RW -- Value at which specified brightness is reached. (Also 1.1.6)";
+  return "0055 Analog Dimming High Value -- 2B -- RW<br>"
+         "Version 1.2.4+<br>"
+         "Value at which specified brightness is reached. (Also 1.1.6)";
 }
 
 QStringList build_get_analogDimmingOffValue(QStringList argList) {
@@ -1156,7 +1282,9 @@ QStringList build_set_analogDimmingOffValue(QStringList argList) {
 }
 
 QString help_analogDimmingOffValue(void) {
-  return "0056 Analog Dimming Off Value -- 2B -- RW -- Value at which lights are powered off (must exceed low value to turn back on) (Also 1.1.6)";
+  return "0056 Analog Dimming Off Value -- 2B -- RW<br>"
+         "Version 1.2.4+<br>"
+         "Value at which lights are powered off (must exceed low value to turn back on) (Also 1.1.6)";
 }
 
 QStringList build_get_powerMeasurementMode(QStringList argList) {
@@ -1172,7 +1300,10 @@ QStringList build_set_powerMeasurementMode(QStringList argList) {
 }
 
 QString help_powerMeasurementMode(void) {
-  return "0057 Power Measurement Mode -- 1B -- RW -- 00 = default/native mode; 01 = external pulse meter on Digital (Sensor) 0 input. AJAX only";
+  return "0057 Power Measurement Mode -- 1B -- RW<br>"
+         "Version 1.2.4+<br>"
+         "00 = default/native mode<br>"
+         "01 = external pulse meter on Digital (Sensor) 0 input. AJAX only";
 }
 
 QStringList build_get_externalPowerMeter(QStringList argList) {
@@ -1188,8 +1319,10 @@ QStringList build_set_externalPowerMeter(QStringList argList) {
 }
 
 QString help_externalPowerMeter(void) {
-  return QString("0058 External Power Meter mWsec per edge -- 4B -- RW -- milliWatt-seconds per pulse edge for external pulse meter (Measurement Mode 01). AJAX only") +
-         QString("for example: 5 Amp CT has WHpP of 0.125, so value is 0.125 * 1000 * 3600 / 2 = 225000 (divide by two because we count edges, not pulses)");
+  return "0058 External Power Meter mWsec per edge -- 4B -- RW<br>"
+         "Version 1.2.4+<br>"
+         "milliWatt-seconds per pulse edge for external pulse meter (Measurement Mode 01). AJAX only"
+         "for example: 5 Amp CT has WHpP of 0.125, so value is 0.125 * 1000 * 3600 / 2 = 225000 (divide by two because we count edges, not pulses)";
 }
 
 QStringList build_get_ambientSensorValue(QStringList argList) {
@@ -1198,7 +1331,9 @@ QStringList build_get_ambientSensorValue(QStringList argList) {
 }
 
 QString help_ambientSensorValue(void) {
-  return "0059 Ambient Sensor Value -- 3B -- R -- Auto Gained result of the ambient light sensor";
+  return "0059 Ambient Sensor Value -- 3B -- R<br>"
+         "Version 1.2.6+<br>"
+         "Auto Gained result of the ambient light sensor";
 }
 
 QStringList build_get_ambientActiveLevel(QStringList argList) {
@@ -1214,7 +1349,9 @@ QStringList build_set_ambientActiveLevel(QStringList argList) {
 }
 
 QString help_ambientActiveLevel(void) {
-  return "005A Ambient Active Level -- 3B -- RW -- Target Sensor Value when in the Active State";
+  return "005A Ambient Active Level -- 3B -- RW<br>"
+         "Version 1.2.6+<br>"
+         "Target Sensor Value when in the Active State";
 }
 
 QStringList build_get_ambientInactiveLevel(QStringList argList) {
@@ -1230,7 +1367,9 @@ QStringList build_set_ambientInactiveLevel(QStringList argList) {
 }
 
 QString help_ambientInactiveLevel(void) {
-  return "005B Ambient Inactive Level -- 3B -- RW -- Target Sensor Value when in the Inactive State";
+  return "005B Ambient Inactive Level -- 3B -- RW<br>"
+         "Version 1.2.6+<br>"
+         "Target Sensor Value when in the Inactive State";
 }
 
 QStringList build_get_ambientEnvironmentalGain(QStringList argList) {
@@ -1246,7 +1385,9 @@ QStringList build_set_ambientEnvironmentalGain(QStringList argList) {
 }
 
 QString help_ambientEnvironmentalGain(void) {
-  return "005C Ambient Environment Gain -- 2B -- RW -- Amount of Sensor change per Power Board output bit. ((Max Out - Min Out) / 255)";
+  return "005C Ambient Environment Gain -- 2B -- RW<br>"
+         "Version 1.2.6+<br>"
+         "Amount of Sensor change per Power Board output bit. ((Max Out - Min Out) / 255)";
 }
 
 QStringList build_get_ambientOffHysteresis(QStringList argList) {
@@ -1262,7 +1403,9 @@ QStringList build_set_ambientOffHysteresis(QStringList argList) {
 }
 
 QString help_ambientOffHysteresis(void) {
-  return "005D Ambient Off Hysteresis -- 3B -- RW -- Amount of Sensor hysteresis to apply at min power before letting fixture turn off. (>next register)";
+  return "005D Ambient Off Hysteresis -- 3B -- RW<br>"
+         "Version 1.2.6+<br>"
+         "Amount of Sensor hysteresis to apply at min power before letting fixture turn off. (>next register)";
 }
 
 QStringList build_get_ambientOnHysteresis(QStringList argList) {
@@ -1278,7 +1421,9 @@ QStringList build_set_ambientOnHysteresis(QStringList argList) {
 }
 
 QString help_ambientOnHysteresis(void) {
-  return "005E Ambient On Hysteresis -- 3B -- RW -- Amount of Sensor hysteresis to apply when off before letting fixture turn on. (Min Out - Off)";
+  return "005E Ambient On Hysteresis -- 3B -- RW<br>"
+         "Version 1.2.6+<br>"
+         "Amount of Sensor hysteresis to apply when off before letting fixture turn on. (Min Out - Off)";
 }
 
 QStringList build_get_powerboardProtocol(QStringList argList) {
@@ -1287,7 +1432,9 @@ QStringList build_get_powerboardProtocol(QStringList argList) {
 }
 
 QString help_powerboardProtocol(void) {
-  return "005F Power Board Protocol -- 4B -- R -- Only on Swan";
+  return "005F Power Board Protocol -- 4B -- R<br>"
+         "Version 1.2.12+<br>"
+         "Only on Swan";
 }
 
 QStringList build_get_ledOverride(QStringList argList) {
@@ -1303,7 +1450,9 @@ QStringList build_set_ledOverride(QStringList argList) {
 }
 
 QString help_ledOverride(void) {
-  return "0060 LED Override -- 1B -- RW -- Override the Status LED Outputs (0xFF is no override)";
+  return "0060 LED Override -- 1B -- RW<br>"
+         "Version 1.2.12+<br>"
+         "Override the Status LED Outputs (0xFF is no override)";
 }
 
 QStringList build_get_fadeUpStep(QStringList argList) {
@@ -1319,7 +1468,9 @@ QStringList build_set_fadeUpStep(QStringList argList) {
 }
 
 QString help_fadeUpStep(void) {
-  return "0061 Fade Up Step -- 2B -- RW -- PWM steps per 0.01 sec when lights fading up (default 500)";
+  return "0061 Fade Up Step -- 2B -- RW<br>"
+         "Ajax 1.2.6+<br>"
+         "PWM steps per 0.01 sec when lights fading up (default 500)";
 }
 
 QStringList build_get_fadeDownStep(QStringList argList) {
@@ -1335,7 +1486,9 @@ QStringList build_set_fadeDownStep(QStringList argList) {
 }
 
 QString help_fadeDownStep(void) {
-  return "0062 Fade Down Step -- 2B -- RW -- PWM steps per 0.01 sec when lights fading down (default 500)";
+  return "0062 Fade Down Step -- 2B -- RW<br>"
+         "Ajax 1.2.6+<br>"
+         "PWM steps per 0.01 sec when lights fading down (default 500)";
 }
 
 QStringList build_get_maxBrightness(QStringList argList) {
@@ -1351,7 +1504,9 @@ QStringList build_set_maxBrightness(QStringList argList) {
 }
 
 QString help_maxBrightness(void) {
-  return "0063 Max Brightness -- 2B -- RW -- XLE only. The maximum PWM brightness supported by fixture.";
+  return "0063 Max Brightness -- 2B -- RW<br>"
+         "XLE 1.2.15+<br>"
+         "XLE only. The maximum PWM brightness supported by fixture.";
 }
 
 QStringList build_get_i2cResets(QStringList argList) {
@@ -1360,7 +1515,9 @@ QStringList build_get_i2cResets(QStringList argList) {
 }
 
 QString help_i2cResets(void) {
-  return "0064 I2C resets -- 2B -- R -- Number of I2C resets seen since power up.";
+  return "0064 I2C resets -- 2B -- R<br>"
+         "Version 1.2.17+<br>"
+         "Number of I2C resets seen since power up.";
 }
 
 QStringList build_get_sensorGuardTime(QStringList argList) {
@@ -1376,7 +1533,9 @@ QStringList build_set_sensorGuardTime(QStringList argList) {
 }
 
 QString help_sensorGuardTime(void) {
-  return "0065 Sensor Guard Time -- 2B -- RW -- Time in milliseconds to wait after switching to inactive before allowing the sensor to re-trigger active state. (EEPROM)";
+  return "0065 Sensor Guard Time -- 2B -- RW<br>"
+         "Version 1.2.18+<br>"
+         "Time in milliseconds to wait after switching to inactive before allowing the sensor to re-trigger active state. (EEPROM)";
 }
 
 QStringList build_get_inputVoltage(QStringList argList) {
@@ -1385,7 +1544,9 @@ QStringList build_get_inputVoltage(QStringList argList) {
 }
 
 QString help_inputVoltage(void) {
-  return "0066 Input Voltage -- 2B -- R -- Input voltage in mV if calibrated. If 0067 is 0, then this is the ADC value instead to allow for calibration. Cowboy only.";
+  return "0066 Input Voltage -- 2B -- R<br>"
+         "Version 2.0.1+<br>"
+         "Input voltage in mV if calibrated. If 0067 is 0, then this is the ADC value instead to allow for calibration. Cowboy only.";
 }
 
 QStringList build_get_inputVoltageCalibration(QStringList argList) {
@@ -1401,7 +1562,9 @@ QStringList build_set_inputVoltageCalibration(QStringList argList) {
 }
 
 QString help_inputVoltageCalibration(void) {
-  return "0067 Input Voltage Calibration -- 2B -- RW -- BAK -- Input voltage Calibration in 3.13 format. round((42000/ADC) * (2^13)). Cowboy only";
+  return "0067 Input Voltage Calibration -- 2B -- RW -- BAK<br>"
+         "Version 2.0.1+<br>"
+         "Input voltage Calibration in 3.13 format. round((42000/ADC) * (2^13)). Cowboy only";
 }
 
 QStringList build_get_numberOfLightbars(QStringList argList) {
@@ -1417,7 +1580,9 @@ QStringList build_set_numberOfLightbars(QStringList argList) {
 }
 
 QString help_numberOfLightbars(void) {
-  return "0068 Number of LightBars -- 1B -- R(W) -- BAK -- Swan = 3, Cowboy = Settable between 1 and 4";
+  return "0068 Number of LightBars -- 1B -- R(W) -- BAK<br>"
+         "Version 2.0.1+<br>"
+         "Swan = 3, Cowboy = Settable between 1 and 4";
 }
 
 QStringList build_get_ambientDivisor(QStringList argList) {
@@ -1426,7 +1591,9 @@ QStringList build_get_ambientDivisor(QStringList argList) {
 }
 
 QString help_ambientDivisor(void) {
-  return "0069 Ambient Divisor -- 2B -- R -- The divisor to use when calibrating Ambient Environmental Gain. (255 or 663 currently)";
+  return "0069 Ambient Divisor -- 2B -- R<br>"
+         "Version 2.0.8+<br>"
+         "The divisor to use when calibrating Ambient Environmental Gain. (255 or 663 currently)";
 }
 
 QStringList build_get_currentLimit(QStringList argList) {
@@ -1442,7 +1609,9 @@ QStringList build_set_currentLimit(QStringList argList) {
 }
 
 QString help_currentLimit(void) {
-  return "006A Current Limit -- 2B -- RW -- The maximum number of mA that the Cowboy Light Bars are allowed to pull from the 42V line combined. Cowboy only.";
+  return "006A Current Limit -- 2B -- RW<br>"
+         "Version 2.0.10+<br>"
+         "The maximum number of mA that the Cowboy Light Bars are allowed to pull from the 42V line combined. Cowboy only.";
 }
 
 QStringList build_get_bootloaderCode(QStringList argList) {
@@ -1451,7 +1620,9 @@ QStringList build_get_bootloaderCode(QStringList argList) {
 }
 
 QString help_bootloaderCode(void) {
-  return "006B Bootloader Code -- 4B -- R -- The unique code used to describe the bootloader installed on the Ember Chip.";
+  return "006B Bootloader Code -- 4B -- R<br>"
+         "Version 2.0.14+<br>"
+         "The unique code used to describe the bootloader installed on the Ember Chip.";
 }
 
 QStringList build_get_xpressMode(QStringList argList) {
@@ -1467,7 +1638,9 @@ QStringList build_set_xpressMode(QStringList argList) {
 }
 
 QString help_xpressMode(void) {
-  return "006C Xpress Mode -- 1B -- RW -- 0 for normal operation. 1 for Xpress operation. (Kills radio, change DIP meanings)";
+  return "006C Xpress Mode -- 1B -- RW<br>"
+         "Version 2.0.X+<br>"
+         "0 for normal operation. 1 for Xpress operation. (Kills radio, change DIP meanings)";
 }
 
 QStringList build_get_batteryBackupStatus(QStringList argList) {
@@ -1522,7 +1695,9 @@ QStringList build_set_batteryBackupStatus(QStringList argList) {
 }
 
 QString help_batteryBackupStatus(void) {
-  return "006D Battery Backup -- 4B -- RW -- Battery Backup status (only the Short and Long test start bits (10 & 11) are writable)";
+  return "006D Battery Backup -- 4B -- RW<br>"
+         "Version 2.0.X+<br>"
+         "Battery Backup status (only the Short and Long test start bits (10 & 11) are writable)";
 }
 
 QStringList build_get_sensorSeconds(QStringList argList) {
@@ -1531,7 +1706,9 @@ QStringList build_get_sensorSeconds(QStringList argList) {
 }
 
 QString help_sensorSeconds(void) {
-  return "006E Sensor Seconds -- 4B -- R -- Number of Seconds that the sensor has been active. (EEPROM) Reset by !U";
+  return "006E Sensor Seconds -- 4B -- R<br>"
+         "Version 2.0.X+<br>"
+         "Number of Seconds that the sensor has been active. (EEPROM) Reset by !U";
 }
 
 QStringList build_get_inputVoltageTwo(QStringList argList) {
@@ -1540,7 +1717,9 @@ QStringList build_get_inputVoltageTwo(QStringList argList) {
 }
 
 QString help_inputVoltageTwo(void) {
-  return "006F Input Voltage Two -- 2B -- R -- Input voltage (2nd supply) in mV if calibrated. If 0070 is 0, then this is the ADC value instead to allow for calibration. Cowboy only 36k/48k";
+  return "006F Input Voltage Two -- 2B -- R<br>"
+         "Version 2.0.X+<br>"
+         "Input voltage (2nd supply) in mV if calibrated. If 0070 is 0, then this is the ADC value instead to allow for calibration. Cowboy only 36k/48k";
 }
 
 QStringList build_get_inputVoltageTwoCalibration(QStringList argList) {
@@ -1556,7 +1735,9 @@ QStringList build_set_inputVoltageTwoCalibration(QStringList argList) {
 }
 
 QString help_inputVoltageTwoCalibration(void) {
-  return "0070 Input Voltage Two Calibration -- 2B -- RW -- Input voltage (2nd supply) Calibration in 3.13 format. round((42000/ADC) * (2^13)). Cowboy only 36k/48k";
+  return "0070 Input Voltage Two Calibration -- 2B -- RW<br>"
+         "Version 2.0.X+<br>"
+         "Input voltage (2nd supply) Calibration in 3.13 format. round((42000/ADC) * (2^13)). Cowboy only 36k/48k";
 }
 
 QStringList build_get_maxRampUpSpeed(QStringList argList) {
@@ -1572,7 +1753,9 @@ QStringList build_set_maxRampUpSpeed(QStringList argList) {
 }
 
 QString help_maxRampUpSpeed(void) {
-  return "0071 Max Ramp Up Speed -- 2B -- RW -- Max speed fixture will increase light level. (80us/%) (On Gen2 this rounds down multiples of 128)";
+  return "0071 Max Ramp Up Speed -- 2B -- RW<br>"
+         "Version 2.1.X+<br>"
+         "Max speed fixture will increase light level. (80us/%) (On Gen2 this rounds down multiples of 128)";
 }
 
 QStringList build_get_maxRampDownSpeed(QStringList argList) {
@@ -1588,7 +1771,9 @@ QStringList build_set_maxRampDownSpeed(QStringList argList) {
 }
 
 QString help_maxRampDownSpeed(void) {
-  return "0072 Max Ramp Down Speed -- 2B -- RW -- Max speed fixture will decrease light level. (80us/%) (On Gen2 this rounds down to multiples of 128)";
+  return "0072 Max Ramp Down Speed -- 2B -- RW<br>"
+         "Version 2.1.X+<br>"
+         "Max speed fixture will decrease light level. (80us/%) (On Gen2 this rounds down to multiples of 128)";
 }
 
 QStringList build_get_wirelessNetworkKey(QStringList argList) {
@@ -1604,8 +1789,10 @@ QStringList build_set_wirelessNetworkKey(QStringList argList) {
 }
 
 QString help_wirelessNetworkKey(void) {
-  return QString("0073 Wireless Network Key -- 16B -- RW -- BAK -- The key to be used for network layer encryption. All 0s will disable encryption (default).<br>") +
-         QString("Please note that the byte order for this register is reversed by the Ember Stack, so it needs to be entered in the opposite byte order as the EZSP security key.");
+  return "0073 Wireless Network Key -- 16B -- RW -- BAK<br>"
+         "Version 2.1.X+<br>"
+         "The key to be used for network layer encryption. All 0s will disable encryption (default).<br>"
+         "Please note that the byte order for this register is reversed by the Ember Stack, so it needs to be entered in the opposite byte order as the EZSP security key.";
 }
 
 QStringList build_get_emergencyLightLevel(QStringList argList) {
@@ -1614,7 +1801,9 @@ QStringList build_get_emergencyLightLevel(QStringList argList) {
 }
 
 QString help_emergencyLightLevel(void) {
-  return "0074 Emergency Light Level -- 2B -- R -- Light level battery backup will use when in emergency mode";
+  return "0074 Emergency Light Level -- 2B -- R<br>"
+         "Version 2.1.X+<br>"
+         "Light level battery backup will use when in emergency mode";
 }
 
 QStringList build_get_batteryBackupPowerCalibration(QStringList argList) {
@@ -1630,7 +1819,9 @@ QStringList build_set_batteryBackupPowerCalibration(QStringList argList) {
 }
 
 QString help_batteryBackupPowerCalibration(void) {
-  return "0075 Battery Backup Power Calibration -- 2B -- RW -- Amount of Power (mW) used by the battery backup while charging";
+  return "0075 Battery Backup Power Calibration -- 2B -- RW<br>"
+         "Version 2.1.X+<br>"
+         "Amount of Power (mW) used by the battery backup while charging";
 }
 
 QStringList build_get_motionSensorProfile(QStringList argList) {
@@ -1646,7 +1837,9 @@ QStringList build_set_motionSensorProfile(QStringList argList) {
 }
 
 QString help_motionSensorProfile(void) {
-  return "0076 Motion Sensor Profile -- 1B -- RW -- BAK -- Sensor Profile Setting (FF to use Custom Profile)";
+  return "0076 Motion Sensor Profile -- 1B -- RW -- BAK<br>"
+         "Version 2.1.X+<br>"
+         "Sensor Profile Setting (FF to use Custom Profile)";
 }
 
 QStringList build_get_powerMeterLevelAtOff(QStringList argList) {
@@ -1662,7 +1855,9 @@ QStringList build_set_powerMeterLevelAtOff(QStringList argList) {
 }
 
 QString help_powerMeterLevelAtOff(void) {
-  return "0077 Power Meter Level At Off -- 4B -- RW -- Power consumption of devices on DALI bus at light level off";
+  return "0077 Power Meter Level At Off -- 4B -- RW<br>"
+         "Version 2.1.X+<br>"
+         "Power consumption of devices on DALI bus at light level off";
 }
 
 QStringList build_get_powerMeterLevelAtMin(QStringList argList) {
@@ -1678,7 +1873,9 @@ QStringList build_set_powerMeterLevelAtMin(QStringList argList) {
 }
 
 QString help_powerMeterLevelAtMin(void) {
-  return "0078 Power Meter Level At Min -- 4B -- RW -- Power consumption of devices on DALI bus at light level min";
+  return "0078 Power Meter Level At Min -- 4B -- RW<br>"
+         "Version 2.1.X+<br>"
+         "Power consumption of devices on DALI bus at light level min";
 }
 
 QStringList build_get_powerMeterLevelAtMax(QStringList argList) {
@@ -1694,7 +1891,9 @@ QStringList build_set_powerMeterLevelAtMax(QStringList argList) {
 }
 
 QString help_powerMeterLevelAtMax(void) {
-  return "0079 Power Meter Level At Max -- 4B -- RW -- Power consumption of devices on DALI bus at light level max";
+  return "0079 Power Meter Level At Max -- 4B -- RW<br>"
+         "Version 2.1.X+<br>"
+         "Power consumption of devices on DALI bus at light level max";
 }
 
 QStringList build_get_powerMeterType(QStringList argList) {
@@ -1710,7 +1909,9 @@ QStringList build_set_powerMeterType(QStringList argList) {
 }
 
 QString help_powerMeterType(void) {
-  return "007A Power Meter Type -- 1B -- RW -- Method of Power Metering used by DLA (0 = DL, 1 = Philips, 2 = Estimate)";
+  return "007A Power Meter Type -- 1B -- RW<br>"
+         "Version 2.1.X+<br>"
+         "Method of Power Metering used by DLA (0 = DL, 1 = Philips, 2 = Estimate)";
 }
 
 QStringList build_get_DLAiSlaveMode(QStringList argList) {
@@ -1726,7 +1927,8 @@ QStringList build_set_DLAiSlaveMode(QStringList argList) {
 }
 
 QString help_DLAiSlaveMode(void) {
-  return "007B DLAi Slave Mode -- 1B -- RW -- Set for DALI slave operation, clear for normal operation";
+  return "007B DLAi Slave Mode -- 1B -- RW<br>"
+         "Set for DALI slave operation, clear for normal operation";
 }
 
 QStringList build_get_DALIBootlodingActive(QStringList argList) {
@@ -1735,7 +1937,9 @@ QStringList build_get_DALIBootlodingActive(QStringList argList) {
 }
 
 QString help_DALIBootlodingActive(void) {
-  return "007C DALI Bootloading Active -- 1B -- R -- Set while bootload is in progress";
+  return "007C DALI Bootloading Active -- 1B -- R<br>"
+         "Version 2.1.X+<br>"
+         "Set while bootload is in progress";
 }
 
 QStringList build_get_testingMode(QStringList argList) {
@@ -1751,7 +1955,10 @@ QStringList build_set_testingMode(QStringList argList) {
 }
 
 QString help_testingMode(void) {
-  return "007D Testing Modes -- 1B -- RW -- 0 = None. 1 = Occupancy Sensor Test.";
+  return "007D Testing Modes -- 1B -- RW<br>"
+         "Version 2.1.2+<br>"
+         "0 = None<br>"
+         "1 = Occupancy Sensor Test.";
 }
 
 QStringList build_get_numberOfBatteriesSupported(QStringList argList) {
@@ -1767,7 +1974,9 @@ QStringList build_set_numberOfBatteriesSupported(QStringList argList) {
 }
 
 QString help_numberOfBatteriesSupported(void) {
-  return "007E Number of Batteries Supported -- 1B -- RW -- BAK -- Only on Cowboy, Set at manufacturing time to 2 for 48K and 1 for other DLEs";
+  return "007E Number of Batteries Supported -- 1B -- RW -- BAK<br>"
+         "Version 2.1.10+<br>"
+         "Only on Cowboy, Set at manufacturing time to 2 for 48K and 1 for other DLEs";
 }
 
 /*** lightbar register commands ***/
@@ -1803,7 +2012,8 @@ QString parse_get_lbVersion(QStringList pmuResponse) {
 }
 
 QString help_get_lbVersion(void) {
-  return "Get Lightbar version information -- 1B -- R -- Lightbar number 00 to 07 (no argument = 00), Only on Cowboy";
+  return "Get Lightbar version information -- 1B -- R<br>"
+         "Lightbar number 00 to 07 (no argument = 00), Only on Cowboy";
 }
 
 QStringList build_get_lbStatus(QStringList argList) {
@@ -1865,7 +2075,8 @@ QString parse_get_lbStatus(QStringList pmuResponse) {
 }
 
 QString help_get_lbStatus(void) {
-  return "Get Lightbar status information -- 1B -- R -- Lightbar number 00 to 07 (no argument = 00), Only on Cowboy";
+  return "Get Lightbar status information -- 1B -- R<br>"
+         "Lightbar number 00 to 07 (no argument = 00), Only on Cowboy";
 }
 
 QStringList build_get_lbConfig(QStringList argList) {
@@ -1910,7 +2121,8 @@ QString parse_get_lbConfig(QStringList pmuResponse) {
 }
 
 QString help_get_lbConfig(void) {
-  return "Get Lightbar MFG configuration -- 1B -- R -- Lightbar number 00 to 07 (no argument = 00), Only on Cowboy";
+  return "Get Lightbar MFG configuration -- 1B -- R<br>"
+         "Lightbar number 00 to 07 (no argument = 00), Only on Cowboy";
 }
 
 /*** battery backup register commands ***/
@@ -1951,7 +2163,8 @@ QString parse_get_bbVersion(QStringList pmuResponse) {
 }
 
 QString help_get_bbVersion(void) {
-  return "Get Battery Backup version information -- 1B -- R -- Battery number 00 to 01 (no argument = 00), Only on Cowboy";
+  return "Get Battery Backup version information -- 1B -- Rv"
+         "Battery number 00 to 01 (no argument = 00), Only on Cowboy";
 }
 
 QStringList build_get_bbStatus(QStringList argList) {
@@ -2056,7 +2269,8 @@ QString parse_get_bbStatus(QStringList pmuResponse) {
 }
 
 QString help_get_bbStatus(void) {
-  return "Get Battery Backup status information -- 1B -- R -- Battery number 00 to 01 (no argument = 00), Only on Cowboy";
+  return "Get Battery Backup status information -- 1B -- R<br>"
+         "Battery number 00 to 01 (no argument = 00), Only on Cowboy";
 }
 
 QStringList build_get_bbConfig(QStringList argList) {
@@ -2122,7 +2336,8 @@ QString parse_get_bbConfig(QStringList pmuResponse) {
 }
 
 QString help_get_bbConfig(void) {
-  return "Get Battery Backup MFG configuration -- 1B -- R -- Battery number 00 to 01 (no argument = 00), Only on Cowboy";
+  return "Get Battery Backup MFG configuration -- 1B -- R<br>"
+         "Battery number 00 to 01 (no argument = 00), Only on Cowboy";
 }
 
 /*** reset commands ***/
@@ -2158,8 +2373,8 @@ QStringList build_reset_logIndex(QStringList argList) {
 }
 
 QString help_reset_logIndex(void) {
-  return QString("J Seen up to command for new logging (2.0 command)<br>") +
-         QString("JIIII\r -- Tell the PMU that you have seen up to I index, so that it can clean up log space. It does not guarantee removal of seen log entries. It will return an Error unless the index is between the Tail and the Head as returned by the K command.");
+  return "J Seen up to command for new logging (2.0 command)<br>"
+         "JIIII\r -- Tell the PMU that you have seen up to I index, so that it can clean up log space. It does not guarantee removal of seen log entries. It will return an Error unless the index is between the Tail and the Head as returned by the K command.";
 }
 
 QStringList build_reset_eeprom(QStringList argList) {
@@ -2328,9 +2543,9 @@ QString parse_get_logIndex(QStringList pmuResponse) {
 }
 
 QString help_get_logIndex(void) {
-  return QString("K New Logging Command (2.0 command)<br>") +
-         QString("K\r -- returns tail and head indices of the log (P values added in 2.0.2)<br>") +
-         QString("K: TTTTHHHHPPPP -- T is a 15 bit tail index inclusive. H is a 15 bit head exclusive. P is the index of the most recent power up, set to 0xFFFF if there isn't one.");
+  return "K New Logging Command (2.0 command)<br>"
+         "K\r -- returns tail and head indices of the log (P values added in 2.0.2)<br>"
+         "K: TTTTHHHHPPPP -- T is a 15 bit tail index inclusive. H is a 15 bit head exclusive. P is the index of the most recent power up, set to 0xFFFF if there isn't one.";
 }
 
 QStringList build_get_log(QStringList argList) {
@@ -2470,9 +2685,9 @@ QStringList build_insert_logEntry(QStringList argList) {
 }
 
 QString help_insert_logEntry(void) {
-  return QString("E Insert Event into logger (2.0.1 command)<br>") +
-         QString("ETTVVVVVVVV\r -- Force the PMU to insert an event into the log with type T (1 byte) and V (4 byte). V is big endian and will be converted to correct size for type T.") +
-         QString("ETTVVVVVVVVSSSSSSSS\r -- Same as above but adds S (4 bytes) seconds to the uptime before inserting the event.");
+  return "E Insert Event into logger (2.0.1 command)<br>"
+         "ETTVVVVVVVV\r -- Force the PMU to insert an event into the log with type T (1 byte) and V (4 byte). V is big endian and will be converted to correct size for type T."
+         "ETTVVVVVVVVSSSSSSSS\r -- Same as above but adds S (4 bytes) seconds to the uptime before inserting the event.";
 }
 
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
