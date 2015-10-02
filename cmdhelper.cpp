@@ -84,9 +84,18 @@ QString help_temperature(void) {
   return "0004 Temperature  -- 2B -- R";
 }
 
-QStringList build_get_lightManualLevel(QStringList argList) {
+QStringList build_get_lightLevel(QStringList argList) {
   (void) argList;
-  return QStringList() << "G0005";
+  return QStringList() << "G0005" << "G0006" << "G0007" << "G0008" << "G0009";
+}
+
+QString parse_get_lightLevel(QStringList pmuResponse) {
+  QString parsedResponse = QString("Manual level: %1<br>").arg(pmuResponse.at(0));
+  parsedResponse += QString("Active level: %1<br>").arg(pmuResponse.at(1));
+  parsedResponse += QString("Inactive level: %1<br>").arg(pmuResponse.at(2));
+  parsedResponse += QString("Override active level: %1<br>").arg(pmuResponse.at(3));
+  parsedResponse += QString("Override inactive level: %1<br>").arg(pmuResponse.at(4));
+  return parsedResponse;
 }
 
 QStringList build_set_lightManualLevel(QStringList argList) {
@@ -100,27 +109,12 @@ QString help_lightManualLevel(void) {
   return "0005 Light Manual Level (FFFF is no override) -- 2B -- RW";
 }
 
-QStringList build_get_lightActiveLevel(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0006";
-}
-
 QString help_lightActiveLevel(void) {
   return "0006 Light Active Level (DIPS) -- 2B -- R";
 }
 
-QStringList build_get_lightInactiveLevel(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0007";
-}
-
 QString help_lightInactiveLevel(void) {
   return "0007 Light Inactive Level (DIPS) -- 2B -- R";
-}
-
-QStringList build_get_lightOverrideActiveLevel(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0008";
 }
 
 QStringList build_set_lightOverrideActiveLevel(QStringList argList) {
@@ -134,11 +128,6 @@ QString help_lightOverrideActiveLevel(void) {
   return "0008 Light Override Active Level (FFFF is no override) -- 2B -- RW";
 }
 
-QStringList build_get_lightOverrideInactiveLevel(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0009";
-}
-
 QStringList build_set_lightOverrideInactiveLevel(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
@@ -148,6 +137,15 @@ QStringList build_set_lightOverrideInactiveLevel(QStringList argList) {
 
 QString help_lightOverrideInactiveLevel(void) {
   return "0009 Light Override Inactive Level (FFFF is no override) -- 2B -- RW";
+}
+
+QString help_get_lightLevel(void) {
+  QString help = help_lightManualLevel() + "<br>";
+  help += help_lightActiveLevel() + "<br>";
+  help += help_lightInactiveLevel() + "<br>";
+  help += help_lightOverrideActiveLevel() + "<br>";
+  help += help_lightOverrideInactiveLevel();
+  return help;
 }
 
 QStringList build_get_sensorDelayTime(QStringList argList) {
@@ -185,76 +183,72 @@ QString help_powerupTime(void) {
   return "000C Power up time in seconds -- 4B -- R";
 }
 
-QStringList build_get_usageActiveTime(QStringList argList) {
+QStringList build_get_usage(QStringList argList) {
   (void) argList;
-  return QStringList() << "G000D";
+  return QStringList() << "G000D"
+                       << "G000E"
+                       << "G000F"
+                       << "G0010"
+                       << "G0011"
+                       << "G0012"
+                       << "G0013"
+                       << "G0014";
+}
+
+QString parse_get_usage(QStringList pmuResponse) {
+  QString parsedResponse = QString("Active seconds: %1<br>").arg(pmuResponse.at(0));
+  parsedResponse += QString("Inactive seconds: %1<br>").arg(pmuResponse.at(1));
+  parsedResponse += QString("Perm active seconds: %1<br>").arg(pmuResponse.at(2));
+  parsedResponse += QString("Perm inactive seconds: %1<br>").arg(pmuResponse.at(3));
+  parsedResponse += QString("Wh: %1<br>").arg(pmuResponse.at(4));
+  parsedResponse += QString("Perm Wh: %1<br>").arg(pmuResponse.at(5));
+  parsedResponse += QString("Sensor events: %1<br>").arg(pmuResponse.at(6));
+  parsedResponse += QString("Perm sensor events: %1<br>").arg(pmuResponse.at(7));
+  return parsedResponse;
 }
 
 QString help_usageActiveTime(void) {
   return "000D Usage: Active Seconds -- 4B -- R";
 }
 
-QStringList build_get_usageInactiveTime(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G000E";
-}
-
 QString help_usageInactiveTime(void) {
   return "000E Usage: Inactive Seconds -- 4B -- R";
-}
-
-QStringList build_get_usagePermActiveTime(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G000F";
 }
 
 QString help_usagePermActiveTime(void) {
   return "000F Usage: Perm Active Seconds -- 4B -- R";
 }
 
-QStringList build_get_usagePermInactiveTime(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0010";
-}
-
 QString help_usagePermInactiveTime(void) {
   return "0010 Usage: Perm Inactive Seconds -- 4B -- R";
-}
-
-QStringList build_get_usageWh(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0011";
 }
 
 QString help_usageWh(void) {
   return "0011 Usage: Wh -- 4B -- R";
 }
 
-QStringList build_get_usagePerm(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0012";
-}
-
-QString help_usagePerm(void) {
+QString help_usagePermWh(void) {
   return "0012 Usage: Perm Wh -- 4B -- R";
-}
-
-QStringList build_get_usageSensorEvents(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0013";
 }
 
 QString help_usageSensorEvents(void) {
   return "0013 Usage: Sensor Events -- 4B -- R";
 }
 
-QStringList build_get_usagePermSensorEvents(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0014";
-}
-
 QString help_usagePermSensorEvents(void) {
   return "0014 Usage: Perm Sensor Events -- 4B -- R";
+}
+
+QString help_get_usage(void) {
+  QString help = help_usageActiveTime() + "<br>";
+  help += help_usageInactiveTime() + "<br>";
+  help += help_usagePermActiveTime() + "<br>";
+  help += help_usagePermInactiveTime() + "<br>";
+  help += help_usageWh() + "<br>";
+  help += help_usagePermWh() + "<br>";
+  help += help_usageSensorEvents() + "<br>";
+  help += help_usagePermSensorEvents();
+  return help;
 }
 
 QStringList build_get_numberOfLogEntries(QStringList argList) {
@@ -521,7 +515,7 @@ QStringList build_set_lightTemporaryInactiveLevel(QStringList argList) {
 
 QString help_lightTemporaryInactiveLevel(void) {
   return "0027 Light Temporary Inactive Level (FFFF is no override) -- 2B -- RW>br>"
-         "Version 1.0.3+<br>";
+         "Version 1.0.3+";
 }
 
 QStringList build_get_sensorTemporaryDelayTime(QStringList argList) {
@@ -538,7 +532,7 @@ QStringList build_set_sensorTemporaryDealyTime(QStringList argList) {
 
 QString help_sensorTemporaryDelayTime(void) {
   return "0028 Sensor Temporary Delay Time (FFFF is no override) -- 2B -- RW<br>"
-         "Version 1.0.3+<br>";
+         "Version 1.0.3+";
 }
 
 QStringList build_get_temporaryOverrideTimeout(QStringList argList) {
@@ -616,9 +610,31 @@ QString help_minimumDimmingValue(void) {
          "(Direct impact on register 0017 as this is used as the start of the linear power regime)";
 }
 
-QStringList build_get_powerCalibrationA0(QStringList argList) {
+QStringList build_get_powerCalibration(QStringList argList) {
   (void) argList;
-  return QStringList() << "G002E";
+  return QStringList() << QString("G002E")
+                       << QString("G002F")
+                       << QString("G0030")
+                       << QString("G0031")
+                       << QString("G0032")
+                       << QString("G0033")
+                       << QString("G0034")
+                       << QString("G0035")
+                       << QString("G0036");
+}
+
+QString parse_get_powerCalibration(QStringList pmuResponse) {
+  QString parsedResponse;
+  parsedResponse = QString("A0: %1<br>").arg(pmuResponse.at(0));
+  parsedResponse += QString("B0: %1<br>").arg(pmuResponse.at(1));
+  parsedResponse += QString("C0: %1<br>").arg(pmuResponse.at(2));
+  parsedResponse += QString("MA: %1<br>").arg(pmuResponse.at(3));
+  parsedResponse += QString("MB: %1<br>").arg(pmuResponse.at(4));
+  parsedResponse += QString("MC: %1<br>").arg(pmuResponse.at(5));
+  parsedResponse += QString("POff: %1<br>").arg(pmuResponse.at(6));
+  parsedResponse += QString("POn: %1<br>").arg(pmuResponse.at(7));
+  parsedResponse += QString("T0: %1").arg(pmuResponse.at(8));
+  return parsedResponse;
 }
 
 QStringList build_set_powerCalibrationA0(QStringList argList) {
@@ -634,11 +650,6 @@ QString help_powerCalibrationA0(void) {
          "(a_0 * 1000 * 1073741824).round (equivalent to shift left 30)";
 }
 
-QStringList build_get_powerCalibrationB0(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G002F";
-}
-
 QStringList build_set_powerCalibrationB0(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
@@ -650,11 +661,6 @@ QString help_powerCalibrationB0(void) {
   return "002F Power Calibration B0 -- 2B -- RW -- BAK<br>"
          "Version 1.0.7+<br>"
          "-(b_0 * 1000 * 4096).round (equivalent to shift left 12 and negate)";
-}
-
-QStringList build_get_powerCalibrationC0(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0030";
 }
 
 QStringList build_set_powerCalibrationC0(QStringList argList) {
@@ -670,11 +676,6 @@ QString help_powerCalibrationC0(void) {
          "(c_0 * 1000 / 4).round (equivalent to shift right 2)";
 }
 
-QStringList build_get_powerCalibrationMA(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0031";
-}
-
 QStringList build_set_powerCalibrationMA(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
@@ -686,11 +687,6 @@ QString help_powerCalibrationMA(void) {
   return "0031 Power Calibration MA -- 2B -- RW -- BAK<br>"""
          "Version 1.0.7+<br>"
          "(m_a * 1000 * 549755813888).round (equivalent to shift left 39) -- XPG: 0x4061";
-}
-
-QStringList build_get_powerCalibrationMB(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0032";
 }
 
 QStringList build_set_powerCalibrationMB(QStringList argList) {
@@ -706,11 +702,6 @@ QString help_powerCalibrationMB(void) {
          "(m_b * 1000 * 2097152).round (equivalent to shift left 21) -- XPG: 0x4FAF";
 }
 
-QStringList build_get_powerCalibrationMC(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0033";
-}
-
 QStringList build_set_powerCalibrationMC(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
@@ -722,11 +713,6 @@ QString help_powerCalibrationMC(void) {
   return "0033 Power Calibration MC -- 2B -- RW -- BAK<br>"
          "Version 1.0.7+<br>"
          "-(m_c * 1000 * 32).round (equivalent to shift left 5 and negate) -- XPG: 0x2D23";
-}
-
-QStringList build_get_powerCalibrationPOff(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0034";
 }
 
 QStringList build_set_powerCalibrationPOff(QStringList argList) {
@@ -742,11 +728,6 @@ QString help_powerCalibrationPOff(void) {
          "(P_Off * 1000).round";
 }
 
-QStringList build_get_powerCalibrationPOn(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0035";
-}
-
 QStringList build_set_powerCalibrationPOn(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
@@ -760,11 +741,6 @@ QString help_powerCalibrationPOn(void) {
          "(P_On * 1000 / 4).round (equivalent to shift right 2)";
 }
 
-QStringList build_get_powerCalibrationT0(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0036";
-}
-
 QStringList build_set_powerCalibrationT0(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
@@ -776,6 +752,19 @@ QString help_powerCalibrationT0(void) {
   return "0036 Power Calibration T0 -- 2B -- RW -- BAK<br>"
          "Version 1.0.7+<br>"
          "(t_0 * 128).round (equivalent to shift left 7) or just put register 0004 straight into this.";
+}
+
+QString help_get_powerCalibration(void) {
+  QString help = help_powerCalibrationA0() + "<br>";
+  help += help_powerCalibrationB0() + "<br>";
+  help += help_powerCalibrationC0() + "<br>";
+  help += help_powerCalibrationMA() + "<br>";
+  help += help_powerCalibrationMB() + "<br>";
+  help += help_powerCalibrationMC() + "<br>";
+  help += help_powerCalibrationPOn() + "<br>";
+  help += help_powerCalibrationPOff() + "<br>";
+  help += help_powerCalibrationT0();
+  return help;
 }
 
 QStringList build_get_powerEstimatorTemperatureOverride(QStringList argList) {
@@ -2701,26 +2690,15 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("get unixTime", new cmdEntry(build_get_unixTime, help_unixTime));
   m_cmdTable.insert("set unixTime", new cmdEntry(build_set_unixTime, help_unixTime));
   m_cmdTable.insert("get temperature", new cmdEntry(build_get_temperature, parse_get_temperature, help_temperature));
-  m_cmdTable.insert("get lightManualLevel", new cmdEntry(build_get_lightManualLevel, help_lightManualLevel));
+  m_cmdTable.insert("get lightLevel", new cmdEntry(build_get_lightLevel, parse_get_lightLevel, help_get_lightLevel));
   m_cmdTable.insert("set lightManualLevel", new cmdEntry(build_set_lightManualLevel, help_lightManualLevel));
-  m_cmdTable.insert("get lightActiveLevel", new cmdEntry(build_get_lightActiveLevel, help_lightActiveLevel));
-  m_cmdTable.insert("get lightInactiveLevel", new cmdEntry(build_get_lightInactiveLevel, help_lightActiveLevel));
-  m_cmdTable.insert("get lightOverrideActiveLevel", new cmdEntry(build_get_lightOverrideActiveLevel, help_lightOverrideActiveLevel));
   m_cmdTable.insert("set lightOverrideActiveLevel", new cmdEntry(build_set_lightOverrideActiveLevel, help_lightOverrideActiveLevel));
-  m_cmdTable.insert("get lightOverrideInactiveLevel", new cmdEntry(build_get_lightOverrideInactiveLevel, help_lightOverrideInactiveLevel));
   m_cmdTable.insert("set lightOverrideInactiveLevel", new cmdEntry(build_set_lightOverrideInactiveLevel, help_lightOverrideInactiveLevel));
   m_cmdTable.insert("get sensorDelayTime", new cmdEntry(build_get_sensorDelayTime, help_sensorDelayTime));
   m_cmdTable.insert("get sensorOverrideDelayTime", new cmdEntry(build_get_sensorOverrideDelayTime, help_sensorOverrideDelayTime));
   m_cmdTable.insert("set sensorOverrideDelayTime", new cmdEntry(build_set_sensorOverrideDelayTime, help_sensorOverrideDelayTime));
   m_cmdTable.insert("get powerupTime", new cmdEntry(build_get_powerupTime, help_powerupTime));
-  m_cmdTable.insert("get usageActiveTime", new cmdEntry(build_get_usageActiveTime, help_usageActiveTime));
-  m_cmdTable.insert("get usageInactiveTime", new cmdEntry(build_get_usageInactiveTime, help_usageInactiveTime));
-  m_cmdTable.insert("get usagePermActiveTime", new cmdEntry(build_get_usagePermActiveTime, help_usagePermActiveTime));
-  m_cmdTable.insert("get usagePermInactiveTime", new cmdEntry(build_get_usagePermInactiveTime, help_usagePermInactiveTime));
-  m_cmdTable.insert("get usageWh", new cmdEntry(build_get_usageWh, help_usageWh));
-  m_cmdTable.insert("get usagePerm", new cmdEntry(build_get_usagePerm, help_usagePerm));
-  m_cmdTable.insert("get usageSensorEvents", new cmdEntry(build_get_usageSensorEvents, help_usageSensorEvents));
-  m_cmdTable.insert("get usagePermSensorEvents", new cmdEntry(build_get_usagePermSensorEvents, help_usageSensorEvents));
+  m_cmdTable.insert("get usage", new cmdEntry(build_get_usage, parse_get_usage, help_get_usage));
   m_cmdTable.insert("get numberOfLogEntries", new cmdEntry(build_get_numberOfLogEntries, help_numberOfLogEntries));
   m_cmdTable.insert("get configCalibrationP0", new cmdEntry(build_get_configCalibrationP0, help_configCalibrationP0));
   m_cmdTable.insert("set configCalibrationP0", new cmdEntry(build_set_configCalibrationP0, help_configCalibrationP0));
@@ -2761,23 +2739,15 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("set remoteSetDelayTime", new cmdEntry(build_set_remoteStateDelayTime, help_remoteStateDelayTime));
   m_cmdTable.insert("get remoteSecondsCountdown", new cmdEntry(build_get_remoteSecondsCountdown, help_remoteSecondsCountdown));
   m_cmdTable.insert("get minimumDimmingValue", new cmdEntry(build_get_minimumDimmingValue, help_minimumDimmingValue));
-  m_cmdTable.insert("get powerCalibrationA0", new cmdEntry(build_get_powerCalibrationA0, help_powerCalibrationA0));
+  m_cmdTable.insert("get powerCalibration", new cmdEntry(build_get_powerCalibration, parse_get_powerCalibration, help_get_powerCalibration));
   m_cmdTable.insert("set powerCalibrationA0", new cmdEntry(build_set_powerCalibrationA0, help_powerCalibrationA0));
-  m_cmdTable.insert("get powerCalibrationB0", new cmdEntry(build_get_powerCalibrationB0, help_powerCalibrationB0));
   m_cmdTable.insert("set powerCalibrationB0", new cmdEntry(build_set_powerCalibrationB0, help_powerCalibrationB0));
-  m_cmdTable.insert("get powerCalibrationC0", new cmdEntry(build_get_powerCalibrationC0, help_powerCalibrationC0));
   m_cmdTable.insert("set powerCalibrationC0", new cmdEntry(build_set_powerCalibrationC0, help_powerCalibrationC0));
-  m_cmdTable.insert("get powerCalibrationMA", new cmdEntry(build_get_powerCalibrationMA, help_powerCalibrationMA));
   m_cmdTable.insert("set powerCalibrationMA", new cmdEntry(build_set_powerCalibrationMA, help_powerCalibrationMA));
-  m_cmdTable.insert("get powerCalibrationMB", new cmdEntry(build_get_powerCalibrationMB, help_powerCalibrationMB));
   m_cmdTable.insert("set powerCalibrationMB", new cmdEntry(build_set_powerCalibrationMB, help_powerCalibrationMB));
-  m_cmdTable.insert("get powerCalibrationMC", new cmdEntry(build_get_powerCalibrationMC, help_powerCalibrationMC));
   m_cmdTable.insert("set powerCalibrationMC", new cmdEntry(build_set_powerCalibrationMC, help_powerCalibrationMC));
-  m_cmdTable.insert("get powerCalibrationPOff", new cmdEntry(build_get_powerCalibrationPOff, help_powerCalibrationPOff));
   m_cmdTable.insert("set powerCalibrationPOff", new cmdEntry(build_set_powerCalibrationPOff, help_powerCalibrationPOff));
-  m_cmdTable.insert("get powerCalibrationPOn", new cmdEntry(build_get_powerCalibrationPOn, help_powerCalibrationPOn));
   m_cmdTable.insert("set powerCalibrationPOn", new cmdEntry(build_set_powerCalibrationPOn, help_powerCalibrationPOn));
-  m_cmdTable.insert("get powerCalibrationT0", new cmdEntry(build_get_powerCalibrationT0, help_powerCalibrationT0));
   m_cmdTable.insert("set powerCalibrationT0", new cmdEntry(build_set_powerCalibrationT0, help_powerCalibrationT0));
   m_cmdTable.insert("get powerEstimatorTemperatureOverride", new cmdEntry(build_get_powerEstimatorTemperatureOverride, help_powerEstimatorTemperatureOverride));
   m_cmdTable.insert("set powerEstimatorTemperatureOverride", new cmdEntry(build_set_powerEstimatorTemperatureOverride, help_powerEstimatorTemperatureOverride));
