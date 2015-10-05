@@ -19,7 +19,7 @@ public:
   void connectTelegesis(void);
   void disconnect(void);
   bool isConnected(void);
-  QString queryPmu(QStringList cmdList, QStringList *responseList);
+  void queryPmu(QStringList cmdList, QStringList *responseList);
 
 signals:
   void connectionEstablished(void);

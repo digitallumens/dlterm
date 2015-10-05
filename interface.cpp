@@ -120,7 +120,7 @@ void interface::connectToFixture(void) {
   }
 }
 
-QString interface::queryPmu(QStringList cmdList, QStringList *responseList) {
+void interface::queryPmu(QStringList cmdList, QStringList *responseList) {
   DLResult ret;
   QString response;
   foreach (const QString &cmd, cmdList) {
@@ -137,12 +137,6 @@ QString interface::queryPmu(QStringList cmdList, QStringList *responseList) {
     } else {
       ret = m_pmuUSB->issueCommand(cmd, response, len);
     }
-    if (ret != DLLIB_SUCCESS) {
-      // return error
-      return response;
-    } else {
-      responseList->append(response);
-    }
+    responseList->append(response);
   }
-  return NULL;
 }

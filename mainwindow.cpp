@@ -50,7 +50,6 @@ QString MainWindow::processUserRequest(QString *request) {
   QStringList argList;
   QStringList cmdList;
   QStringList responseList;
-  QString errorResponse;
   QString response;
   if (request->contains(" ")) {
     // helper command format "verb object argList"
@@ -88,19 +87,18 @@ QString MainWindow::processUserRequest(QString *request) {
     m_solarized->setTextColor(request, SOLAR_YELLOW);
   }
   // send commands & get responses
-  errorResponse = m_interface->queryPmu(cmdList, &responseList);
+  m_interface->queryPmu(cmdList, &responseList);
   // parse responses
-  if (errorResponse != NULL) {
-    // translate error response
-    response = m_cmdHelper->m_errorResponses[errorResponse];
-    m_solarized->setTextColor(&response, SOLAR_RED);
-  } else if (cmdEntry == NULL) {
+  if (cmdEntry == NULL) {
     // not a helper command, flatten responses
     foreach (QString s, responseList) {
       response.append(s);
     }
-    if (response.contains("OK")) {
+    if (response.startsWith("OK")) {
       m_solarized->setTextColor(&response, SOLAR_GREEN);
+    } else if (response.startsWith("ERROR")) {
+      response = m_cmdHelper->m_errorResponses[response];
+      m_solarized->setTextColor(&response, SOLAR_RED);
     } else {
       m_solarized->setTextColor(&response, SOLAR_VIOLET);
     }
@@ -109,8 +107,11 @@ QString MainWindow::processUserRequest(QString *request) {
     foreach (QString s, responseList) {
       response.append(s);
     }
-    if (response.contains("OK")) {
+    if (response.startsWith("OK")) {
       m_solarized->setTextColor(&response, SOLAR_GREEN);
+    } else if (response.startsWith("ERROR")) {
+      response = m_cmdHelper->m_errorResponses[response];
+      m_solarized->setTextColor(&response, SOLAR_RED);
     } else {
       m_solarized->setTextColor(&response, SOLAR_VIOLET);
     }
