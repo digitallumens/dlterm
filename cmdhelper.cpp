@@ -3026,6 +3026,10 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_errorResponses.insert("ERROR: FFEE", "ERROR: Resource busy");
 }
 
+QString cmdHelper::parseError(QString pmuResponse) {
+  return m_errorResponses[pmuResponse];
+}
+
 QString cmdHelper::getNextCompletion(void) {
   m_cmdCompleter->setCurrentRow(m_cmdCompleter->currentRow() + 1);
   return m_cmdCompleter->currentCompletion();

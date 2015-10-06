@@ -98,7 +98,7 @@ QString MainWindow::processUserRequest(QString *request) {
     if (response.startsWith("OK")) {
       m_solarized->setTextColor(&response, SOLAR_GREEN);
     } else if (response.startsWith("ERROR")) {
-      response = m_cmdHelper->m_errorResponses[response];
+      response = m_cmdHelper->parseError(response);
       m_solarized->setTextColor(&response, SOLAR_RED);
     } else {
       m_solarized->setTextColor(&response, SOLAR_VIOLET);
@@ -111,7 +111,7 @@ QString MainWindow::processUserRequest(QString *request) {
     if (response.startsWith("OK")) {
       m_solarized->setTextColor(&response, SOLAR_GREEN);
     } else if (response.startsWith("ERROR")) {
-      response = m_cmdHelper->m_errorResponses[response];
+      response = m_cmdHelper->parseError(response);
       m_solarized->setTextColor(&response, SOLAR_RED);
     } else {
       m_solarized->setTextColor(&response, SOLAR_VIOLET);
