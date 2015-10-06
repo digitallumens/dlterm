@@ -2161,21 +2161,21 @@ QStringList parse_get_lbStatus(QStringList pmuResponse) {
     parsedResponse << "Bypass: inactive";
   }
   statusInt = pmuResponse.at(1).toUShort(&ok, 16);
-  parsedResponse << QString("String 1 current: %1 mA").arg(statusInt);
+  parsedResponse << QString("String 1 current: %1 mA").arg(1.4 * statusInt);
   statusInt = pmuResponse.at(2).toUShort(&ok, 16);
-  parsedResponse << QString("String 2 current: %1 mA").arg(statusInt);
+  parsedResponse << QString("String 2 current: %1 mA").arg(1.4 * statusInt);
   statusInt = pmuResponse.at(3).toUShort(&ok, 16);
-  parsedResponse << QString("String 3 current: %1 mA").arg(statusInt);
+  parsedResponse << QString("String 3 current: %1 mA").arg(1.4 * statusInt);
   statusInt = pmuResponse.at(4).toUShort(&ok, 16);
-  parsedResponse << QString("String 4 current: %1 mA").arg(statusInt);
+  parsedResponse << QString("String 4 current: %1 mA").arg(1.4 * statusInt);
   statusInt = pmuResponse.at(5).toUShort(&ok, 16);
-  parsedResponse << QString("String current minimum: %1 mA").arg(statusInt);
+  parsedResponse << QString("String current minimum: %1 mA").arg(1.4 * statusInt);
   statusInt = pmuResponse.at(6).toUShort(&ok, 16);
-  parsedResponse << QString("Temperature: %1 C").arg(statusInt);
+  parsedResponse << QString("Temperature: %1 C").arg((125 * statusInt / 1024) - 40);
   statusInt = pmuResponse.at(7).toUShort(&ok, 16);
-  parsedResponse << QString("String current sum: %1 mA").arg(statusInt);
+  parsedResponse << QString("String current sum: %1 mA").arg(1.4 * statusInt);
   statusInt = pmuResponse.at(8).toUShort(&ok, 16);
-  parsedResponse << QString("Voltage reference: %1 volts").arg(statusInt);
+  parsedResponse << QString("Voltage reference: %1 volts").arg(2.5 * statusInt / 1024);
   parsedResponse << QString("Light level (0x029C = OFF): %1").arg(pmuResponse.at(9));
   parsedResponse << QString("Light active slew rate: %1").arg(pmuResponse.at(10));
   parsedResponse << QString("Light inactive slew rate: %1").arg(pmuResponse.at(11));
@@ -2352,8 +2352,8 @@ QStringList parse_get_bbStatus(QStringList pmuResponse) {
   parsedResponse += QString("Test button status: %1<br>").arg(statusDict[(statusInt >> 12) & 0x1]);
   // parse PSU status bits
   statusDict.clear();
-  statusDict.insert(0, "42v active");
-  statusDict.insert(1, "42v inactive");
+  statusDict.insert(0, "42v on");
+  statusDict.insert(1, "42v off");
   parsedResponse += QString("PSU status: %1<br>").arg(statusDict[(statusInt >> 13) & 0x1]);
   // parse certification mark status
   statusDict.clear();
