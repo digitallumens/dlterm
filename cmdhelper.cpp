@@ -40,11 +40,11 @@ QStringList build_get_firmwareVersion(QStringList argList) {
   return QStringList() << "G0000";
 }
 
-QString parse_get_firmwareVersion(QStringList pmuResponse) {
+QStringList parse_get_firmwareVersion(QStringList pmuResponse) {
   bool ok;
   qulonglong verInt = pmuResponse.at(0).toULongLong(&ok, 16);
   // format verMajor.verMinor.verBuild (buildMonth/buildDay/BuildYear)
-  return QString("%1.%2.%3 (%5/%6/%4)").arg((verInt >> 40) & 0xFF).arg((verInt >> 32) & 0xFF).arg((verInt >> 24) & 0xFF).arg((verInt >> 16) & 0xFF).arg((verInt >> 8) & 0xFF).arg(verInt & 0xFF);
+  return QStringList() << QString("%1.%2.%3 (%5/%6/%4)").arg((verInt >> 40) & 0xFF).arg((verInt >> 32) & 0xFF).arg((verInt >> 24) & 0xFF).arg((verInt >> 16) & 0xFF).arg((verInt >> 8) & 0xFF).arg(verInt & 0xFF);
 }
 
 QString help_firmwareVersion(void) {
@@ -104,9 +104,9 @@ QStringList build_get_temperature(QStringList argList) {
   return QStringList() << "G0004";
 }
 
-QString parse_get_temperature(QStringList pmuResponse) {
+QStringList parse_get_temperature(QStringList pmuResponse) {
   (void) pmuResponse;
-  return "todo";
+  return QStringList() << "todo";
 }
 
 QString help_temperature(void) {
@@ -115,15 +115,20 @@ QString help_temperature(void) {
 
 QStringList build_get_lightLevel(QStringList argList) {
   (void) argList;
-  return QStringList() << "G0005" << "G0006" << "G0007" << "G0008" << "G0009";
+  return QStringList() << "G0005" // light manual level
+                       << "G0006" // light active level
+                       << "G0007" // light inactive level
+                       << "G0008" // light overrirde active level
+                       << "G0009"; // light override inactive level
 }
 
-QString parse_get_lightLevel(QStringList pmuResponse) {
-  QString parsedResponse = QString("Manual level: %1<br>").arg(pmuResponse.at(0));
-  parsedResponse += QString("Active level: %1<br>").arg(pmuResponse.at(1));
-  parsedResponse += QString("Inactive level: %1<br>").arg(pmuResponse.at(2));
-  parsedResponse += QString("Override active level: %1<br>").arg(pmuResponse.at(3));
-  parsedResponse += QString("Override inactive level: %1<br>").arg(pmuResponse.at(4));
+QStringList parse_get_lightLevel(QStringList pmuResponse) {
+  QStringList parsedResponse;
+  parsedResponse << QString("Manual level: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("Active level: %1").arg(pmuResponse.at(1));
+  parsedResponse << QString("Inactive level: %1").arg(pmuResponse.at(2));
+  parsedResponse << QString("Override active level: %1").arg(pmuResponse.at(3));
+  parsedResponse << QString("Override inactive level: %1").arg(pmuResponse.at(4));
   return parsedResponse;
 }
 
@@ -208,8 +213,8 @@ QStringList build_get_upTime(QStringList argList) {
   return QStringList() << "G000C";
 }
 
-QString parse_get_upTime(QStringList pmuResponse) {
-  return toYDHMS(pmuResponse.at(0));
+QStringList parse_get_upTime(QStringList pmuResponse) {
+  return QStringList() << toYDHMS(pmuResponse.at(0));
 }
 
 QString help_upTime(void) {
@@ -229,17 +234,18 @@ QStringList build_get_usage(QStringList argList) {
                        << "G0014"; // perm sensor events
 }
 
-QString parse_get_usage(QStringList pmuResponse) {
+QStringList parse_get_usage(QStringList pmuResponse) {
   bool ok;
-  QString parsedResponse = QString("Up time: %1<br>").arg(toYDHMS(pmuResponse.at(0)));
-  parsedResponse += QString("Active time: %1<br>").arg(toYDHMS(pmuResponse.at(1)));
-  parsedResponse += QString("Inactive time: %1<br>").arg(toYDHMS(pmuResponse.at(2)));
-  parsedResponse += QString("Perm active time: %1<br>").arg(toYDHMS(pmuResponse.at(3)));
-  parsedResponse += QString("Perm inactive time: %1 <br>").arg(toYDHMS(pmuResponse.at(4)));
-  parsedResponse += QString("Power: %1 watt hours<br>").arg(pmuResponse.at(5).toUShort(&ok, 16));
-  parsedResponse += QString("Perm power: %1 watt hours<br>").arg(pmuResponse.at(6).toUShort(&ok, 16));
-  parsedResponse += QString("Sensor events: %1<br>").arg(pmuResponse.at(7).toUShort(&ok, 16));
-  parsedResponse += QString("Perm sensor events: %1").arg(pmuResponse.at(8).toUShort(&ok, 16));
+  QStringList parsedResponse;
+  parsedResponse << QString("Up time: %1").arg(toYDHMS(pmuResponse.at(0)));
+  parsedResponse << QString("Active time: %1").arg(toYDHMS(pmuResponse.at(1)));
+  parsedResponse << QString("Inactive time: %1").arg(toYDHMS(pmuResponse.at(2)));
+  parsedResponse << QString("Perm active time: %1").arg(toYDHMS(pmuResponse.at(3)));
+  parsedResponse << QString("Perm inactive time: %1").arg(toYDHMS(pmuResponse.at(4)));
+  parsedResponse << QString("Power: %1 watt hours").arg(pmuResponse.at(5).toUShort(&ok, 16));
+  parsedResponse << QString("Perm power: %1 watt hours").arg(pmuResponse.at(6).toUShort(&ok, 16));
+  parsedResponse << QString("Sensor events: %1").arg(pmuResponse.at(7).toUShort(&ok, 16));
+  parsedResponse << QString("Perm sensor events: %1").arg(pmuResponse.at(8).toUShort(&ok, 16));
   return parsedResponse;
 }
 
@@ -305,11 +311,12 @@ QStringList build_get_configCalibration(QStringList argList) {
                        << "G0019"; // P3
 }
 
-QString parse_get_configCalibration(QStringList pmuReponse) {
-  QString parsedResponse = QString("P0: %1<br>").arg(pmuReponse.at(0));
-  parsedResponse = QString("P1: %1<br>").arg(pmuReponse.at(1));
-  parsedResponse = QString("P2: %1<br>").arg(pmuReponse.at(2));
-  parsedResponse = QString("P3: %1").arg(pmuReponse.at(3));
+QStringList parse_get_configCalibration(QStringList pmuReponse) {
+  QStringList parsedResponse;
+  parsedResponse << QString("P0: %1").arg(pmuReponse.at(0));
+  parsedResponse << QString("P1: %1").arg(pmuReponse.at(1));
+  parsedResponse << QString("P2: %1").arg(pmuReponse.at(2));
+  parsedResponse << QString("P3: %1").arg(pmuReponse.at(3));
   return parsedResponse;
 }
 
@@ -662,17 +669,17 @@ QStringList build_get_powerCalibration(QStringList argList) {
                        << QString("G0036");
 }
 
-QString parse_get_powerCalibration(QStringList pmuResponse) {
-  QString parsedResponse;
-  parsedResponse = QString("A0: %1<br>").arg(pmuResponse.at(0));
-  parsedResponse += QString("B0: %1<br>").arg(pmuResponse.at(1));
-  parsedResponse += QString("C0: %1<br>").arg(pmuResponse.at(2));
-  parsedResponse += QString("MA: %1<br>").arg(pmuResponse.at(3));
-  parsedResponse += QString("MB: %1<br>").arg(pmuResponse.at(4));
-  parsedResponse += QString("MC: %1<br>").arg(pmuResponse.at(5));
-  parsedResponse += QString("POff: %1<br>").arg(pmuResponse.at(6));
-  parsedResponse += QString("POn: %1<br>").arg(pmuResponse.at(7));
-  parsedResponse += QString("T0: %1").arg(pmuResponse.at(8));
+QStringList parse_get_powerCalibration(QStringList pmuResponse) {
+  QStringList parsedResponse;
+  parsedResponse << QString("A0: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("B0: %1").arg(pmuResponse.at(1));
+  parsedResponse << QString("C0: %1").arg(pmuResponse.at(2));
+  parsedResponse << QString("MA: %1").arg(pmuResponse.at(3));
+  parsedResponse << QString("MB: %1").arg(pmuResponse.at(4));
+  parsedResponse << QString("MC: %1").arg(pmuResponse.at(5));
+  parsedResponse << QString("POff: %1").arg(pmuResponse.at(6));
+  parsedResponse << QString("POn: %1").arg(pmuResponse.at(7));
+  parsedResponse << QString("T0: %1").arg(pmuResponse.at(8));
   return parsedResponse;
 }
 
@@ -868,14 +875,15 @@ QStringList build_get_wirelessConfig(QStringList argList) {
                        << "G0073"; // network key
 }
 
-QString parse_get_wirelessConfig(QStringList pmuResponse) {
-  QString parsedResponse = QString("Pan ID: %1<br>").arg(pmuResponse.at(0));
-  parsedResponse += QString("Channel mask: %1<br>").arg(pmuResponse.at(1));
-  parsedResponse += QString("Short address: %1<br>").arg(pmuResponse.at(2));
-  parsedResponse += QString("Role: %1<br>").arg(pmuResponse.at(3));
-  parsedResponse += QString("Watchdog hold: %1<br>").arg(pmuResponse.at(4));
-  parsedResponse += QString("Watchdog period: %1<br>").arg(pmuResponse.at(5));
-  return parsedResponse + QString("Network key: %1").arg(pmuResponse.at(6));
+QStringList parse_get_wirelessConfig(QStringList pmuResponse) {
+  QStringList parsedResponse;
+  parsedResponse << QString("Pan ID: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("Channel mask: %1").arg(pmuResponse.at(1));
+  parsedResponse << QString("Short address: %1").arg(pmuResponse.at(2));
+  parsedResponse << QString("Role: %1").arg(pmuResponse.at(3));
+  parsedResponse << QString("Watchdog hold: %1").arg(pmuResponse.at(4));
+  parsedResponse << QString("Watchdog period: %1").arg(pmuResponse.at(5));
+  return parsedResponse << QString("Network key: %1").arg(pmuResponse.at(6));
 }
 
 QStringList build_set_wirelessPanId(QStringList argList) {
@@ -1008,8 +1016,8 @@ QStringList build_get_maxTemperature(QStringList argList) {
                        << "G0044"; // observed time
 }
 
-QString parse_get_maxTemperature(QStringList pmuResponse) {
-  return QString("%1 at time %2").arg(pmuResponse.at(0)).arg(toYDHMS(pmuResponse.at(1)));
+QStringList parse_get_maxTemperature(QStringList pmuResponse) {
+  return QStringList() << QString("%1 at time %2").arg(pmuResponse.at(0)).arg(toYDHMS(pmuResponse.at(1)));
 }
 
 QString help_maxTemperatureObserved(void) {
@@ -1036,10 +1044,11 @@ QStringList build_get_overTemperatureConfig(QStringList argList) {
                        << "G0047"; // dimming limit
 }
 
-QString parse_get_overTemperatureConfig(QStringList pmuResponse) {
-  QString parsedResponse = QString("Low threshold: %1<br>").arg(pmuResponse.at(0));
-  parsedResponse += QString("High threshold: %1<br>").arg(pmuResponse.at(1));
-  return parsedResponse + QString("Dimming limit: %1<br>").arg(pmuResponse.at(2));
+QStringList parse_get_overTemperatureConfig(QStringList pmuResponse) {
+  QStringList parsedResponse;
+  parsedResponse << QString("Low threshold: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("High threshold: %1").arg(pmuResponse.at(1));
+  return parsedResponse << QString("Dimming limit: %1").arg(pmuResponse.at(2));
 }
 
 QStringList build_set_overTemperatureThresholdLow(QStringList argList) {
@@ -1227,12 +1236,13 @@ QStringList build_get_sensorConfig(QStringList argList) {
                        << "G0053"; // sensor 1 offset
 }
 
-QString parse_get_sensorConfig(QStringList pmuResponse) {
-  QString parsedResponse = QString("Sensor level: %1<br>").arg(pmuResponse.at(0));
-  parsedResponse += QString("Sensor 0 timeout: %1<br>").arg(pmuResponse.at(1));
-  parsedResponse += QString("Sensor 0 offset: %1<br>").arg(pmuResponse.at(2));
-  parsedResponse += QString("Sensor 1 timeout: %1<br>").arg(pmuResponse.at(3));
-  return parsedResponse + QString("Sensor 1 offset: %1").arg(pmuResponse.at(4));
+QStringList parse_get_sensorConfig(QStringList pmuResponse) {
+  QStringList parsedResponse;
+  parsedResponse << QString("Sensor level: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("Sensor 0 timeout: %1").arg(pmuResponse.at(1));
+  parsedResponse << QString("Sensor 0 offset: %1").arg(pmuResponse.at(2));
+  parsedResponse << QString("Sensor 1 timeout: %1").arg(pmuResponse.at(3));
+  return parsedResponse << QString("Sensor 1 offset: %1").arg(pmuResponse.at(4));
 }
 
 QStringList build_set_sensor0Timeout(QStringList argList) {
@@ -1317,10 +1327,11 @@ QStringList build_get_analogDimmingConfig(QStringList argList) {
                        << "G0056"; // off value
 }
 
-QString parse_get_analogDimmingConfig(QStringList pmuResponse) {
-  QString parsedResponse = QString("Low value: %1<br>").arg(pmuResponse.at(0));
-  parsedResponse += QString("High value: %1<br>").arg(pmuResponse.at(1));
-  return parsedResponse + QString("Off value: %1").arg(pmuResponse.at(2));
+QStringList parse_get_analogDimmingConfig(QStringList pmuResponse) {
+  QStringList parsedResponse;
+  parsedResponse << QString("Low value: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("High value: %1").arg(pmuResponse.at(1));
+  return parsedResponse << QString("Off value: %1").arg(pmuResponse.at(2));
 }
 
 QStringList build_set_analogDimmingLowValue(QStringList argList) {
@@ -1438,14 +1449,15 @@ QStringList build_get_ambientConfig(QStringList argList) {
                        << "G0069"; // divisor
 }
 
-QString parse_get_ambientConfig(QStringList pmuResponse) {
-  QString parsedResponse = QString("Sensor value: %1<br>").arg(pmuResponse.at(0));
-  parsedResponse += QString("Active level: %1<br>").arg(pmuResponse.at(1));
-  parsedResponse += QString("Inactive level: %1<br>").arg(pmuResponse.at(2));
-  parsedResponse += QString("Environmental gain: %1<br>").arg(pmuResponse.at(3));
-  parsedResponse += QString("Off hysteresis: %1<br>").arg(pmuResponse.at(4));
-  parsedResponse += QString("On hysteresis: %1<br>").arg(pmuResponse.at(5));
-  return parsedResponse + QString("Divisor: %1").arg(pmuResponse.at(6));
+QStringList parse_get_ambientConfig(QStringList pmuResponse) {
+  QStringList parsedResponse;
+  parsedResponse << QString("Sensor value: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("Active level: %1").arg(pmuResponse.at(1));
+  parsedResponse << QString("Inactive level: %1").arg(pmuResponse.at(2));
+  parsedResponse << QString("Environmental gain: %1").arg(pmuResponse.at(3));
+  parsedResponse << QString("Off hysteresis: %1").arg(pmuResponse.at(4));
+  parsedResponse << QString("On hysteresis: %1").arg(pmuResponse.at(5));
+  return parsedResponse << QString("Divisor: %1").arg(pmuResponse.at(6));
 }
 
 QStringList build_set_ambientActiveLevel(QStringList argList) {
@@ -1760,7 +1772,7 @@ QStringList build_get_batteryBackupStatus(QStringList argList) {
   return QStringList() << "G006D";
 }
 
-QString parse_get_batteryBackupStatus(QStringList pmuResponse) {
+QStringList parse_get_batteryBackupStatus(QStringList pmuResponse) {
   bool ok;
   QString parsedResponse;
   QMap <int, QString> battDetectedDict;
@@ -1772,7 +1784,7 @@ QString parse_get_batteryBackupStatus(QStringList pmuResponse) {
   battDetectedDict.insert(1, "Battery 1 detected");
   battDetectedDict.insert(2, "Battery 2 detected");
   battDetectedDict.insert(3, "Batteries 1 & 2 detected");
-  parsedResponse = (battDetectedDict[status & 0x3] + "<br>");
+  parsedResponse += (battDetectedDict[status & 0x3] + "<br>");
   // parse test running bits
   testRunningDict.insert(0, "No tests running");
   testRunningDict.insert(1, "Short test running");
@@ -1796,7 +1808,7 @@ QString parse_get_batteryBackupStatus(QStringList pmuResponse) {
   // parse test time
   parsedResponse += "Test time: ";
   parsedResponse += QString("%1 seconds").arg(status >> 16);
-  return parsedResponse;
+  return QStringList() << parsedResponse;
 }
 
 QStringList build_set_batteryBackupStatus(QStringList argList) {
@@ -1943,11 +1955,12 @@ QStringList build_get_powerMeterConfig(QStringList argList) {
                        << "G007A"; // type
 }
 
-QString parse_get_powerMeterConfig(QStringList pmuResponse) {
-  QString parsedResponse = QString("Level at off: %1<br>").arg(pmuResponse.at(0));
-  parsedResponse += QString("Level at min: %1<br>").arg(pmuResponse.at(1));
-  parsedResponse += QString("Level at max: %1<br>").arg(pmuResponse.at(2));
-  return parsedResponse + QString("Type: %1<br>").arg(pmuResponse.at(3));
+QStringList parse_get_powerMeterConfig(QStringList pmuResponse) {
+  QStringList parsedResponse;
+  parsedResponse << QString("Level at off: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("Level at min: %1").arg(pmuResponse.at(1));
+  parsedResponse << QString("Level at max: %1").arg(pmuResponse.at(2));
+  return parsedResponse << QString("Type: %1").arg(pmuResponse.at(3));
 }
 
 QStringList build_set_powerMeterLevelAtOff(QStringList argList) {
@@ -2095,14 +2108,14 @@ QStringList build_get_lbVersion(QStringList argList) {
   return cmdList;
 }
 
-QString parse_get_lbVersion(QStringList pmuResponse) {
+QStringList parse_get_lbVersion(QStringList pmuResponse) {
   bool ok;
-  QString parsedResponse;
+  QStringList parsedResponse;
   quint16 verHiInt = pmuResponse.at(3).toUShort(&ok, 16);
   quint16 verLoInt = pmuResponse.at(4).toUShort(&ok, 16);
-  parsedResponse += QString("Firmware version: %1.%2.%3<br>").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
-  parsedResponse += QString("Firmware code: %1%2<br>").arg(pmuResponse.at(1)).arg(pmuResponse.at(2));
-  parsedResponse += QString("Protocol version: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("Firmware version: %1.%2.%3").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
+  parsedResponse << QString("Firmware code: %1%2").arg(pmuResponse.at(1)).arg(pmuResponse.at(2));
+  parsedResponse << QString("Protocol version: %1").arg(pmuResponse.at(0));
   return parsedResponse;
 }
 
@@ -2138,34 +2151,34 @@ QStringList build_get_lbStatus(QStringList argList) {
   return cmdList;
 }
 
-QString parse_get_lbStatus(QStringList pmuResponse) {
+QStringList parse_get_lbStatus(QStringList pmuResponse) {
   bool ok;
   quint16 statusInt = pmuResponse.at(0).toUShort(&ok, 16);
-  QString parsedResponse;
+  QStringList parsedResponse;
   if (statusInt & 4) {
-    parsedResponse += "Bypass: activate<br>";
+    parsedResponse << "Bypass: activate";
   } else {
-    parsedResponse += "Bypass: inactive<br>";
+    parsedResponse << "Bypass: inactive";
   }
   statusInt = pmuResponse.at(1).toUShort(&ok, 16);
-  parsedResponse += QString("String 1 current: %1 mA<br>").arg(statusInt);
+  parsedResponse << QString("String 1 current: %1 mA").arg(statusInt);
   statusInt = pmuResponse.at(2).toUShort(&ok, 16);
-  parsedResponse += QString("String 2 current: %1 mA<br>").arg(statusInt);
+  parsedResponse << QString("String 2 current: %1 mA").arg(statusInt);
   statusInt = pmuResponse.at(3).toUShort(&ok, 16);
-  parsedResponse += QString("String 3 current: %1 mA<br>").arg(statusInt);
+  parsedResponse << QString("String 3 current: %1 mA").arg(statusInt);
   statusInt = pmuResponse.at(4).toUShort(&ok, 16);
-  parsedResponse += QString("String 4 current: %1 mA<br>").arg(statusInt);
+  parsedResponse << QString("String 4 current: %1 mA").arg(statusInt);
   statusInt = pmuResponse.at(5).toUShort(&ok, 16);
-  parsedResponse += QString("String current minimum: %1 mA<br>").arg(statusInt);
+  parsedResponse << QString("String current minimum: %1 mA").arg(statusInt);
   statusInt = pmuResponse.at(6).toUShort(&ok, 16);
-  parsedResponse += QString("Temperature: %1 C<br>").arg(statusInt);
+  parsedResponse << QString("Temperature: %1 C").arg(statusInt);
   statusInt = pmuResponse.at(7).toUShort(&ok, 16);
-  parsedResponse += QString("String current sum: %1 mA<br>").arg(statusInt);
+  parsedResponse << QString("String current sum: %1 mA").arg(statusInt);
   statusInt = pmuResponse.at(8).toUShort(&ok, 16);
-  parsedResponse += QString("Voltage reference: %1 volts<br>").arg(statusInt);
-  parsedResponse += QString("Light level (0x029C = OFF): %1<br>").arg(pmuResponse.at(9));
-  parsedResponse += QString("Light active slew rate: %1<br>").arg(pmuResponse.at(10));
-  parsedResponse += QString("Light inactive slew rate: %1").arg(pmuResponse.at(11));
+  parsedResponse << QString("Voltage reference: %1 volts").arg(statusInt);
+  parsedResponse << QString("Light level (0x029C = OFF): %1").arg(pmuResponse.at(9));
+  parsedResponse << QString("Light active slew rate: %1").arg(pmuResponse.at(10));
+  parsedResponse << QString("Light inactive slew rate: %1").arg(pmuResponse.at(11));
   return parsedResponse;
 }
 
@@ -2200,18 +2213,18 @@ QStringList build_get_lbConfig(QStringList argList) {
   return cmdList;
 }
 
-QString parse_get_lbConfig(QStringList pmuResponse) {
-  QString parsedResponse;
-  parsedResponse += QString("Hardware revision: %1<br>").arg(pmuResponse.at(0));
-  parsedResponse += QString("Temperature calibration: %1<br>").arg(pmuResponse.at(1));
-  parsedResponse += QString("LED device type: %1<br>").arg(pmuResponse.at(2));
-  parsedResponse += QString("Serial number: %1%2<br>").arg(pmuResponse.at(3)).arg(pmuResponse.at(4));
-  parsedResponse += QString("Current sense bypass threshold: %1<br>").arg(pmuResponse.at(5));
-  parsedResponse += QString("Current sense bypass hysteresis: %1<br>").arg(pmuResponse.at(6));
-  parsedResponse += QString("Estimator current sense coefficient: %1<br>").arg(pmuResponse.at(7));
-  parsedResponse += QString("Estimator current sense exponent: %1<br>").arg(pmuResponse.at(8));
-  parsedResponse += QString("Bypass override temperature: %1<br>").arg(pmuResponse.at(9));
-  parsedResponse += QString("Temperature throttle limit: %1").arg(pmuResponse.at(10));
+QStringList parse_get_lbConfig(QStringList pmuResponse) {
+  QStringList parsedResponse;
+  parsedResponse << QString("Hardware revision: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("Temperature calibration: %1").arg(pmuResponse.at(1));
+  parsedResponse << QString("LED device type: %1").arg(pmuResponse.at(2));
+  parsedResponse << QString("Serial number: %1%2").arg(pmuResponse.at(3)).arg(pmuResponse.at(4));
+  parsedResponse << QString("Current sense bypass threshold: %1").arg(pmuResponse.at(5));
+  parsedResponse << QString("Current sense bypass hysteresis: %1").arg(pmuResponse.at(6));
+  parsedResponse << QString("Estimator current sense coefficient: %1").arg(pmuResponse.at(7));
+  parsedResponse << QString("Estimator current sense exponent: %1").arg(pmuResponse.at(8));
+  parsedResponse << QString("Bypass override temperature: %1").arg(pmuResponse.at(9));
+  parsedResponse << QString("Temperature throttle limit: %1").arg(pmuResponse.at(10));
   return parsedResponse;
 }
 
@@ -2246,19 +2259,19 @@ QStringList build_get_bbVersion(QStringList argList) {
   return cmdList;
 }
 
-QString parse_get_bbVersion(QStringList pmuResponse) {
+QStringList parse_get_bbVersion(QStringList pmuResponse) {
   bool ok;
-  QString parsedResponse;
+  QStringList parsedResponse;
   quint16 verHiInt = pmuResponse.at(3).toUShort(&ok, 16);
   quint16 verLoInt = pmuResponse.at(4).toUShort(&ok, 16);
-  parsedResponse += QString("Firmware version: %1.%2.%3<br>").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
-  parsedResponse += QString("Firmware code: %1%2<br>").arg(pmuResponse.at(1)).arg(pmuResponse.at(2));
-  parsedResponse += QString("Protocol version: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("Firmware version: %1.%2.%3").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
+  parsedResponse << QString("Firmware code: %1%2").arg(pmuResponse.at(1)).arg(pmuResponse.at(2));
+  parsedResponse << QString("Protocol version: %1").arg(pmuResponse.at(0));
   return parsedResponse;
 }
 
 QString help_get_bbVersion(void) {
-  return "Get Battery Backup version information -- 1B -- Rv"
+  return "Get Battery Backup version information -- 1B -- R<br>"
          "Battery number 00 to 01 (no argument = 00), Only on Cowboy";
 }
 
@@ -2292,7 +2305,7 @@ QStringList build_get_bbStatus(QStringList argList) {
   return cmdList;
 }
 
-QString parse_get_bbStatus(QStringList pmuResponse) {
+QStringList parse_get_bbStatus(QStringList pmuResponse) {
   bool ok;
   QString parsedResponse;
   QMap <int, QString> statusDict;
@@ -2360,7 +2373,7 @@ QString parse_get_bbStatus(QStringList pmuResponse) {
   parsedResponse += QString("Time to mode change: %1 minutes<br>").arg(pmuResponse.at(6).toUShort(&ok, 16));
   parsedResponse += QString("Uptime: %1 hours, %2 minutes<br>").arg(pmuResponse.at(8).toUShort(&ok, 16)).arg(pmuResponse.at(7).toUShort(&ok, 16));
   parsedResponse += QString("Error count: %1").arg(pmuResponse.at(9).toUShort(&ok, 16));
-  return parsedResponse;
+  return QStringList() << parsedResponse;
 }
 
 QString help_get_bbStatus(void) {
@@ -2407,26 +2420,26 @@ QStringList build_get_bbConfig(QStringList argList) {
   return cmdList;
 }
 
-QString parse_get_bbConfig(QStringList pmuResponse) {
+QStringList parse_get_bbConfig(QStringList pmuResponse) {
   bool ok;
-  QString parsedResponse;
-  parsedResponse += QString("Hardware revision: %1<br>").arg(pmuResponse.at(0));
-  parsedResponse += QString("Temperature calibration: %1<br>").arg(pmuResponse.at(1));
-  parsedResponse += QString("Serial number: %1%2<br>").arg(pmuResponse.at(2)).arg(pmuResponse.at(3));
-  parsedResponse += QString("Charge time: %1 minutes<br>").arg(pmuResponse.at(4).toUShort(&ok, 16));
-  parsedResponse += QString("Trickle time: %1 minutes<br>").arg(pmuResponse.at(5).toUShort(&ok, 16));
-  parsedResponse += QString("Standby time: %1 minutes<br>").arg(pmuResponse.at(6).toUShort(&ok, 16));
-  parsedResponse += QString("Shutdown time: %1 minutes<br>").arg(pmuResponse.at(16).toUShort(&ok, 16));
-  parsedResponse += QString("Max battery voltage: %1 volts<br>").arg(pmuResponse.at(7).toUShort(&ok, 16) * 0.04);
-  parsedResponse += QString("Min battery voltage: %1 volts<br>").arg(pmuResponse.at(8).toUShort(&ok, 16) * 0.04);
-  parsedResponse += QString("Recharge battery voltage: %1 volts<br>").arg(pmuResponse.at(9).toUShort(&ok, 16) * 0.04);
-  parsedResponse += QString("Max charge temperature: %1 C<br>").arg((pmuResponse.at(10).toUShort(&ok, 16) - 164) * 0.125);
-  parsedResponse += QString("Max emergency temperature: %1 C<br>").arg((pmuResponse.at(11).toUShort(&ok, 16) - 164) * 0.125);
-  parsedResponse += QString("Min emergency verify voltage: %1 volts<br>").arg(pmuResponse.at(12).toUShort(&ok, 16) * 0.05);
-  parsedResponse += QString("Max emergency verify voltage: %1 volts<br>").arg(pmuResponse.at(13).toUShort(&ok, 16) * 0.05);
-  parsedResponse += QString("Max lightbar PSU current: %1 mA<br>").arg(pmuResponse.at(14).toUShort(&ok, 16) * 2.44);
-  parsedResponse += QString("Certification mark: %1<br>").arg((pmuResponse.at(15) == "0000") ? "UL" : "CE");
-  parsedResponse += QString("Product code: %1%2").arg(pmuResponse.at(17)).arg(pmuResponse.at(18));
+  QStringList parsedResponse;
+  parsedResponse << QString("Hardware revision: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("Temperature calibration: %1").arg(pmuResponse.at(1));
+  parsedResponse << QString("Serial number: %1%2").arg(pmuResponse.at(2)).arg(pmuResponse.at(3));
+  parsedResponse << QString("Charge time: %1 minutes").arg(pmuResponse.at(4).toUShort(&ok, 16));
+  parsedResponse << QString("Trickle time: %1 minutes").arg(pmuResponse.at(5).toUShort(&ok, 16));
+  parsedResponse << QString("Standby time: %1 minutes").arg(pmuResponse.at(6).toUShort(&ok, 16));
+  parsedResponse << QString("Shutdown time: %1 minutes").arg(pmuResponse.at(16).toUShort(&ok, 16));
+  parsedResponse << QString("Max battery voltage: %1 volts").arg(pmuResponse.at(7).toUShort(&ok, 16) * 0.04);
+  parsedResponse << QString("Min battery voltage: %1 volts").arg(pmuResponse.at(8).toUShort(&ok, 16) * 0.04);
+  parsedResponse << QString("Recharge battery voltage: %1 volts").arg(pmuResponse.at(9).toUShort(&ok, 16) * 0.04);
+  parsedResponse << QString("Max charge temperature: %1 C").arg((pmuResponse.at(10).toUShort(&ok, 16) - 164) * 0.125);
+  parsedResponse << QString("Max emergency temperature: %1 C").arg((pmuResponse.at(11).toUShort(&ok, 16) - 164) * 0.125);
+  parsedResponse << QString("Min emergency verify voltage: %1 volts").arg(pmuResponse.at(12).toUShort(&ok, 16) * 0.05);
+  parsedResponse << QString("Max emergency verify voltage: %1 volts").arg(pmuResponse.at(13).toUShort(&ok, 16) * 0.05);
+  parsedResponse << QString("Max lightbar PSU current: %1 mA").arg(pmuResponse.at(14).toUShort(&ok, 16) * 2.44);
+  parsedResponse << QString("Certification mark: %1").arg((pmuResponse.at(15) == "0000") ? "UL" : "CE");
+  parsedResponse << QString("Product code: %1%2").arg(pmuResponse.at(17)).arg(pmuResponse.at(18));
   return parsedResponse;
 }
 
@@ -2624,7 +2637,7 @@ QStringList build_get_logIndex(QStringList argList) {
   return QStringList() << "K";
 }
 
-QString parse_get_logIndex(QStringList pmuResponse) {
+QStringList parse_get_logIndex(QStringList pmuResponse) {
   QString arg1 = pmuResponse.at(0);
   QString head = arg1.left(4);
   arg1.remove(0, 4);
@@ -2634,7 +2647,7 @@ QString parse_get_logIndex(QStringList pmuResponse) {
   if (first == "FFFF") {
     first = "none";
   }
-  return QString("head: %1<br>tail: %2<br>first recent: %3").arg(head).arg(tail).arg(first);
+  return QStringList() << QString("head: %1<br>tail: %2<br>first recent: %3").arg(head).arg(tail).arg(first);
 }
 
 QString help_get_logIndex(void) {
@@ -2653,7 +2666,7 @@ QStringList build_get_log(QStringList argList) {
   return QStringList() << QString("K%1").arg(index);
 }
 
-QString parse_get_log(QStringList pmuResponse) {
+QStringList parse_get_log(QStringList pmuResponse) {
   QString arg1;
   int uptimeSize, valueSize, baseTime, uptime;
   QString eventType, eventValue;
@@ -2768,7 +2781,7 @@ QString parse_get_log(QStringList pmuResponse) {
   } else {
     log += "[More events available...]";
   }
-  return log;
+  return QStringList() << log;
 }
 
 QString help_get_log(void) {
@@ -2941,7 +2954,7 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("set batteryBackupPowerCalibration", new cmdEntry(build_set_batteryBackupPowerCalibration, help_batteryBackupPowerCalibration));
   m_cmdTable.insert("get motionSensorProfile", new cmdEntry(build_get_motionSensorProfile, help_motionSensorProfile));
   m_cmdTable.insert("set motionSensorProfile", new cmdEntry(build_set_motionSensorProfile, help_motionSensorProfile));
-  m_cmdTable.insert("get powerMeterConfig", new cmdEntry(build_get_powerMeterConfig, help_get_powerMeterConfig));
+  m_cmdTable.insert("get powerMeterConfig", new cmdEntry(build_get_powerMeterConfig, parse_get_powerMeterConfig, help_get_powerMeterConfig));
   m_cmdTable.insert("set powerMeterLevelAtOff", new cmdEntry(build_set_powerMeterLevelAtOff, help_powerMeterLevelAtOff));
   m_cmdTable.insert("set powerMeterLevelAtMin", new cmdEntry(build_set_powerMeterLevelAtMin, help_powerMeterLevelAtMin));
   m_cmdTable.insert("set powerMeterLevelAtMax", new cmdEntry(build_set_powerMeterLevelAtMax, help_powerMeterLevelAtMax));

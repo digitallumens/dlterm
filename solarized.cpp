@@ -44,7 +44,7 @@ solarized::solarized(QObject *parent) : QObject(parent)
 }
 
 void solarized::setTextColor(QString *text, solarizedColor_t color) {
-  *text = QString("%1%2%3%4%5").arg("<font color=\"").arg(m_colorTable[color]).arg("\">").arg(*text).arg("<\font>");
+  *text = QString("%1%2%3%4%5").arg("<font color=\"").arg(m_colorTable[color]).arg("\">").arg(*text).arg("<\\font>");
 }
 
 void solarized::setStyleSheetQLineEdit(QLineEdit *lineEdit) {

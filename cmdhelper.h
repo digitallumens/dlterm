@@ -5,7 +5,7 @@
 #include <QCompleter>
 
 typedef QStringList(*buildCmd_t)(QStringList argList);
-typedef QString(*parseResponse_t)(QStringList pmuResponse);
+typedef QStringList(*parseResponse_t)(QStringList pmuResponse);
 typedef QString(*getHelp_t)(void);
 
 struct cmdEntry {

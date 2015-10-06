@@ -49,7 +49,8 @@ QString MainWindow::processUserRequest(QString *request) {
   QString cmd;
   QStringList argList;
   QStringList cmdList;
-  QStringList responseList;
+  QStringList pmuResponseList;
+  QStringList parsedResponseList;
   QString response;
   if (request->contains(" ")) {
     // helper command format "verb object argList"
@@ -87,11 +88,11 @@ QString MainWindow::processUserRequest(QString *request) {
     m_solarized->setTextColor(request, SOLAR_YELLOW);
   }
   // send commands & get responses
-  m_interface->queryPmu(cmdList, &responseList);
+  m_interface->queryPmu(cmdList, &pmuResponseList);
   // parse responses
   if (cmdEntry == NULL) {
     // not a helper command, flatten responses
-    foreach (QString s, responseList) {
+    foreach (QString s, pmuResponseList) {
       response.append(s);
     }
     if (response.startsWith("OK")) {
@@ -103,8 +104,8 @@ QString MainWindow::processUserRequest(QString *request) {
       m_solarized->setTextColor(&response, SOLAR_VIOLET);
     }
   } else if (cmdEntry->parseResponse == NULL) {
-    // no helper parser available, flatten responses
-    foreach (QString s, responseList) {
+    // no parser available, flatten responses
+    foreach (QString s, pmuResponseList) {
       response.append(s);
     }
     if (response.startsWith("OK")) {
@@ -116,9 +117,21 @@ QString MainWindow::processUserRequest(QString *request) {
       m_solarized->setTextColor(&response, SOLAR_VIOLET);
     }
   } else {
-    // use helper parser
-    response = cmdEntry->parseResponse(responseList);
-    m_solarized->setTextColor(&response, SOLAR_BLUE);
+    // use parser
+    parsedResponseList = cmdEntry->parseResponse(pmuResponseList);
+    // flatten
+    foreach(QString r, parsedResponseList) {
+      if (r.contains("ERROR")) {
+        m_solarized->setTextColor(&r, SOLAR_RED);
+      } else {
+        m_solarized->setTextColor(&r, SOLAR_BLUE);
+      }
+      response += (r + "<br>");
+    }
+  }
+  // an empty line between blocks adds clarity
+  if (response.endsWith("<br>") == false) {
+    response += "<br>";
   }
   return response;
 }
