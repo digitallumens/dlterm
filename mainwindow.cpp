@@ -64,7 +64,7 @@ QString MainWindow::processUserRequest(QString *request) {
     cmd = *request;
   }
   // find the associated helper entry
-  struct cmdEntry *cmdEntry = m_cmdHelper->m_cmdTable[cmd];
+  struct cmdEntry *cmdEntry = m_cmdHelper->getCmdEntry(cmd);
   if (cmdEntry == NULL) {
     // not a helper command
     cmdList << *request;

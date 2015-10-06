@@ -23,8 +23,8 @@ class cmdHelper : public QObject
 
 public:
   explicit cmdHelper(QObject *parent = 0);
-  QHash <QString, struct cmdEntry*> m_cmdTable;
   QCompleter *m_cmdCompleter;
+  struct cmdEntry *getCmdEntry(QString cmd);
   QString parseError(QString pmuResponse);
   QString getNextCompletion(void);
   int getCurrentCompletionLength(void);
@@ -34,6 +34,7 @@ signals:
 public slots:
 
 private:
+  QHash <QString, struct cmdEntry*> m_cmdTable;
   QMap <QString, QString> m_errorResponses;
 };
 

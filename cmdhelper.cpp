@@ -3026,6 +3026,10 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_errorResponses.insert("ERROR: FFEE", "ERROR: Resource busy");
 }
 
+struct cmdEntry * cmdHelper::getCmdEntry(QString cmd) {
+  return m_cmdTable[cmd];
+}
+
 QString cmdHelper::parseError(QString pmuResponse) {
   return m_errorResponses[pmuResponse];
 }
