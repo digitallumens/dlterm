@@ -6,7 +6,7 @@
 
 typedef QStringList(*buildCmd_t)(QStringList argList);
 typedef QStringList(*parseResponse_t)(QStringList pmuResponse);
-typedef QString(*getHelp_t)(void);
+typedef QStringList(*getHelp_t)(void);
 
 struct cmdEntry {
   cmdEntry(){}

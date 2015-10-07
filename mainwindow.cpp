@@ -72,7 +72,10 @@ QString MainWindow::processUserRequest(QString *request) {
   } else {
     // show help
     if (request->contains("help")) {
-      response = cmdEntry->getHelp();
+      QStringList helpList = cmdEntry->getHelp();
+      foreach(QString h, helpList) {
+        response.append(h + "<br>");
+      }
       m_solarized->setTextColor(request, SOLAR_YELLOW);
       m_solarized->setTextColor(&response, SOLAR_CYAN);
       return response;
@@ -126,12 +129,12 @@ QString MainWindow::processUserRequest(QString *request) {
       } else {
         m_solarized->setTextColor(&r, SOLAR_BLUE);
       }
-      response += (r + "<br>");
+      response.append(r + "<br>");
     }
   }
   // an empty line between blocks adds clarity
   if (response.endsWith("<br>") == false) {
-    response += "<br>";
+    response.append("<br>");
   }
   return response;
 }
