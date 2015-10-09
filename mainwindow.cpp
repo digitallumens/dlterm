@@ -72,21 +72,14 @@ QString MainWindow::processUserRequest(QString *request) {
   } else {
     // show help
     if (request->contains("help")) {
-      QStringList helpList = cmdEntry->getHelp();
-      foreach(QString h, helpList) {
-        response.append(h + "<br>");
-      }
       m_solarized->setTextColor(request, SOLAR_YELLOW);
-      m_solarized->setTextColor(&response, SOLAR_CYAN);
-      return response;
+      return buildHelp(cmdEntry);
     }
     // translate helper command
     cmdList = cmdEntry->buildCmd(argList);
     // command translator returned an error
     if (cmdList.at(0).startsWith("ERROR")) {
-      response = cmdList.at(0);
-      m_solarized->setTextColor(&response, SOLAR_RED);
-      return response;
+      return buildUserInputError(cmdList);
     }
     m_solarized->setTextColor(request, SOLAR_YELLOW);
   }
@@ -94,47 +87,11 @@ QString MainWindow::processUserRequest(QString *request) {
   m_interface->queryPmu(cmdList, &pmuResponseList);
   // parse responses
   if (cmdEntry == NULL) {
-    // not a helper command, flatten responses
-    foreach (QString s, pmuResponseList) {
-      response.append(s);
-    }
-    if (response.startsWith("OK")) {
-      m_solarized->setTextColor(&response, SOLAR_GREEN);
-    } else if (response.startsWith("ERROR")) {
-      response = m_cmdHelper->parseError(response);
-      m_solarized->setTextColor(&response, SOLAR_RED);
-    } else {
-      m_solarized->setTextColor(&response, SOLAR_VIOLET);
-    }
+    response = buildBasicCommandResponse(pmuResponseList);
   } else if (cmdEntry->parseResponse == NULL) {
-    // no parser available, flatten responses
-    foreach (QString s, pmuResponseList) {
-      response.append(s);
-    }
-    if (response.startsWith("OK")) {
-      m_solarized->setTextColor(&response, SOLAR_GREEN);
-    } else if (response.startsWith("ERROR")) {
-      response = m_cmdHelper->parseError(response);
-      m_solarized->setTextColor(&response, SOLAR_RED);
-    } else {
-      m_solarized->setTextColor(&response, SOLAR_VIOLET);
-    }
+    response = buildUnparsedResponse(cmdList, pmuResponseList);
   } else {
-    // use parser
-    parsedResponseList = cmdEntry->parseResponse(pmuResponseList);
-    // flatten
-    foreach(QString r, parsedResponseList) {
-      if (r.contains("ERROR")) {
-        m_solarized->setTextColor(&r, SOLAR_RED);
-      } else {
-        m_solarized->setTextColor(&r, SOLAR_BLUE);
-      }
-      response.append(r + "<br>");
-    }
-  }
-  // an empty line between blocks adds clarity
-  if (response.endsWith("<br>") == false) {
-    response.append("<br>");
+    response = buildParsedResponse(cmdEntry, cmdList, pmuResponseList);
   }
   return response;
 }
@@ -150,6 +107,111 @@ QString MainWindow::buildPrompt(void) {
   }
   m_solarized->setTextColor(&prompt, SOLAR_BASE_01);
   return prompt;
+}
+
+QString MainWindow::buildParsedResponse(struct cmdEntry * cmdEntry, QStringList cmdList, QStringList pmuResponseList) {
+  QString preamble;
+  QString response;
+  QStringList parsedResponseList;
+  if (ui->actionShow_PMU_Command->isChecked()) {
+    preamble = QString("PMU command: %1").arg(cmdList.at(0));
+    if (cmdList.length() > 1) {
+      preamble += QString(" [plus %1 others...]").arg(cmdList.length() - 1);
+    }
+    preamble += "<br>";
+    preamble += QString("PMU response: %1").arg(pmuResponseList.at(0));
+    if (pmuResponseList.length() > 1) {
+      preamble += QString(" [plus %1 others...]").arg(pmuResponseList.length() - 1);
+    }
+    preamble += "<br>";
+    m_solarized->setTextColor(&preamble, SOLAR_BASE_01);
+  }
+  // use parser
+  parsedResponseList = cmdEntry->parseResponse(pmuResponseList);
+  // flatten
+  foreach(QString r, parsedResponseList) {
+    if (r.contains("ERROR")) {
+      m_solarized->setTextColor(&r, SOLAR_RED);
+    } else {
+      m_solarized->setTextColor(&r, SOLAR_BLUE);
+    }
+    response.append(r + "<br>");
+  }
+  if (response.endsWith("<br>") == false) {
+    response.append("<br>");
+  }
+  return preamble + response;
+}
+
+QString MainWindow::buildUnparsedResponse(QStringList cmdList, QStringList pmuResponseList) {
+  QString preamble;
+  QString response;
+  if (ui->actionShow_PMU_Command->isChecked()) {
+    preamble = QString("PMU command: %1").arg(cmdList.at(0));
+    if (cmdList.length() > 1) {
+      preamble += QString(" [plus %1 others...]").arg(cmdList.length() - 1);
+    }
+    preamble += "<br>";
+    m_solarized->setTextColor(&preamble, SOLAR_BASE_01);
+  }
+  // no parser available, flatten responses
+  foreach (QString s, pmuResponseList) {
+    response.append(s);
+  }
+  if (response.startsWith("OK")) {
+    m_solarized->setTextColor(&response, SOLAR_GREEN);
+  } else if (response.startsWith("ERROR")) {
+    response = m_cmdHelper->parseError(response);
+    m_solarized->setTextColor(&response, SOLAR_RED);
+  } else {
+    m_solarized->setTextColor(&response, SOLAR_VIOLET);
+  }
+  if (response.endsWith("<br>") == false) {
+    response.append("<br>");
+  }
+  return preamble + response;
+}
+
+QString MainWindow::buildBasicCommandResponse(QStringList pmuResponseList) {
+  QString response;
+  // not a helper command, flatten responses
+  foreach (QString s, pmuResponseList) {
+    response.append(s);
+  }
+  if (response.startsWith("OK")) {
+    m_solarized->setTextColor(&response, SOLAR_GREEN);
+  } else if (response.startsWith("ERROR")) {
+    response = m_cmdHelper->parseError(response);
+    m_solarized->setTextColor(&response, SOLAR_RED);
+  } else {
+    m_solarized->setTextColor(&response, SOLAR_VIOLET);
+  }
+  if (response.endsWith("<br>") == false) {
+    response.append("<br>");
+  }
+  return response;
+}
+
+QString MainWindow::buildHelp(struct cmdEntry * cmdEntry) {
+  QString response;
+  QStringList helpList = cmdEntry->getHelp();
+  foreach(QString h, helpList) {
+    response.append(h + "<br>");
+  }
+  m_solarized->setTextColor(&response, SOLAR_CYAN);
+  if (response.endsWith("<br>") == false) {
+    response.append("<br>");
+  }
+  return response;
+}
+
+QString MainWindow::buildUserInputError(QStringList cmdList) {
+  QString response = cmdList.at(0);
+  m_solarized->setTextColor(&response, SOLAR_RED);
+  if (response.endsWith("<br>") == false) {
+    response.append("<br>");
+  }
+  return response;
 }
 
 bool MainWindow::eventFilter(QObject *target, QEvent *event) {

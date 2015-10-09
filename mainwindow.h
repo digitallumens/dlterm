@@ -35,6 +35,11 @@ private:
   bool eventFilter(QObject *target, QEvent *event);
   QString processUserRequest(QString *request);
   QString buildPrompt(void);
+  QString buildParsedResponse(struct cmdEntry * cmdEntry, QStringList cmdList, QStringList pmuResponseList);
+  QString buildUnparsedResponse(QStringList cmdList, QStringList pmuResponseList);
+  QString buildBasicCommandResponse(QStringList pmuResponseList);
+  QString buildHelp(struct cmdEntry * cmdEntry);
+  QString buildUserInputError(QStringList cmdList);
   cmdHelper *m_cmdHelper;
   cmdHistory *m_cmdHistory;
   solarized *m_solarized;

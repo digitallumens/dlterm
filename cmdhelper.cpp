@@ -241,8 +241,8 @@ QStringList parse_get_usage(QStringList pmuResponse) {
   parsedResponse << QString("Inactive time: %1").arg(toYDHMS(pmuResponse.at(2)));
   parsedResponse << QString("Perm active time: %1").arg(toYDHMS(pmuResponse.at(3)));
   parsedResponse << QString("Perm inactive time: %1").arg(toYDHMS(pmuResponse.at(4)));
-  parsedResponse << QString("Power: %1 watt hours").arg(pmuResponse.at(5).toUShort(&ok, 16));
-  parsedResponse << QString("Perm power: %1 watt hours").arg(pmuResponse.at(6).toUShort(&ok, 16));
+  parsedResponse << QString("Power: %1 Wh").arg(pmuResponse.at(5).toUShort(&ok, 16));
+  parsedResponse << QString("Perm power: %1 Wh").arg(pmuResponse.at(6).toUShort(&ok, 16));
   parsedResponse << QString("Sensor events: %1").arg(pmuResponse.at(7).toUShort(&ok, 16));
   parsedResponse << QString("Perm sensor events: %1").arg(pmuResponse.at(8).toUShort(&ok, 16));
   return parsedResponse;
