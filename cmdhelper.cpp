@@ -433,12 +433,18 @@ QStringList help_lightBarSelect(void) {
                        << "(bit mask for what light bars should be used. Development use only, not EEPROM backed)";
 }
 
-QStringList build_get_currentPowerConsumption(QStringList argList) {
+QStringList build_get_powerConsumption(QStringList argList) {
   (void) argList;
   return QStringList() << "G001F";
 }
 
-QStringList help_currentPowerConsumption(void) {
+QStringList parse_get_powerConsumption(QStringList pmuResponse) {
+  bool ok;
+  quint16 powerInt = pmuResponse.at(0).toUShort(&ok, 16);
+  return QStringList() << QString("%1 mW").arg(powerInt);
+}
+
+QStringList help_powerConsumption(void) {
   return QStringList() << "001F Current Power Consumption -- 4B -- R (Power in mW)"
                        << "Version 1.0+";
 }
@@ -2828,7 +2834,7 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("get safeMode", new cmdEntry(build_get_safeMode, help_safeMode));
   m_cmdTable.insert("get lightBarSelect", new cmdEntry(build_get_lightBarSelect, help_lightBarSelect));
   m_cmdTable.insert("set lightBarSelect", new cmdEntry(build_set_lightBarSelect, help_lightBarSelect));
-  m_cmdTable.insert("get currentPowerConsumption", new cmdEntry(build_get_currentPowerConsumption, help_currentPowerConsumption));
+  m_cmdTable.insert("get powerConsumption", new cmdEntry(build_get_powerConsumption, parse_get_powerConsumption, help_powerConsumption));
   m_cmdTable.insert("get wirelessDataAggregator", new cmdEntry(build_get_wirelessDataAggregator, help_wirelessDataAggregator));
   m_cmdTable.insert("set wirelessDataAggregator", new cmdEntry(build_set_wirelessDataAggregator, help_wirelessDataAggregator));
   m_cmdTable.insert("get resetUsageTimestamp", new cmdEntry(build_get_resetUsageTimestamp, help_resetUsageTimestamp));
