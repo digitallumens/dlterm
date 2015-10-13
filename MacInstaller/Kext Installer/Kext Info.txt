@@ -1,0 +1,16 @@
+IMPORTANT:
+----------
+
+1. This .kext must be chown'd as system/wheel after installation:
+
+sudo chmod -R 755 /System/Library/Extensions/NAME.kext
+sudo chown -R root:wheel /System/Library/Extensions/NAME.kext
+
+2. Also, to tell the OS that there's a new extension, you need to:
+
+sudo touch /System/Library/Extensions
+
+3. The info for the "silent USB install" kext came from this Apple Technote:
+
+http://developer.apple.com/library/mac/#qa/qa1667/_index.html
+

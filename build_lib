@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+set -e # Exit immediately on error.
+set -x # Display expanded commands as they are executed.
+
+getAppName(){
+	APPNAME=`sed -n 's/^TARGET\ =\ "*\(.*.\)"*/\1/p' *.pro`
+    APPNAME=`echo $APPNAME | tr -d '"'`
+}
+
+getQtVersion(){
+	QTTRUNC=`sed -n 's/REQUIRED_QT\ =\ \(.*.\)/\1/p' *.pro`
+	QTVERSION=`echo $QTTRUNC | tr -d '\r'`
+}
+
+#takes application name as argument and sets variable APPVERSION equal to version number
+getAppVersion(){
+	APPVERSION=`sed -n 's/APPLICATION_VERSION\ =\ \(.*.\)/\1/p' *.pro`
+}
+
+returnGitHash(){
+	echo `git log -1 --format=%h`
+}
+
+#returns the current branch name
+getGitBranchName(){
+	if [ ! -z $GIT_BRANCH ]; then
+		local branch_name=$GIT_BRANCH
+	else
+		local branch_name=$(git symbolic-ref -q HEAD)
+		branch_name=${branch_name##refs/heads/}
+		branch_name=${branch_name:-HEAD}
+	fi
+
+	echo "$branch_name"
+}
+# #define BUILD_TIME "2000-12-12T00:12:34 6f3126e #99"
+# USAGE: setBuildString dev 6f3126e
+# cat build_time.h
+# #define BUILD_TIME "dev 6f3126e"
+setBuildString(){
+	if [ $# -eq 3 ]; then
+		local buildid="$1"
+		local gitsha="$2"
+		local buildnum="$3"
+		echo "#define BUILD_TIME \"${buildid} ${gitsha} #${buildnum}\"" > build_time.h
+	elif [ $# -eq 2 ]; then
+		local buildname="$1"
+		local gitsha="$2"
+		echo "#define BUILD_TIME \"${buildname} $gitsha\"" > build_time.h
+	else
+		echo "Build was not defined"
+		exit 1
+	fi
+}
+
+setLibVersion(){
+	if [ $# -eq 2 ]; then
+		local buildname="$1"
+		local sha="$2"
+		sed -ie 's/\(LIB_VERSION_STRING.*\)"\(.*\)"/\1"'$buildname' '$sha'"/g' DLLib/dllib.h
+	elif [ $# -eq 3]; then
+		local buildid="$1"
+		local sha="$2"
+		local buildnumber="$3"
+		sed -ie 's/\(LIB_VERSION_STRING.*\)"\(.*\)"/\1"'$buildid' '$sha' '$buildnumber'"/g' DLLib/dllib.h
+	fi
+}
+
+#takes on parameter in the form of jenkins BUILD_ID environment variable and converts it to iso8601 format
+isoDateTime(){
+	if [ ! -z "$1" ]; then
+		local datetime="$1"
+		echo $datetime | sed 's/\(....-..-..\)_\(..\)-\(..\)-\(..\)/\1T\2:\3:\4/'
+	else
+		return 0
+	fi
+}
+#creates environment variable used by *.pro file
+#sets the gitBranchName to the VERSION_EXPR variable or removes it if considered "release"
+modifyApplicationVersionName(){
+	case $(getGitBranchName) in
+		*"release"*) export VERSION_EXPR=`sed -n 's#APPLICATION_VERSION\ =\ \(\([0-9]\{1,\}\.\)\{2\}[0-9]\{1,\}\).*#\1#p' *.pro`;;
+		*) export VERSION_EXPR=`sed -n 's#APPLICATION_VERSION\ =\ \(\([0-9]\{1,\}\.\)\{2\}[0-9]\{1,\}\).*#\1\-'"$(getGitBranchName)"'#p' *.pro`;;
+
+	esac
+}
+
+# modifies dllibDebugLevel in mainwinow.cpp to the argument passed - between 0 and 999
+setDebugLevel(){
+	if [ "$1" -ge 0 ] && [ "$1" -le 1000 ]; then
+		local newLevel="$1"
+		sed -ie 's/\(g_dllibDebugLevel\ =\)\(.*\);/\1\ '$newLevel';/g' main.cpp
+	else
+		return -1
+	fi
+}
+
+# Builds a disk image.
+# If you don't, you get the current date: NameYYYYMMDD.dmg
+# Contents will be whatever lives in the DIST_PATH folder.
+# Script depends on copying a DS_Store file that contains the folder layout.
+# Script depends on copying a backgroundImage.tiff file as the image background.
+buildDMG(){
+    VOL_NAME="$APPNAME $APPVERSION"
+    DIST_NAME="$APPNAME $APPVERSION"
+    DIST_PATH=./"release-mac"
+    DIST_ARCHIVE=MacInstaller/$DIST_NAME.dmg
+    ln -s /Applications $DIST_PATH/Applications
+    cp MacInstaller/MacDiskImageTools/files_to_be_hidden_on_dmg/DS_Store $DIST_PATH/.DS_Store || exit -1
+    cp MacInstaller/MacDiskImageTools/files_to_be_hidden_on_dmg/backgroundImage.tiff $DIST_PATH/.backgroundImage.tiff || exit -1
+    # The following is a possible fix for "hdiutil: create failed - error -5341"
+    # per http://stackoverflow.com/questions/18621467/error-creating-disk-image-using-hdutil
+    touch $DIST_PATH/.Trash
+    hdiutil create -volname "$VOL_NAME" -ov -format UDZO -imagekey zlib-level=9 -srcfolder "$DIST_PATH"  "$DIST_ARCHIVE" || exit 1
+    #hdiutil unflatten "$DIST_ARCHIVE" || return -1
+    # To enable automount/copy/unmount: (http://stackoverflow.com/questions/1237951/create-dmg-file)
+    #   hdiutil internet-enable -yes $DIST_ARCHIVE || return -1
+    #/Applications/Xcode.app/Contents/Developer/Tools/Rez /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/Developer/Headers/FlatCarbon/*.r Digital\ Lumens\ EULA.r -a -o "$DIST_ARCHIVE" || return -1
+    ##hdiutil flatten "$DIST_ARCHIVE" || return -1
+    rm -f $DIST_PATH/Applications || return -1
+}

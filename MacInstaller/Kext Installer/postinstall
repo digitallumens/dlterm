@@ -1,0 +1,31 @@
+#!/bin/sh
+
+echo "*** postinstall script start"
+
+echo "*** chown -R root:wheel, chmod -R 755 phase"
+
+sudo chown -R root:wheel /private/tmp/DigitalLumens.kext
+sudo chmod -R 755 /private/tmp/DigitalLumens.kext
+
+sudo chown -R root:wheel /private/tmp/SiLabsUSBDriver.kext
+sudo chmod -R 755 /private/tmp/SiLabsUSBDriver.kext
+
+echo "*** cp -R /private/tmp/___.kext /Library/Extensions/___.kext"
+
+sudo cp -R /private/tmp/DigitalLumens.kext /Library/Extensions/
+sudo cp -R /private/tmp/SiLabsUSBDriver.kext /Library/Extensions/
+
+echo "*** rm -rf /private/tmp/___.kext"
+
+sudo rm -rf /private/tmp/DigitalLumens.kext
+sudo rm -rf /private/tmp/SiLabsUSBDriver.kext
+
+echo "*** touch /Library/Extensions"
+
+sudo touch /Library/Extensions
+
+# echo "*** kextload phase"
+# sudo kextload /Library/Extensions/DigitalLumens.kext
+# sudo kextload /Library/Extensions/SiLabsUSBDriver.kext
+
+echo "*** postinstall script finished"

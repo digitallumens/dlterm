@@ -1,8 +1,5 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2015-07-16T10:51:15
-#
-#-------------------------------------------------
+REQUIRED_QT = 5.5.0
+APPLICATION_VERSION = 0.1.0
 
 QT       += core gui network xml
 
@@ -45,6 +42,17 @@ OTHER_FILES += DL.icns DL.ico
 
 ICON += DL.icns
 
+# Set up destination directory.
+CONFIG(debug, debug|release) {
+    message( "This is a debug build." )
+    DESTTYPE = debug
+    DEFINES += QT_DEBUG
+} else {
+    message ( "This is a release build." )
+    DESTTYPE = release
+    DEFINES += QT_NO_DEBUG
+}
+
 DLLIB_DIR = ../DLLib
 
 macx {
@@ -57,9 +65,6 @@ macx {
     DEFINES     += APP_DEPTH=0
 
     DESTDIR = $$join(DESTTYPE,,,-mac)
-
-    #LIBS += /Applications/Xcode.app//Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Carbon.framework/Carbon
-    #LIBS += /Applications/Xcode.app//Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework/Foundation
 }
 
 OBJECTS_DIR = temp
