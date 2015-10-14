@@ -105,8 +105,10 @@ QStringList build_get_temperature(QStringList argList) {
 }
 
 QStringList parse_get_temperature(QStringList pmuResponse) {
-  (void) pmuResponse;
-  return QStringList() << "todo";
+  bool ok;
+  quint16 tInt = pmuResponse.at(0).toUShort(&ok, 16);
+  float tFloat = tInt / 128;
+  return QStringList() << QString("%1 C").arg(tFloat);
 }
 
 QStringList help_temperature(void) {
@@ -1107,6 +1109,17 @@ QStringList help_get_overTemperatureConfig(void) {
 QStringList build_get_analogDimmingMode(QStringList argList) {
   (void) argList;
   return QStringList() << "G0048";
+}
+
+QStringList parse_get_analogDimmingMode(QStringList pmuResponse) {
+  QMap <QString, QString> analogDimmingModeDict;
+  analogDimmingModeDict.insert("00", "Analog dimming off");
+  analogDimmingModeDict.insert("01", "Analog dimming on");
+  analogDimmingModeDict.insert("02", "Analog dimming on with ability to go full off");
+  analogDimmingModeDict.insert("03", "Analog dimming using registers 54-56");
+  analogDimmingModeDict.insert("04", "Analog dimming using registers 54-56 with full off support");
+  analogDimmingModeDict.insert("05", "Ambient sensor dimming");
+  return QStringList() << QString("%1").arg(analogDimmingModeDict[pmuResponse.at(0)]);
 }
 
 QStringList build_set_analogDimmingMode(QStringList argList) {
@@ -2888,7 +2901,7 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("set overTemperatureThresholdLow", new cmdEntry(build_set_overTemperatureThresholdLow, help_overTemperatureThresholdLow));
   m_cmdTable.insert("set overTemperatureThresholdHigh", new cmdEntry(build_get_overTemperatureThresholdHigh, help_overTemperatureThresholdHigh));
   m_cmdTable.insert("set overTemperatureDimmingLimit", new cmdEntry(build_set_overTemperatureDimmingLimit, help_overTemperatureDimmingLimit));
-  m_cmdTable.insert("get analogDimmingMode", new cmdEntry(build_get_analogDimmingMode, help_analogDimmingMode));
+  m_cmdTable.insert("get analogDimmingMode", new cmdEntry(build_get_analogDimmingMode, parse_get_analogDimmingMode, help_analogDimmingMode));
   m_cmdTable.insert("set analogDimmingMode", new cmdEntry(build_set_analogDimmingMode, help_analogDimmingMode));
   m_cmdTable.insert("get fixtureIdMode", new cmdEntry(build_get_fixtureIdMode, help_fixtureIdMode));
   m_cmdTable.insert("set fixtureIdMode", new cmdEntry(build_set_fixtureIdMode, help_fixtureIdMode));
