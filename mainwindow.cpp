@@ -236,6 +236,7 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       ui->outputFeed->insertHtml(buildPrompt() + userRequest + "<br>");
       ui->outputFeed->insertHtml(pmuResponse + "<br>");
       // scroll to bottom
+      QCoreApplication::processEvents();
       ui->outputFeed->verticalScrollBar()->setValue(ui->outputFeed->verticalScrollBar()->maximum());
       break;
     case Qt::Key_Tab:
@@ -324,7 +325,7 @@ void MainWindow::on_actionPreferences_triggered() {
 void MainWindow::on_actionAbout_triggered() {
   QMessageBox::about(this, "About DLTerm",
                      tr("<p><b>Digital Lumens Terminal</b></p>"
-                        "<p><small>Version 0.1.0</small></p>"
-                        "<p><small>Build date 9/22/15</small></p>"
-                        "<small>Copyright &copy; 2010-2014. All rights reserved.</small>"));
+                        "<p><small>Version 0.2.0</small></p>"
+                        "<p><small>Build date 10/14/15</small></p>"
+                        "<small>Copyright &copy; 2010-2015. All rights reserved.</small>"));
 }
