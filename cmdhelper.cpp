@@ -9,6 +9,9 @@ QString toYDHMS(QString timeInSec) {
   bool ok;
   quint32 ulTimeInSec = timeInSec.toULong(&ok, 16);
   QString outTime;
+  if (ulTimeInSec == 0) {
+    return "0S";
+  }
   if (ulTimeInSec / 31536000) {
     outTime += QString("%1Y:").arg(ulTimeInSec / 31536000);
     ulTimeInSec %= 31536000;
@@ -2689,6 +2692,7 @@ QStringList parse_get_log(QStringList pmuResponse) {
   QString log;
   bool ok;
   bool isLastEntry;
+  QString timestamp;
   arg1 = pmuResponse.at(0);
   baseTime = 0;
   do {
@@ -2718,6 +2722,8 @@ QStringList parse_get_log(QStringList pmuResponse) {
       uptime += baseTime;
       baseTime = uptime;
     }
+    timestamp.setNum(uptime, 16);
+    timestamp = toYDHMS(timestamp);
     // parse log entry
     if (eventType == "00") {
       // build a dictionary of power events
@@ -2726,7 +2732,7 @@ QStringList parse_get_log(QStringList pmuResponse) {
       powerEventsMap.insert("01", "Power up");
       powerEventsMap.insert("02", "Power restored");
       powerEventsMap.insert("03", "Power soft reset");
-      log += QString("%1 > %2").arg(uptime).arg(powerEventsMap[eventValue]);
+      log += QString("%1 > %2").arg(timestamp).arg(powerEventsMap[eventValue]);
     } else if (eventType == "01") {
       // build a dictionary of activity state transition events
       QMap <QString, QString> activityStateTransitionEventsMap;
@@ -2738,21 +2744,21 @@ QStringList parse_get_log(QStringList pmuResponse) {
       activityStateTransitionEventsMap.insert("05", "Remote sensor & sensor 0 active");
       activityStateTransitionEventsMap.insert("06", "Remote sensor & sensor 1 active");
       activityStateTransitionEventsMap.insert("07", "Remote sensor, sensor 0, and sensor 1 active");
-      log += QString("%1 > %2").arg(uptime).arg(activityStateTransitionEventsMap[eventValue]);
+      log += QString("%1 > %2").arg(timestamp).arg(activityStateTransitionEventsMap[eventValue]);
     } else if (eventType == "02") {
       // type 2 events are not implemented
-      log += QString("%1 > Type 2 event: %2").arg(uptime).arg(eventValue);
+      log += QString("%1 > Type 2 event: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "03") {
-      log += QString("%1 > Sensor off: %2").arg(uptime).arg(eventValue);
+      log += QString("%1 > Sensor off: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "04") {
       // unspecified value
-      log += QString("%1 > SerialNet watchdog tripped").arg(uptime);
+      log += QString("%1 > SerialNet watchdog tripped").arg(timestamp);
     } else if (eventType == "05") {
-      log += QString("%1 > Temperature state change: %2").arg(uptime).arg(eventValue);
+      log += QString("%1 > Temperature state change: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "06") {
-      log += QString("%1 > Lightbar error: %2").arg(uptime).arg(eventValue);
+      log += QString("%1 > Lightbar error: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "07") {
-      log += QString("%1 > RTC set event: %2").arg(uptime).arg(eventValue);
+      log += QString("%1 > RTC set event: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "08") {
       int batteryNumber;
       // build a dictionary of battery backup events
@@ -2778,15 +2784,15 @@ QStringList parse_get_log(QStringList pmuResponse) {
       } else {
         batteryNumber = 0;
       }
-      log += QString("%1 > Battery backup %2 event: %3").arg(uptime).arg(batteryNumber).arg(batteryBackupEventsMap[eventValue]);
+      log += QString("%1 > Battery backup %2 event: %3").arg(timestamp).arg(batteryNumber).arg(batteryBackupEventsMap[eventValue]);
     } else if (eventType == "09") {
-      log += QString("%1 > I2C watchdog reset event: %2").arg(uptime).arg(eventValue);
+      log += QString("%1 > I2C watchdog reset event: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "0A") {
       // unspecified value
-      log += QString("%1 > Registers restored from backup").arg(uptime);
+      log += QString("%1 > Registers restored from backup").arg(timestamp);
     } else {
       // unknown event
-      log += QString("%1 > Type %2 event: %3").arg(uptime).arg(eventType).arg(eventValue);
+      log += QString("%1 > Type %2 event: %3").arg(timestamp).arg(eventType).arg(eventValue);
     }
     // insert a break
     log += "<br>";
