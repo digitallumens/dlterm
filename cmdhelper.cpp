@@ -120,7 +120,8 @@ QStringList help_temperature(void) {
 
 QStringList build_get_lightLevel(QStringList argList) {
   (void) argList;
-  return QStringList() << "G0005" // light manual level
+  return QStringList() << "G001C" // current level
+                       << "G0005" // light manual level
                        << "G0006" // light active level
                        << "G0007" // light inactive level
                        << "G0008" // light overrirde active level
@@ -129,11 +130,12 @@ QStringList build_get_lightLevel(QStringList argList) {
 
 QStringList parse_get_lightLevel(QStringList pmuResponse) {
   QStringList parsedResponse;
-  parsedResponse << QString("Manual level: %1").arg(pmuResponse.at(0));
-  parsedResponse << QString("Active level: %1").arg(pmuResponse.at(1));
-  parsedResponse << QString("Inactive level: %1").arg(pmuResponse.at(2));
-  parsedResponse << QString("Override active level: %1").arg(pmuResponse.at(3));
-  parsedResponse << QString("Override inactive level: %1").arg(pmuResponse.at(4));
+  parsedResponse << QString("Current level: %1").arg(pmuResponse.at(0));
+  parsedResponse << QString("Manual level: %1").arg(pmuResponse.at(1));
+  parsedResponse << QString("Active level: %1").arg(pmuResponse.at(2));
+  parsedResponse << QString("Inactive level: %1").arg(pmuResponse.at(3));
+  parsedResponse << QString("Override active level: %1").arg(pmuResponse.at(4));
+  parsedResponse << QString("Override inactive level: %1").arg(pmuResponse.at(5));
   return parsedResponse;
 }
 
