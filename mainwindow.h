@@ -33,6 +33,7 @@ public slots:
 private:
   Ui::MainWindow *ui;
   bool eventFilter(QObject *target, QEvent *event);
+  void checkForInstalledKexts(void);
   QString processUserRequest(QString *request);
   QString buildPrompt(void);
   QString buildParsedResponse(struct cmdEntry * cmdEntry, QStringList cmdList, QStringList pmuResponseList);

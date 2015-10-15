@@ -7,6 +7,7 @@
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <QMessageBox>
+#include <QDesktopServices>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui(new Ui::MainWindow),
@@ -39,10 +40,38 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   // connect signals and slots
   connect(m_interface, SIGNAL(connectionEstablished()), this, SLOT(on_connectionEstablished()));
   this->setWindowTitle("DLTerm (Disconnected)");
+  // install telegesis drivers if missing
+  checkForInstalledKexts();
 }
 
 MainWindow::~MainWindow() {
   delete ui;
+}
+
+void MainWindow::checkForInstalledKexts(void) {
+  QFileInfo siLabsNewDriverInfo("/Library/Extensions/SiLabsUSBDriver.kext");
+  QFileInfo siLabsDriverInfo("/System/Library/Extensions/SiLabsUSBDriver.kext");
+  QFileInfo siLabsDriver64Info("/System/Library/Extensions/SiLabsUSBDriver64.kext");
+  if ( (!siLabsNewDriverInfo.exists() && !siLabsDriverInfo.exists() && !siLabsDriver64Info.exists()) ) {
+    int result = QMessageBox::warning(this,
+                        tr("Drivers not detected"),
+                        tr("It looks like the drivers for the USB Wireless Adapter are not installed. Would you like to install them now?"),
+                        QMessageBox::Yes | QMessageBox::No,
+                        QMessageBox::Yes);
+    if (result == QMessageBox::Yes) {
+      // Launch installer from Resources folder
+      //DLDebug(1, DL_FUNC_INFO) << "User chose to install drivers.";
+      QString path = qApp->applicationDirPath() + QString("/../Resources/Install Drivers.pkg");
+      QUrl url = QUrl::fromLocalFile(path);
+      if (!QDesktopServices::openUrl(url)) {
+        QMessageBox::critical(QApplication::activeWindow(), tr("Error"), tr("Failed to open file at %1").arg(path));
+      }
+    } else {
+      //DLDebug(1, DL_FUNC_INFO) << "User chose NOT to install drivers.";
+    }
+  } else {
+    //DLDebug(600, DL_FUNC_INFO) << "SiLabsUSBDriver is installed.";
+  }
 }
 
 QString MainWindow::processUserRequest(QString *request) {
