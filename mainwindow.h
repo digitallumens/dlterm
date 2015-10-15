@@ -29,6 +29,7 @@ public slots:
   void on_actionPreferences_triggered();
   void on_actionAbout_triggered();
   void on_connectionEstablished();
+  void on_connectionStatusChanged(QString status);
 
 private:
   Ui::MainWindow *ui;

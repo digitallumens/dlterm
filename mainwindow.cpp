@@ -39,7 +39,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui->actionPreferences->setMenuRole(QAction::PreferencesRole);
   // connect signals and slots
   connect(m_interface, SIGNAL(connectionEstablished()), this, SLOT(on_connectionEstablished()));
-  this->setWindowTitle("DLTerm (Disconnected)");
+  connect(m_interface, SIGNAL(connectionStatusChanged(QString)), this, SLOT(on_connectionStatusChanged(QString)));
+  this->setWindowTitle("DLTerm: Disconnected");
   // install telegesis drivers if missing
   checkForInstalledKexts();
 }
@@ -306,10 +307,12 @@ void MainWindow::on_actionConnect_Using_FTDI_triggered() {
 }
 
 void MainWindow::on_actionConnect_Using_Telegesis_triggered() {
+  // open the preferences dialog so the user can input the missing info
   if (m_preferencesDialog->m_serialNumber == 0) {
-    // open the preferences dialog so the user can input the missing info
     m_preferencesDialog->exec();
-  } else {
+  }
+  // check serial number again before connecting
+  if (m_preferencesDialog->m_serialNumber != 0) {
     m_interface->configure(m_preferencesDialog->m_networkStr, m_preferencesDialog->m_serialNumber);
     m_interface->connectTelegesis();
   }
@@ -322,7 +325,6 @@ void MainWindow::on_actionDisconnect_triggered() {
   ui->actionConnect_Using_Telegesis->setVisible(true);
   ui->actionPreferences->setDisabled(false);
   ui->commandLine->setPlaceholderText("Press ⌘K to establish a connection.");
-  this->setWindowTitle("DLTerm (Disconnected)");
 }
 
 void MainWindow::on_connectionEstablished(void) {
@@ -331,7 +333,10 @@ void MainWindow::on_connectionEstablished(void) {
   ui->actionDisconnect->setVisible(true);
   ui->actionPreferences->setDisabled(true);
   ui->commandLine->setPlaceholderText("Type a command here. Terminate by pressing ENTER.");
-  this->setWindowTitle("DLTerm (Connected)");
+}
+
+void MainWindow::on_connectionStatusChanged(QString status) {
+  this->setWindowTitle(QString("DLTerm: %1").arg(status));
 }
 
 void MainWindow::on_actionClear_Output_triggered() {

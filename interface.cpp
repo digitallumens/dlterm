@@ -32,6 +32,7 @@ void interface::disconnect(void) {
   }
   GlobalGateway::Instance()->leaveAnyNetwork();
   m_connected = false;
+  emit connectionStatusChanged("Disconnected");
 }
 
 bool interface::isConnected(void) {
@@ -45,6 +46,7 @@ void interface::slotPMUDiscovered(PMU* pmu) {
     return;
   }
   m_connected = true;
+  emit connectionStatusChanged(QString("FTDI connection established"));
   emit connectionEstablished();
 }
 
@@ -59,7 +61,7 @@ void interface::joinAndConnectWirelessly(void) {
   Gateway *gw = ggw->getGateway(0);
   if (!gw) return;
   if (m_joined && m_joinedNetworkStr != m_networkStr) {
-    //DLDebug(100, DL_FUNC_INFO) << "Leaving" << m_joinedNetworkStr << "to join" << m_networkStr;
+    emit connectionStatusChanged(QString("Leaving %1 to join %2").arg(m_joinedNetworkStr).arg(m_networkStr));
     gw->leaveNetwork();
     m_joined = false;
     m_joinedNetworkStr = "";
@@ -75,16 +77,16 @@ bool interface::join(void) {
   DLResult ret = ggw->joinNetwork(m_panid, m_chmask);
   if (ret == DLLIB_SUCCESS) {
     // successfully joined network
-    //report(tr("Joined network %1").arg(m_networkStr));
+    emit connectionStatusChanged(QString("Joined network %1").arg(m_networkStr));
     m_joined = true;
     m_joinedNetworkStr = m_networkStr;
     return true;
   } else {
     m_joined = false;
     if (ret == DLLIB_USB_DISCONNECTED) {
-      //report(tr("USB Wireless Adapter disconnected"));
+      emit connectionStatusChanged("USB Wireless Adapter disconnected");
     } else {
-      //report(tr("Failed to join network %1").arg(m_networkStr));
+      emit connectionStatusChanged(QString("Failed to join network %1").arg(m_networkStr));
     }
   }
   return false;
@@ -108,13 +110,13 @@ void interface::connectToFixture(void) {
   m_connected = false;
   ret = m_pmuRemote->getRegister(PMU_FIRMWARE_VERSION, ignoreStr);
   if (ret == DLLIB_USB_DISCONNECTED) {
-    //report(tr("USB Wireless Adapter disconnected"));
+    emit connectionStatusChanged("USB Wireless Adapter disconnected");
     ggw->deleteGateway();
     m_joined = false;
   } else if (ret != DLLIB_SUCCESS) {
-    //report(tr("Failed to connect to Fixture %1.").arg(m_pmu->getEESNStr()));
+    emit connectionStatusChanged(QString("Failed to connect to Fixture %1").arg(m_serialNumber));
   } else {
-    //report(tr("Fixture %1 connected.").arg(m_pmu->getEESNStr()));
+    emit connectionStatusChanged(QString("Telegesis connection established").arg(m_serialNumber));
     m_connected = true;
     emit connectionEstablished();
   }

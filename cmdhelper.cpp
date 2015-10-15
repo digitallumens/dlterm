@@ -1,5 +1,5 @@
 #include "cmdhelper.h"
-
+#include "dllib.h"
 #include <QAbstractItemView>
 #include <QEvent>
 #include <QKeyEvent>
@@ -886,7 +886,16 @@ QStringList build_get_wirelessConfig(QStringList argList) {
 }
 
 QStringList parse_get_wirelessConfig(QStringList pmuResponse) {
+  bool ok;
+  unsigned long long panid = pmuResponse.at(0).toULongLong(&ok, 16);
+  unsigned long chmask = pmuResponse.at(1).toULong(&ok, 16);
+  unsigned group;
+  unsigned freq;
+  bool encrypted;
+  LRNetwork::groupAndFreqFromPanidAndChmask(panid, chmask, &group, &freq, &encrypted);
+  QString netId = LRNetwork::nwidFromGroupAndFreq(group, freq, encrypted);
   QStringList parsedResponse;
+  parsedResponse << QString("Network ID: %1").arg(netId);
   parsedResponse << QString("Pan ID: %1").arg(pmuResponse.at(0));
   parsedResponse << QString("Channel mask: %1").arg(pmuResponse.at(1));
   parsedResponse << QString("Short address: %1").arg(pmuResponse.at(2));

@@ -23,6 +23,7 @@ public:
 
 signals:
   void connectionEstablished(void);
+  void connectionStatusChanged(QString status);
 
 public slots:
 
