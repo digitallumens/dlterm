@@ -298,12 +298,12 @@ QStringList help_get_usage(void) {
                        << help_usagePermSensorEvents();
 }
 
-QStringList build_get_numberOfLogEntries(QStringList argList) {
+QStringList build_get_numLogEntries(QStringList argList) {
   (void) argList;
   return QStringList() << "G0015";
 }
 
-QStringList help_numberOfLogEntries(void) {
+QStringList help_numLogEntries(void) {
   return QStringList() << "0015 Number of Log entries -- 2B -- R"
                        << "(Does not increment in Gen 3)";
 }
@@ -1732,19 +1732,19 @@ QStringList help_inputVoltageCalibration(void) {
                        << "Input voltage Calibration in 3.13 format. round((42000/ADC) * (2^13)). Cowboy only";
 }
 
-QStringList build_get_numberOfLightbars(QStringList argList) {
+QStringList build_get_numLightbars(QStringList argList) {
   (void) argList;
   return QStringList() << "G0068";
 }
 
-QStringList build_set_numberOfLightbars(QStringList argList) {
+QStringList build_set_numLightbars(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0068 %1").arg(argList.at(0));
 }
 
-QStringList help_numberOfLightbars(void) {
+QStringList help_numLightbars(void) {
   return QStringList() << "0068 Number of LightBars -- 1B -- R(W) -- BAK"
                        << "Version 2.0.1+"
                        << "Swan = 3, Cowboy = Settable between 1 and 4";
@@ -2099,19 +2099,19 @@ QStringList help_testingMode(void) {
                        << "1 = Occupancy Sensor Test.";
 }
 
-QStringList build_get_numberOfBatteriesSupported(QStringList argList) {
+QStringList build_get_numBatteriesSupported(QStringList argList) {
   (void) argList;
   return QStringList() << "G007E";
 }
 
-QStringList build_set_numberOfBatteriesSupported(QStringList argList) {
+QStringList build_set_numBatteriesSupported(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S007E %1").arg(argList.at(0));
 }
 
-QStringList help_numberOfBatteriesSupported(void) {
+QStringList help_numBatteriesSupported(void) {
   return QStringList() << "007E Number of Batteries Supported -- 1B -- RW -- BAK"
                        << "Version 2.1.10+"
                        << "Only on Cowboy, Set at manufacturing time to 2 for 48K and 1 for other DLEs";
@@ -2851,7 +2851,7 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("set sensorOverrideDelayTime", new cmdEntry(build_set_sensorOverrideDelayTime, help_sensorOverrideDelayTime));
   m_cmdTable.insert("get upTime", new cmdEntry(build_get_upTime, parse_get_upTime, help_upTime));
   m_cmdTable.insert("get usage", new cmdEntry(build_get_usage, parse_get_usage, help_get_usage));
-  m_cmdTable.insert("get numberOfLogEntries", new cmdEntry(build_get_numberOfLogEntries, help_numberOfLogEntries));
+  m_cmdTable.insert("get numLogEntries", new cmdEntry(build_get_numLogEntries, help_numLogEntries));
   m_cmdTable.insert("get configCalibration", new cmdEntry(build_get_configCalibration, parse_get_configCalibration, help_configCalibration));
   m_cmdTable.insert("set configCalibrationP0", new cmdEntry(build_set_configCalibrationP0, help_configCalibrationP0));
   m_cmdTable.insert("set configCalibrationP1", new cmdEntry(build_set_configCalibrationP1, help_configCalibrationP1));
@@ -2965,8 +2965,8 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("get inputVoltage", new cmdEntry(build_get_inputVoltage, help_inputVoltage));
   m_cmdTable.insert("get inputVoltageCalibration", new cmdEntry(build_get_inputVoltageCalibration, help_inputVoltageCalibration));
   m_cmdTable.insert("set inputVoltageCalibration", new cmdEntry(build_set_inputVoltageCalibration, help_inputVoltageCalibration));
-  m_cmdTable.insert("get numberOfLightbars", new cmdEntry(build_get_numberOfLightbars, help_numberOfLightbars));
-  m_cmdTable.insert("set numberOfLightbars", new cmdEntry(build_set_numberOfLightbars, help_numberOfLightbars));
+  m_cmdTable.insert("get numLightbars", new cmdEntry(build_get_numLightbars, help_numLightbars));
+  m_cmdTable.insert("set numLightbars", new cmdEntry(build_set_numLightbars, help_numLightbars));
   m_cmdTable.insert("get currentLimit", new cmdEntry(build_get_currentLimit, help_currentLimit));
   m_cmdTable.insert("set currentLimit", new cmdEntry(build_set_currentLimit, help_currentLimit));
   m_cmdTable.insert("get bootloaderCode", new cmdEntry(build_get_bootloaderCode, help_bootloaderCode));
@@ -2997,8 +2997,7 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("get DALIBootloadingActive", new cmdEntry(build_get_DALIBootlodingActive, help_DALIBootlodingActive));
   m_cmdTable.insert("get testingMode", new cmdEntry(build_get_testingMode, help_testingMode));
   m_cmdTable.insert("set testingMode", new cmdEntry(build_set_testingMode, help_testingMode));
-  m_cmdTable.insert("get numberOfBatteriesSupported", new cmdEntry(build_get_numberOfBatteriesSupported, help_numberOfBatteriesSupported));
-  m_cmdTable.insert("set numberOfBatteriesSupported", new cmdEntry(build_set_numberOfBatteriesSupported, help_numberOfBatteriesSupported));
+  m_cmdTable.insert("get numBatteriesSupported", new cmdEntry(build_get_numBatteriesSupported, help_numBatteriesSupported));
   // get & set lightbar commands
   m_cmdTable.insert("get lbVersion", new cmdEntry(build_get_lbVersion, parse_get_lbVersion, help_get_lbVersion));
   m_cmdTable.insert("get lbStatus", new cmdEntry(build_get_lbStatus, parse_get_lbStatus, help_get_lbStatus));
