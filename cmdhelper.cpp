@@ -5,6 +5,8 @@
 #include <QKeyEvent>
 #include <QDebug>
 
+quint16 logIndex = 0;
+
 QString toYDHMS(QString timeInSec) {
   bool ok;
   quint32 ulTimeInSec = timeInSec.toULong(&ok, 16);
@@ -2687,11 +2689,17 @@ QStringList help_get_logIndex(void) {
 }
 
 QStringList build_get_log(QStringList argList) {
+  bool ok;
   QString index;
   if (argList.length() == 0) {
-    index = "0000";
+    index.setNum(logIndex, 16);
+    // pad with leading zeros
+    while (index.length() < 4) {
+      index.prepend("0");
+    }
   } else {
     index = argList.at(0);
+    logIndex = index.toUShort(&ok, 16);
   }
   return QStringList() << QString("K%1").arg(index);
 }
@@ -2704,6 +2712,7 @@ QStringList parse_get_log(QStringList pmuResponse) {
   bool ok;
   bool isLastEntry;
   QString timestamp;
+  int numEvents = 0;
   arg1 = pmuResponse.at(0);
   baseTime = 0;
   do {
@@ -2807,12 +2816,15 @@ QStringList parse_get_log(QStringList pmuResponse) {
     }
     // insert a break
     log += "<br>";
+    // count events
+    numEvents++;
   } while (arg1.isEmpty() != true);
   // notify the user that more logs are available
   if (isLastEntry == true) {
     log += "[End of log]";
   } else {
     log += "[More events available...]";
+    logIndex += numEvents;
   }
   return QStringList() << log;
 }
