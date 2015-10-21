@@ -4,8 +4,7 @@
 #include <QMainWindow>
 #include "cmdhelper.h"
 #include "cmdhistory.h"
-#include "solarized.h"
-#include "interface.h"
+#include "cmdio.h"
 #include "preferencesdialog.h"
 
 namespace Ui {
@@ -35,16 +34,9 @@ private:
   Ui::MainWindow *ui;
   bool eventFilter(QObject *target, QEvent *event);
   void checkForInstalledKexts(void);
-  QString processUserRequest(QString *request);
-  QString buildPrompt(void);
-  QString buildParsedResponse(struct cmdEntry * cmdEntry, QStringList cmdList, QStringList pmuResponseList);
-  QString buildUnparsedResponse(QStringList cmdList, QStringList pmuResponseList);
-  QString buildBasicCommandResponse(QStringList pmuResponseList);
-  QString buildAppHelp(void);
-  QString buildUserInputError(QStringList cmdList);
   cmdHelper *m_cmdHelper;
   cmdHistory *m_cmdHistory;
-  solarized *m_solarized;
+  cmdIO *m_cmdIO;
   interface *m_interface;
   preferencesDialog *m_preferencesDialog;
 };
