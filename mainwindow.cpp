@@ -104,11 +104,6 @@ QString MainWindow::processUserRequest(QString *request) {
     cmdList << *request;
     m_solarized->setTextColor(request, SOLAR_BASE_01);
   } else {
-    // show help
-    if (request->contains("help")) {
-      m_solarized->setTextColor(request, SOLAR_YELLOW);
-      return buildHelp(cmdEntry);
-    }
     // translate helper command
     cmdList = cmdEntry->buildCmd(argList);
     // command translator returned an error
@@ -220,19 +215,6 @@ QString MainWindow::buildBasicCommandResponse(QStringList pmuResponseList) {
   } else {
     m_solarized->setTextColor(&response, SOLAR_VIOLET);
   }
-  if (response.endsWith("<br>") == false) {
-    response.append("<br>");
-  }
-  return response;
-}
-
-QString MainWindow::buildHelp(struct cmdEntry * cmdEntry) {
-  QString response;
-  QStringList helpList = cmdEntry->getHelp();
-  foreach(QString h, helpList) {
-    response.append(h + "<br>");
-  }
-  m_solarized->setTextColor(&response, SOLAR_CYAN);
   if (response.endsWith("<br>") == false) {
     response.append("<br>");
   }

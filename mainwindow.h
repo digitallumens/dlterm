@@ -40,7 +40,6 @@ private:
   QString buildParsedResponse(struct cmdEntry * cmdEntry, QStringList cmdList, QStringList pmuResponseList);
   QString buildUnparsedResponse(QStringList cmdList, QStringList pmuResponseList);
   QString buildBasicCommandResponse(QStringList pmuResponseList);
-  QString buildHelp(struct cmdEntry * cmdEntry);
   QString buildAppHelp(void);
   QString buildUserInputError(QStringList cmdList);
   cmdHelper *m_cmdHelper;

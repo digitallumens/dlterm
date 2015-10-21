@@ -52,10 +52,6 @@ QStringList parse_get_firmwareVersion(QStringList pmuResponse) {
   return QStringList() << QString("%1.%2.%3 (%5/%6/%4)").arg((verInt >> 40) & 0xFF).arg((verInt >> 32) & 0xFF).arg((verInt >> 24) & 0xFF).arg((verInt >> 16) & 0xFF).arg((verInt >> 8) & 0xFF).arg(verInt & 0xFF);
 }
 
-QStringList help_firmwareVersion(void) {
-  return QStringList() << "0000 Firmware Version -- 6B -- R";
-}
-
 QStringList build_get_productCode(QStringList argList) {
   (void) argList;
   return QStringList() << "G0001";
@@ -66,10 +62,6 @@ QStringList build_set_productCode(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0001 %1").arg(argList.at(0));
-}
-
-QStringList help_productCode(void) {
-  return QStringList() << "0001 Product Code  -- 4B -- RW -- BAK";
 }
 
 QStringList build_get_serialNumber(QStringList argList) {
@@ -84,10 +76,6 @@ QStringList build_set_serialNumber(QStringList argList) {
   return QStringList() << QString("S0002 %1").arg(argList.at(0));
 }
 
-QStringList help_serialNumber(void) {
-  return QStringList() << "0002 SerialNumber -- 4B -- RW -- BAK";
-}
-
 QStringList build_get_unixTime(QStringList argList) {
   (void) argList;
   return QStringList() << "G0003";
@@ -100,10 +88,6 @@ QStringList build_set_unixTime(QStringList argList) {
   return QStringList() << QString("S0003 %1").arg(argList.at(0));
 }
 
-QStringList help_unixTime(void) {
-  return QStringList() << "0003 UnixTime (RTC) -- 4B -- RW";
-}
-
 QStringList build_get_temperature(QStringList argList) {
   (void) argList;
   return QStringList() << "G0004";
@@ -114,10 +98,6 @@ QStringList parse_get_temperature(QStringList pmuResponse) {
   quint16 tInt = pmuResponse.at(0).toUShort(&ok, 16);
   float tFloat = tInt / 128;
   return QStringList() << QString("%1 C").arg(tFloat);
-}
-
-QStringList help_temperature(void) {
-  return QStringList() << "0004 Temperature  -- 2B -- R";
 }
 
 QStringList build_get_lightLevel(QStringList argList) {
@@ -148,27 +128,11 @@ QStringList build_set_lightManualLevel(QStringList argList) {
   return QStringList() << QString("S0005 %1").arg(argList.at(0));
 }
 
-QStringList help_lightManualLevel(void) {
-  return QStringList() << "0005 Light Manual Level (FFFF is no override) -- 2B -- RW";
-}
-
-QStringList help_lightActiveLevel(void) {
-  return QStringList() << "0006 Light Active Level (DIPS) -- 2B -- R";
-}
-
-QStringList help_lightInactiveLevel(void) {
-  return QStringList() << "0007 Light Inactive Level (DIPS) -- 2B -- R";
-}
-
 QStringList build_set_lightOverrideActiveLevel(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0008 %1").arg(argList.at(0));
-}
-
-QStringList help_lightOverrideActiveLevel(void) {
-  return QStringList() << "0008 Light Override Active Level (FFFF is no override) -- 2B -- RW";
 }
 
 QStringList build_set_lightOverrideInactiveLevel(QStringList argList) {
@@ -182,31 +146,14 @@ QStringList help_lightOverrideInactiveLevel(void) {
   return QStringList() << "0009 Light Override Inactive Level (FFFF is no override) -- 2B -- RW";
 }
 
-QStringList help_get_lightLevel(void) {
-  return QStringList() << help_lightManualLevel()
-                       << help_lightActiveLevel()
-                       << help_lightInactiveLevel()
-                       << help_lightOverrideActiveLevel()
-                       << help_lightOverrideInactiveLevel();
-}
-
 QStringList build_get_sensorDelayTime(QStringList argList) {
   (void) argList;
   return QStringList() << "G000A";
 }
 
-QStringList help_sensorDelayTime(void) {
-  return QStringList() << "000A Sensor Delay Time (DIPS, FFFF is \"always active\") -- 2B -- R";
-}
-
 QStringList build_get_sensorOverrideDelayTime(QStringList argList) {
   (void) argList;
   return QStringList() << "G000B";
-}
-
-QStringList help_sensorOverrideDelayTime(void) {
-  return QStringList() << "000B Sensor Override Delay Time"
-                       << "(FFFF is no override, FFF1 is \"always on\", FFF0 does not count down) -- 2B -- RW";
 }
 
 QStringList build_set_sensorOverrideDelayTime(QStringList argList) {
@@ -223,10 +170,6 @@ QStringList build_get_upTime(QStringList argList) {
 
 QStringList parse_get_upTime(QStringList pmuResponse) {
   return QStringList() << toYDHMS(pmuResponse.at(0));
-}
-
-QStringList help_upTime(void) {
-  return QStringList() << "000C Power up time in seconds -- 4B -- R";
 }
 
 QStringList build_get_usage(QStringList argList) {
@@ -257,57 +200,9 @@ QStringList parse_get_usage(QStringList pmuResponse) {
   return parsedResponse;
 }
 
-QStringList help_usageActiveTime(void) {
-  return QStringList() << "000D Usage: Active Seconds -- 4B -- R";
-}
-
-QStringList help_usageInactiveTime(void) {
-  return QStringList() << "000E Usage: Inactive Seconds -- 4B -- R";
-}
-
-QStringList help_usagePermActiveTime(void) {
-  return QStringList() << "000F Usage: Perm Active Seconds -- 4B -- R";
-}
-
-QStringList help_usagePermInactiveTime(void) {
-  return QStringList() << "0010 Usage: Perm Inactive Seconds -- 4B -- R";
-}
-
-QStringList help_usageWh(void) {
-  return QStringList() << "0011 Usage: Wh -- 4B -- R";
-}
-
-QStringList help_usagePermWh(void) {
-  return QStringList() << "0012 Usage: Perm Wh -- 4B -- R";
-}
-
-QStringList help_usageSensorEvents(void) {
-  return QStringList() << "0013 Usage: Sensor Events -- 4B -- R";
-}
-
-QStringList help_usagePermSensorEvents(void) {
-  return QStringList() << "0014 Usage: Perm Sensor Events -- 4B -- R";
-}
-
-QStringList help_get_usage(void) {
-  return QStringList() << help_usageActiveTime()
-                       << help_usageInactiveTime()
-                       << help_usagePermActiveTime()
-                       << help_usagePermInactiveTime()
-                       << help_usageWh()
-                       << help_usagePermWh()
-                       << help_usageSensorEvents()
-                       << help_usagePermSensorEvents();
-}
-
 QStringList build_get_numLogEntries(QStringList argList) {
   (void) argList;
   return QStringList() << "G0015";
-}
-
-QStringList help_numLogEntries(void) {
-  return QStringList() << "0015 Number of Log entries -- 2B -- R"
-                       << "(Does not increment in Gen 3)";
 }
 
 QStringList build_get_configCalibration(QStringList argList) {
@@ -331,21 +226,11 @@ QStringList build_set_configCalibrationP0(QStringList argList) {
   return QStringList() << QString("S0016 %1").arg(argList.at(0));
 }
 
-QStringList help_configCalibrationP0(void) {
-  return QStringList() << "0016 Config Calibration P0 -- 4B -- RW"
-                       << "(ES/EP 0x00000384) Idle Power (mW) **Dropped in 1.0.7**";
-}
-
 QStringList build_set_configCalibrationP1(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0017 %1").arg(argList.at(0));
-}
-
-QStringList help_configCalibrationP1(void) {
-  return QStringList() << "0017 Config Calibration P1 -- 4B -- RW"
-                       << "(ES/EP 0x00000C80) Power (mW) at Min Dimming 0x7A00 **Dropped in 1.0.7**";
 }
 
 QStringList build_set_configCalibrationP2(QStringList argList) {
@@ -355,28 +240,11 @@ QStringList build_set_configCalibrationP2(QStringList argList) {
   return QStringList() << QString("S0018 %1").arg(argList.at(0));
 }
 
-QStringList help_configCalibrationP2(void) {
-  return QStringList() << "0018 Config Calibration P2 -- 4B -- RW"
-                       << "(ES/EP 0x0004D45D) Power slope (mW * 65536 per bit) **Dropped in 1.0.7**";
-}
-
 QStringList build_set_configCalibrationP3(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0019 %1").arg(argList.at(0));
-}
-
-QStringList help_configCalibrationP3(void) {
-  return QStringList() << "0019 Config Calibration P3 -- 4B -- RW"
-                       << "(ES/EP 0x00028D84) Power (mw) at Max **Dropped in 1.0.7**";
-}
-
-QStringList help_configCalibration(void) {
-  return QStringList() << help_configCalibrationP0()
-                       << help_configCalibrationP1()
-                       << help_configCalibrationP2()
-                       << help_configCalibrationP3();
 }
 
 QStringList build_get_buildTime(QStringList argList) {
@@ -391,19 +259,9 @@ QStringList build_set_buildTime(QStringList argList) {
   return QStringList() << QString("S001A %1").arg(argList.at(0));
 }
 
-QStringList help_buildTime(void) {
-  return QStringList() << "001A Build Time -- 4B -- RW -- BAK";
-}
-
 QStringList build_get_sensorTimeoutCountdown(QStringList argList) {
   (void) argList;
   return QStringList() << "G001B";
-}
-
-QStringList help_sensorTimeoutCountdown(void) {
-  return QStringList() << "001B Sensor Timeout Countdown -- 2B -- R"
-                       << "Version 1.0+"
-                       << "(Seconds left until turnoff. 0 is off, 0xffff is on)";
 }
 
 QStringList build_get_currentLightLevel(QStringList argList) {
@@ -411,20 +269,9 @@ QStringList build_get_currentLightLevel(QStringList argList) {
   return QStringList() << "G001C";
 }
 
-QStringList help_currentLightLevel(void) {
-  return QStringList() << "001C Current Light Level -- 4B -- R"
-                       << "Version 1.0+";
-}
-
 QStringList build_get_safeMode(QStringList argList) {
   (void) argList;
   return QStringList() << "G001D";
-}
-
-QStringList help_safeMode(void) {
-  return QStringList() << "001D Safe Mode -- 1B -- R"
-                       << "Version 1.0+"
-                       << "(0 normal, 1 safe due to EEPROM failure, 2 safe due to DIPS)";
 }
 
 QStringList build_get_lightBarSelect(QStringList argList) {
@@ -436,12 +283,6 @@ QStringList build_set_lightBarSelect(QStringList argList) {
   return QStringList() << QString("S001E %1").arg(argList.at(0));
 }
 
-QStringList help_lightBarSelect(void) {
-  return QStringList() << "001E Light Bar Select -- 1B -- RW"
-                       << "Version 1.0+"
-                       << "(bit mask for what light bars should be used. Development use only, not EEPROM backed)";
-}
-
 QStringList build_get_powerConsumption(QStringList argList) {
   (void) argList;
   return QStringList() << "G001F";
@@ -451,11 +292,6 @@ QStringList parse_get_powerConsumption(QStringList pmuResponse) {
   bool ok;
   quint16 powerInt = pmuResponse.at(0).toUShort(&ok, 16);
   return QStringList() << QString("%1 mW").arg(powerInt);
-}
-
-QStringList help_powerConsumption(void) {
-  return QStringList() << "001F Current Power Consumption -- 4B -- R (Power in mW)"
-                       << "Version 1.0+";
 }
 
 QStringList build_get_wirelessDataAggregator(QStringList argList) {
@@ -470,20 +306,9 @@ QStringList build_set_wirelessDataAggregator(QStringList argList) {
   return QStringList() << QString("S0020 %1").arg(argList.at(0));
 }
 
-QStringList help_wirelessDataAggregator(void) {
-  return QStringList() << "0020 Wireless Data Aggregator -- 2B -- RW"
-                       << "Version 1.0+"
-                       << "(Wireless 16 bit address of data aggregator to send events to)";
-}
-
 QStringList build_get_resetUsageTimestamp(QStringList argList) {
   (void) argList;
   return QStringList() << "G0021";
-}
-
-QStringList help_resetUsageTimestamp(void) {
-  return QStringList() << "0021 Reset Usage Timestamp -- 4B -- R"
-                       << "Version 1.0+";
 }
 
 QStringList build_get_pwmPeriodRegister(QStringList argList) {
@@ -498,32 +323,14 @@ QStringList build_set_pwmPeriodRegister(QStringList argList) {
   return QStringList() << QString("S0022 %1").arg(argList.at(0));
 }
 
-QStringList help_pwmPeriodRegister(void) {
-  return QStringList() << "0022 PWM period register -- 2B -- RW"
-                       << "Version 1.0+"
-                       << "(default of 0x8000 gives ~500Hz period, not EEPROM backed)";
-}
-
 QStringList build_get_analogSensorValue(QStringList argList) {
   (void) argList;
   return QStringList() << "G0023";
 }
 
-QStringList help_analogSensorValue(void) {
-  return QStringList() << "0023 Analog Sensor Value -- 2B -- R"
-                       << "Version 1.0.3+"
-                       << "(0 - 1024)";
-}
-
 QStringList build_get_analogReportingHysteresis(QStringList argList) {
   (void) argList;
   return QStringList() << "G0024";
-}
-
-QStringList help_analogReportingHysteresis(void) {
-  return QStringList() << "0024 Analog Reporting Hysteresis -- 2B -- RW"
-                       << "Version 1.0.3+"
-                       << "(Required change in value before an analog event is fired with the new value)";
 }
 
 QStringList build_get_zone(QStringList argList) {
@@ -538,11 +345,6 @@ QStringList build_set_zone(QStringList argList) {
   return QStringList() << QString("S0025 %1").arg(argList.at(0));
 }
 
-QStringList help_zone(void) {
-  return QStringList() << "0025 Zone -- 2B -- RW (EEPROM backed Zone)"
-                       << "Version 1.0.3+";
-}
-
 QStringList build_get_lightTemporaryActiveLevel(QStringList argList) {
   (void) argList;
   return QStringList() << "G0026";
@@ -553,11 +355,6 @@ QStringList build_set_lightTemporaryActiveLevel(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0026 %1").arg(argList.at(0));
-}
-
-QStringList help_lightTemporaryActiveLevel(void) {
-  return QStringList() << "0026 Light Temporary Active Level (FFFF is no override) -- 2B -- RW"
-                       << "Version 1.0.3+";
 }
 
 QStringList build_get_lightTemporaryInactiveLevel(QStringList argList) {
@@ -572,11 +369,6 @@ QStringList build_set_lightTemporaryInactiveLevel(QStringList argList) {
   return QStringList() << QString("S0027 %1").arg(argList.at(0));
 }
 
-QStringList help_lightTemporaryInactiveLevel(void) {
-  return QStringList() << "0027 Light Temporary Inactive Level (FFFF is no override) -- 2B -- RW"
-                       << "Version 1.0.3+";
-}
-
 QStringList build_get_sensorTemporaryDelayTime(QStringList argList) {
   (void) argList;
   return QStringList() << "G0028";
@@ -587,11 +379,6 @@ QStringList build_set_sensorTemporaryDealyTime(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0028 %1").arg(argList.at(0));
-}
-
-QStringList help_sensorTemporaryDelayTime(void) {
-  return QStringList() << "0028 Sensor Temporary Delay Time (FFFF is no override) -- 2B -- RW"
-                       << "Version 1.0.3+";
 }
 
 QStringList build_get_temporaryOverrideTimeout(QStringList argList) {
@@ -606,12 +393,6 @@ QStringList build_set_temporaryOverrideTiemout(QStringList argList) {
   return QStringList() << QString("S0029 %1").arg(argList.at(0));
 }
 
-QStringList help_temporaryOverrideTimeout(void) {
-  return QStringList() << "0029 Temporary Override Timeout (FFFFFFFF is off) -- 4B -- RW"
-                       << "Version 1.0.3+"
-                       << "Number of seconds until Temporary Overrides are wiped";
-}
-
 QStringList build_get_setRemoteState(QStringList argList) {
   (void) argList;
   return QStringList() << "G002A";
@@ -622,11 +403,6 @@ QStringList build_set_setRemoteState(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S002A %1").arg(argList.at(0));
-}
-
-QStringList help_setRemoteState(void) {
-  return QStringList() << "002A Set Remote State (00 inactive, 01 active) -- 1B -- RW"
-                       << "Version 1.0.3+";
 }
 
 QStringList build_get_remoteStateDelayTime(QStringList argList) {
@@ -641,32 +417,14 @@ QStringList build_set_remoteStateDelayTime(QStringList argList) {
   return QStringList() << QString("S002B %1").arg(argList.at(0));
 }
 
-QStringList help_remoteStateDelayTime(void) {
-  return QStringList() << "002B Remote Set Delay Time -- 2B -- RW"
-                       << "Version 1.0.3+"
-                       << "Number of seconds that Remote Set state sticks";
-}
-
 QStringList build_get_remoteSecondsCountdown(QStringList argList) {
   (void) argList;
   return QStringList() << "G002C";
 }
 
-QStringList help_remoteSecondsCountdown(void) {
-  return QStringList() << "002C Remote Seconds Countdown -- 2B -- R"
-                       << "Version 1.0.3+"
-                       << "(number of seconds left that Remote Set state has left)";
-}
-
 QStringList build_get_minimumDimmingValue(QStringList argList) {
   (void) argList;
   return QStringList() << "G002D";
-}
-
-QStringList help_minimumDimmingValue(void) {
-  return QStringList() << "002D Minimum Dimming Value -- 2B -- R"
-                       << "Version 1.0.3+"
-                       << "(Direct impact on register 0017 as this is used as the start of the linear power regime)";
 }
 
 QStringList build_get_powerCalibration(QStringList argList) {
@@ -703,23 +461,11 @@ QStringList build_set_powerCalibrationA0(QStringList argList) {
   return QStringList() << QString("S002E %1").arg(argList.at(0));
 }
 
-QStringList help_powerCalibrationA0(void) {
-  return QStringList() << "002E Power Calibration A0 -- 2B -- RW -- BAK"
-                       << "Version 1.0.7+"
-                       << "(a_0 * 1000 * 1073741824).round (equivalent to shift left 30)";
-}
-
 QStringList build_set_powerCalibrationB0(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S002F %1").arg(argList.at(0));
-}
-
-QStringList help_powerCalibrationB0(void) {
-  return QStringList() << "002F Power Calibration B0 -- 2B -- RW -- BAK"
-                       << "Version 1.0.7+"
-                          "-(b_0 * 1000 * 4096).round (equivalent to shift left 12 and negate)";
 }
 
 QStringList build_set_powerCalibrationC0(QStringList argList) {
@@ -729,23 +475,11 @@ QStringList build_set_powerCalibrationC0(QStringList argList) {
   return QStringList() << QString("S0030 %1").arg(argList.at(0));
 }
 
-QStringList help_powerCalibrationC0(void) {
-  return QStringList() << "0030 Power Calibration C0 -- 2B -- RW -- BAK"
-                       << "Version 1.0.7+<br>"
-                       << "(c_0 * 1000 / 4).round (equivalent to shift right 2)";
-}
-
 QStringList build_set_powerCalibrationMA(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0031 %1").arg(argList.at(0));
-}
-
-QStringList help_powerCalibrationMA(void) {
-  return QStringList() << "0031 Power Calibration MA -- 2B -- RW -- BAK"
-                       << "Version 1.0.7+"
-                       << "(m_a * 1000 * 549755813888).round (equivalent to shift left 39) -- XPG: 0x4061";
 }
 
 QStringList build_set_powerCalibrationMB(QStringList argList) {
@@ -755,23 +489,11 @@ QStringList build_set_powerCalibrationMB(QStringList argList) {
   return QStringList() << QString("S0032 %1").arg(argList.at(0));
 }
 
-QStringList help_powerCalibrationMB(void) {
-  return QStringList() << "0032 Power Calibration MB -- 2B -- RW -- BAK"
-                       << "Version 1.0.7+"
-                       << "(m_b * 1000 * 2097152).round (equivalent to shift left 21) -- XPG: 0x4FAF";
-}
-
 QStringList build_set_powerCalibrationMC(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0033 %1").arg(argList.at(0));
-}
-
-QStringList help_powerCalibrationMC(void) {
-  return QStringList() << "0033 Power Calibration MC -- 2B -- RW -- BAK"
-                       << "Version 1.0.7+"
-                       << "-(m_c * 1000 * 32).round (equivalent to shift left 5 and negate) -- XPG: 0x2D23";
 }
 
 QStringList build_set_powerCalibrationPOff(QStringList argList) {
@@ -781,12 +503,6 @@ QStringList build_set_powerCalibrationPOff(QStringList argList) {
   return QStringList() << QString("S0034 %1").arg(argList.at(0));
 }
 
-QStringList help_powerCalibrationPOff(void) {
-  return QStringList() << "0034 Power Calibration POff -- 2B -- RW -- BAK"
-                       << "Version 1.0.7+"
-                       << "(P_Off * 1000).round";
-}
-
 QStringList build_set_powerCalibrationPOn(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
@@ -794,35 +510,11 @@ QStringList build_set_powerCalibrationPOn(QStringList argList) {
   return QStringList() << QString("S0035 %1").arg(argList.at(0));
 }
 
-QStringList help_powerCalibrationPOn(void) {
-  return QStringList() << "0035 Power Calibration POn -- 2B -- RW -- BAK"
-                       << "Version 1.0.7+"
-                       << "(P_On * 1000 / 4).round (equivalent to shift right 2)";
-}
-
 QStringList build_set_powerCalibrationT0(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0036 %1").arg(argList.at(0));
-}
-
-QStringList help_powerCalibrationT0(void) {
-  return QStringList() << "0036 Power Calibration T0 -- 2B -- RW -- BAK"
-                       << "Version 1.0.7+"
-                       << "(t_0 * 128).round (equivalent to shift left 7) or just put register 0004 straight into this.";
-}
-
-QStringList help_get_powerCalibration(void) {
-  return QStringList() << help_powerCalibrationA0()
-                       << help_powerCalibrationB0()
-                       << help_powerCalibrationC0()
-                       << help_powerCalibrationMA()
-                       << help_powerCalibrationMB()
-                       << help_powerCalibrationMC()
-                       << help_powerCalibrationPOn()
-                       << help_powerCalibrationPOff()
-                       << help_powerCalibrationT0();
 }
 
 QStringList build_get_powerEstimatorTemperatureOverride(QStringList argList) {
@@ -837,21 +529,9 @@ QStringList build_set_powerEstimatorTemperatureOverride(QStringList argList) {
   return QStringList() << QString("S0037 %1").arg(argList.at(0));
 }
 
-QStringList help_powerEstimatorTemperatureOverride(void) {
-  return QStringList() << "0037 Power Estimator Temperature Override -- 2B -- RW"
-                       << "Version 1.0.7+"
-                       << "Set to 0x7FFF to disable override. Otherwise estimator will use this temperature.";
-}
-
 QStringList build_get_cachedTemperatureValue(QStringList argList) {
   (void) argList;
   return QStringList() << "G0038";
-}
-
-QStringList help_cachedTemperatureValue(void) {
-  return QStringList() << "0038 Cached Temperature Value -- 2B -- R"
-                       << "Version 1.0.7+"
-                       << "The cached temperature used for power calculations. Updated once per minute.";
 }
 
 QStringList build_get_eepromSize(QStringList argList) {
@@ -859,21 +539,9 @@ QStringList build_get_eepromSize(QStringList argList) {
   return QStringList() << "G0039";
 }
 
-QStringList help_eepromSize(void) {
-  return QStringList() << "0039 EEPROM Size -- 1B -- R"
-                       << "Version 1.0.8+"
-                       << "The EEPROM size in log(2) (in bytes not bits)";
-}
-
 QStringList build_get_hardwareRevision(QStringList argList) {
   (void) argList;
   return QStringList() << "G003A";
-}
-
-QStringList help_hardwareRevision(void) {
-  return QStringList() << "003A Hardware Revision -- 4B -- RW -- BAK"
-                       << "Version 1.0.8+"
-                       << "Revision of the hardware for the unit (EEPROM)";
 }
 
 QStringList build_get_wirelessConfig(QStringList argList) {
@@ -914,23 +582,11 @@ QStringList build_set_wirelessPanId(QStringList argList) {
   return QStringList() << QString("S003B %1").arg(argList.at(0));
 }
 
-QStringList help_wirelessPanId(void) {
-  return QStringList() << "003B Wireless Pan ID -- 8B -- RW -- -- BAK"
-                       << "Version 1.0.10+"
-                       << "The Wireless PAN ID to set the wireless to with !N";
-}
-
 QStringList build_set_wirelessChannelMask(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S003C %1").arg(argList.at(0));
-}
-
-QStringList help_wirelessChannelMask(void) {
-  return QStringList() << "003C Wireless Channel Mask -- 4B -- RW -- BAK"
-                       << "Version 1.0.10+"
-                       << "The Wireless Channel Mask to set the wireless to with !N";
 }
 
 QStringList build_set_wirelessShortAddress(QStringList argList) {
@@ -940,23 +596,11 @@ QStringList build_set_wirelessShortAddress(QStringList argList) {
   return QStringList() << QString("S003D %1").arg(argList.at(0));
 }
 
-QStringList help_wirelessShortAddress(void) {
-  return QStringList() << "003D Wireless Short Address -- 2B -- RW"
-                       << "Version 1.0.10+"
-                       << "The Wireless Short Source Address to set the wireless to with !N";
-}
-
 QStringList build_set_wirelessRole(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S003E %1").arg(argList.at(0));
-}
-
-QStringList help_wirelessRole(void) {
-  return QStringList() << "003E Wireless Role -- 1B -- RW"
-                       << "Version 1.0.10+"
-                       << "The Wireless Role to set the wireless to with !N";
 }
 
 QStringList build_set_wirelessWatchdogHold(QStringList argList) {
@@ -966,23 +610,11 @@ QStringList build_set_wirelessWatchdogHold(QStringList argList) {
   return QStringList() << QString("S003F %1").arg(argList.at(0));
 }
 
-QStringList help_wirelessWatchdogHold(void) {
-  return QStringList() << "003F Wireless Watchdog Hold -- 1B -- RW"
-                       << "Version 1.0.11+"
-                       << "The hold time in minutes for the SerialNet watchdog. (0xFF becomes 0 minutes) Setting this or 0040 to 0 will disable watchdog. (EEPROM)";
-}
-
 QStringList build_set_wirelessWatchdogPeriod(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0040 %1").arg(argList.at(0));
-}
-
-QStringList help_wirelessWatchdogPeriod(void) {
-  return QStringList() << "0040 Wireless Watchdog Period -- 2B -- RW"
-                       << "Version 1.0.11+"
-                       << "The period in minutes to watchdog SerialNet at. Resets will occur at times divisible by this value. (0xFFFF becomes 0 hours) (EEPROM)";
 }
 
 QStringList build_set_wirelessNetworkKey(QStringList argList) {
@@ -992,43 +624,14 @@ QStringList build_set_wirelessNetworkKey(QStringList argList) {
   return QStringList() << QString("S0073 %1").arg(argList.at(0));
 }
 
-QStringList help_wirelessNetworkKey(void) {
-  return QStringList() << "0073 Wireless Network Key -- 16B -- RW -- BAK"
-                       << "Version 2.1.X+"
-                       << "The key to be used for network layer encryption. All 0s will disable encryption (default)."
-                       << "Please note that the byte order for this register is reversed by the Ember Stack, so it needs to be entered in the opposite byte order as the EZSP security key.";
-}
-
-QStringList help_get_wirelessConfig(void) {
-  return QStringList() << help_wirelessPanId()
-                       << help_wirelessChannelMask()
-                       << help_wirelessShortAddress()
-                       << help_wirelessRole()
-                       << help_wirelessWatchdogHold()
-                       << help_wirelessWatchdogPeriod()
-                       << help_wirelessNetworkKey();
-}
-
 QStringList build_get_firmwareCode(QStringList argList) {
   (void) argList;
   return QStringList() << "G0041";
 }
 
-QStringList help_firmwareCode(void) {
-  return QStringList() << "0041 Firmware Code -- 4B -- R"
-                       << "Version 1.1.0+"
-                       << "A unique identifier for compatible firmware. Only firmware with this Firmware Code can be bootloaded.";
-}
-
 QStringList build_get_moduleFirmwareCode(QStringList argList) {
   (void) argList;
   return QStringList() << "G0042";
-}
-
-QStringList help_moduleFirmwareCode(void) {
-  return QStringList() << "0042 Module Firmware Code -- 4B -- R"
-                       << "Version 1.1.0+"
-                       << "A unique identifier for compatible firmware. Only firmware with this Firmware Code can be bootloaded.";
 }
 
 QStringList build_get_maxTemperature(QStringList argList) {
@@ -1039,23 +642,6 @@ QStringList build_get_maxTemperature(QStringList argList) {
 
 QStringList parse_get_maxTemperature(QStringList pmuResponse) {
   return QStringList() << QString("%1 at time %2").arg(pmuResponse.at(0)).arg(toYDHMS(pmuResponse.at(1)));
-}
-
-QStringList help_maxTemperatureObserved(void) {
-  return QStringList() << "0043 Max Temperature Observed -- 2B -- R"
-                       << "Version 1.1.4+"
-                       << "Highest temperature observed. (EEPROM)";
-}
-
-QStringList help_maxTemperatureObservedTime(void) {
-  return QStringList() << "0044 Max Temperature Observed Time -- 4B -- R"
-                       << "Version 1.1.4+"
-                       << "Time that highest temperature was observed. (EEPROM)";
-}
-
-QStringList help_get_maxTemperature(void) {
-  return QStringList() << help_maxTemperatureObserved()
-                       << help_maxTemperatureObservedTime();
 }
 
 QStringList build_get_overTemperatureConfig(QStringList argList) {
@@ -1079,12 +665,6 @@ QStringList build_set_overTemperatureThresholdLow(QStringList argList) {
   return QStringList() << QString("S0045 %1").arg(argList.at(0));
 }
 
-QStringList help_overTemperatureThresholdLow(void) {
-  return QStringList() << "0045 Over Temp Threshold Low -- 2B -- RW -- BAK"
-                       << "Version 1.1.4+"
-                       << "Maximum Temperature allowed for full brightness. (EEPROM)";
-}
-
 QStringList build_get_overTemperatureThresholdHigh(QStringList argList) {
   (void) argList;
   return QStringList() << "G0046";
@@ -1097,29 +677,11 @@ QStringList build_set_overTemperatureThresholdHigh(QStringList argList) {
   return QStringList() << QString("S0046 %1").arg(argList.at(0));
 }
 
-QStringList help_overTemperatureThresholdHigh(void) {
-  return QStringList() << "0046 Over Temp Threshold High -- 2B -- RW -- BAK"
-                       << "Version 1.1.4+"
-                       << "Temperature at which the maximum allowed brightness reaches Over Temp Dim Limit. (EEPROM)";
-}
-
 QStringList build_set_overTemperatureDimmingLimit(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0047 %1").arg(argList.at(0));
-}
-
-QStringList help_overTemperatureDimmingLimit(void) {
-  return QStringList() << "0047 Over Temp Dimming Limit -- 2B -- RW -- BAK"
-                       << "Version 1.1.4+"
-                       << "Minimum dimming level that the protection is allowed to reduce the maximum brightness to. (EEPROM)";
-}
-
-QStringList help_get_overTemperatureConfig(void) {
-  return QStringList() << help_overTemperatureThresholdLow()
-                       << help_overTemperatureThresholdHigh()
-                       << help_overTemperatureDimmingLimit();
 }
 
 QStringList build_get_analogDimmingMode(QStringList argList) {
@@ -1145,17 +707,6 @@ QStringList build_set_analogDimmingMode(QStringList argList) {
   return QStringList() << QString("S0048 %1").arg(argList.at(0));
 }
 
-QStringList help_analogDimmingMode(void) {
-  return QStringList() << "0048 Analog Dimming Mode -- 1B -- RW"
-                       << "Version 1.1.4+"
-                       << "00 = Analog Dimming OFF"
-                       << "01 = Analog Dimming On"
-                       << "02 = Analog Dimming On w/ ability to go full off"
-                       << "03 = Analog Dimming using registers 54-56"
-                       << "04 = Analog Dimming using registers 54-56 w/ full off suport"
-                       << "05 = Ambient Sensor Dimming. (EEPROM)";
-}
-
 QStringList build_get_fixtureIdMode(QStringList argList) {
   (void) argList;
   return QStringList() << "G0049";
@@ -1168,37 +719,14 @@ QStringList build_set_fixtureIdMode(QStringList argList) {
   return QStringList() << QString("S0049 %1").arg(argList.at(0));
 }
 
-QStringList help_fixtureIdMode(void) {
-  return QStringList() << "0049 Fixture ID Mode -- 3B -- RW"
-                       << "Version 1.1.4+"
-                       << "(1B mode, 2B time in seconds)"
-                       << "00 = Off"
-                       << "01 = Status LEDs"
-                       << "02 = Full Flash"
-                       << "03 = Safe Flash"
-                       << "04 = Middle Flash";
-}
-
 QStringList build_get_acFrequency(QStringList argList) {
   (void) argList;
   return QStringList() << "G004A";
 }
 
-QStringList help_acFrequency(void) {
-  return QStringList() << "004A AC Frequency -- 2B -- R"
-                       << "Version 1.1.4+"
-                       << "frequency in 250kHz increments. f = 250kHz/value";
-}
-
 QStringList build_get_sensorBits(QStringList argList) {
   (void) argList;
   return QStringList() << "G004B";
-}
-
-QStringList help_sensorBits(void) {
-  return QStringList() << "004B Sensor Bits -- 1B -- R"
-                       << "Version 1.2.0+"
-                       << "The current digital sensor bits";
 }
 
 QStringList build_get_powerMeterCommand(QStringList argList) {
@@ -1213,12 +741,6 @@ QStringList build_set_powerMeterCommand(QStringList argList) {
   return QStringList() << QString("S004C %1").arg(argList.at(0));
 }
 
-QStringList help_powerMeterCommand(void) {
-  return QStringList() << "004C Power Meter Command -- 1B -- RW"
-                       << "Version 1.2.1+"
-                       << "Command to execute on the power meter chip. AJAX only";
-}
-
 QStringList build_get_powerMeterRegister(QStringList argList) {
   (void) argList;
   return QStringList() << "G004D";
@@ -1231,32 +753,14 @@ QStringList build_set_powerMeterRegister(QStringList argList) {
   return QStringList() << QString("S004D %1").arg(argList.at(0));
 }
 
-QStringList help_powerMeterRegister(void) {
-  return QStringList() << "004D Power Meter Register -- 4B -- RW"
-                       << "Version 1.2.1+"
-                       << "Read or Write register on power meter chip. AJAX only";
-}
-
 QStringList build_get_ambientTemperature(QStringList argList) {
   (void) argList;
   return QStringList() << "G004E";
 }
 
-QStringList help_ambientTemperature(void) {
-  return QStringList() << "004E Ambient Temperature -- 2B -- R"
-                       << "Version 1.2.1+"
-                       << "Temperature from Ambient junction. 128ths of a deg C. SWAN only";
-}
-
 QStringList build_get_lightSensorLevel(QStringList argList) {
   (void) argList;
   return QStringList() << "G004F";
-}
-
-QStringList help_lightSensorLevel(void) {
-  return QStringList() << "004F Light Sensor Level -- 2B -- R"
-                       << "Version 1.2.1+"
-                       << "SWAN Light Sensor (Analog, OBSOLETE!)";
 }
 
 QStringList build_get_sensorConfig(QStringList argList) {
@@ -1284,12 +788,6 @@ QStringList build_set_sensor0Timeout(QStringList argList) {
   return QStringList() << QString("S0050 %1").arg(argList.at(0));
 }
 
-QStringList help_sensor0Timeout(void) {
-  return QStringList() << "0050 Sensor 0 Timeout -- 1B -- RW"
-                       << "Version 1.2.1+"
-                       << "The timeout of the hardware installed at Sensor 0. (Also 1.1.6)";
-}
-
 QStringList build_get_sensor0Offset(QStringList argList) {
   (void) argList;
   return QStringList() << "G0051";
@@ -1300,12 +798,6 @@ QStringList build_set_sensor0Offset(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0051 %1").arg(argList.at(0));
-}
-
-QStringList help_sensor0Offset(void) {
-  return QStringList() << "0051 Sensor 0 Offset -- 1B -- RW"
-                       << "Version 1.2.1+"
-                       << "Additional delay added to hardware Sensor 0 before starting normal countdown. (Allow new sensor to act like old sensor) (Also 1.1.6)";
 }
 
 QStringList build_get_sensor1Timeout(QStringList argList) {
@@ -1320,12 +812,6 @@ QStringList build_set_sensor1Timeout(QStringList argList) {
   return QStringList() << QString("S0052 %1").arg(argList.at(0));
 }
 
-QStringList help_sensor1Timeout(void) {
-  return QStringList() << "0052 Sensor 1 Timeout -- 1B -- RW"
-                       << "Version 1.2.1+"
-                       << "The timeout of the hardware installed at Sensor 1 (not AJAX) (Also 1.1.6)";
-}
-
 QStringList build_get_sensor1Offset(QStringList argList) {
   (void) argList;
   return QStringList() << "G0053";
@@ -1336,20 +822,6 @@ QStringList build_set_sensor1Offset(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0053 %1").arg(argList.at(0));
-}
-
-QStringList help_sensor1Offset(void) {
-  return QStringList() << "0053 Sensor 1 Offset -- 1B -- RW"
-                       << "Version 1.2.1+"
-                       << "Same as 0051 but for Sensor 1 (not AJAX) (Also 1.1.6)";
-}
-
-QStringList help_get_sensorConfig(void) {
-  return QStringList() << help_lightSensorLevel()
-                       << help_sensor0Timeout()
-                       << help_sensor0Offset()
-                       << help_sensor1Timeout()
-                       << help_sensor1Offset();
 }
 
 QStringList build_get_analogDimmingConfig(QStringList argList) {
@@ -1373,12 +845,6 @@ QStringList build_set_analogDimmingLowValue(QStringList argList) {
   return QStringList() << QString("S0054 %1").arg(argList.at(0));
 }
 
-QStringList help_analogDimmingLowValue(void) {
-  return QStringList() << "0054 Analog Dimming Low Value -- 2B -- RW"
-                       << "Version 1.2.4+"
-                       << "Value at which minimum dimming is reached. (Also 1.1.6)";
-}
-
 QStringList build_get_analogDimmingHighValue(QStringList argList) {
   (void) argList;
   return QStringList() << "G0055";
@@ -1389,12 +855,6 @@ QStringList build_set_analogDimmingHighValue(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0055 %1").arg(argList.at(0));
-}
-
-QStringList help_analogDimmingHighValue(void) {
-  return QStringList() << "0055 Analog Dimming High Value -- 2B -- RW"
-                          "Version 1.2.4+"
-                          "Value at which specified brightness is reached. (Also 1.1.6)";
 }
 
 QStringList build_get_analogDimmingOffValue(QStringList argList) {
@@ -1409,18 +869,6 @@ QStringList build_set_analogDimmingOffValue(QStringList argList) {
   return QStringList() << QString("S0056 %1").arg(argList.at(0));
 }
 
-QStringList help_analogDimmingOffValue(void) {
-  return QStringList() << "0056 Analog Dimming Off Value -- 2B -- RW"
-                       << "Version 1.2.4+"
-                       << "Value at which lights are powered off (must exceed low value to turn back on) (Also 1.1.6)";
-}
-
-QStringList help_get_analogDimmingConfig(void) {
-  return QStringList() << help_analogDimmingLowValue()
-                       << help_analogDimmingHighValue()
-                       << help_analogDimmingOffValue();
-}
-
 QStringList build_get_powerMeasurementMode(QStringList argList) {
   (void) argList;
   return QStringList() << "G0057";
@@ -1431,13 +879,6 @@ QStringList build_set_powerMeasurementMode(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0057 %1").arg(argList.at(0));
-}
-
-QStringList help_powerMeasurementMode(void) {
-  return QStringList() << "0057 Power Measurement Mode -- 1B -- RW"
-                       << "Version 1.2.4+"
-                       << "00 = default/native mode"
-                       << "01 = external pulse meter on Digital (Sensor) 0 input. AJAX only";
 }
 
 QStringList build_get_externalPowerMeter(QStringList argList) {
@@ -1452,22 +893,9 @@ QStringList build_set_externalPowerMeter(QStringList argList) {
   return QStringList() << QString("S0058 %1").arg(argList.at(0));
 }
 
-QStringList help_externalPowerMeter(void) {
-  return QStringList() << "0058 External Power Meter mWsec per edge -- 4B -- RW"
-                       << "Version 1.2.4+"
-                       << "milliWatt-seconds per pulse edge for external pulse meter (Measurement Mode 01). AJAX only"
-                       << "for example: 5 Amp CT has WHpP of 0.125, so value is 0.125 * 1000 * 3600 / 2 = 225000 (divide by two because we count edges, not pulses)";
-}
-
 QStringList build_get_ambientSensorValue(QStringList argList) {
   (void) argList;
   return QStringList() << "G0059";
-}
-
-QStringList help_ambientSensorValue(void) {
-  return QStringList() << "0059 Ambient Sensor Value -- 3B -- R"
-                       << "Version 1.2.6+"
-                       << "Auto Gained result of the ambient light sensor";
 }
 
 QStringList build_get_ambientConfig(QStringList argList) {
@@ -1499,12 +927,6 @@ QStringList build_set_ambientActiveLevel(QStringList argList) {
   return QStringList() << QString("S005A %1").arg(argList.at(0));
 }
 
-QStringList help_ambientActiveLevel(void) {
-  return QStringList() << "005A Ambient Active Level -- 3B -- RW"
-                       << "Version 1.2.6+"
-                       << "Target Sensor Value when in the Active State";
-}
-
 QStringList build_get_ambientInactiveLevel(QStringList argList) {
   (void) argList;
   return QStringList() << "G005B";
@@ -1515,12 +937,6 @@ QStringList build_set_ambientInactiveLevel(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S005B %1").arg(argList.at(0));
-}
-
-QStringList help_ambientInactiveLevel(void) {
-  return QStringList() << "005B Ambient Inactive Level -- 3B -- RW"
-                       << "Version 1.2.6+"
-                       << "Target Sensor Value when in the Inactive State";
 }
 
 QStringList build_get_ambientEnvironmentalGain(QStringList argList) {
@@ -1535,12 +951,6 @@ QStringList build_set_ambientEnvironmentalGain(QStringList argList) {
   return QStringList() << QString("S005C %1").arg(argList.at(0));
 }
 
-QStringList help_ambientEnvironmentalGain(void) {
-  return QStringList() << "005C Ambient Environment Gain -- 2B -- RW"
-                       << "Version 1.2.6+"
-                       << "Amount of Sensor change per Power Board output bit. ((Max Out - Min Out) / 255)";
-}
-
 QStringList build_get_ambientOffHysteresis(QStringList argList) {
   (void) argList;
   return QStringList() << "G005D";
@@ -1551,12 +961,6 @@ QStringList build_set_ambientOffHysteresis(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S005D %1").arg(argList.at(0));
-}
-
-QStringList help_ambientOffHysteresis(void) {
-  return QStringList() << "005D Ambient Off Hysteresis -- 3B -- RW"
-                       << "Version 1.2.6+"
-                       << "Amount of Sensor hysteresis to apply at min power before letting fixture turn off. (>next register)";
 }
 
 QStringList build_get_ambientOnHysteresis(QStringList argList) {
@@ -1571,37 +975,9 @@ QStringList build_set_ambientOnHysteresis(QStringList argList) {
   return QStringList() << QString("S005E %1").arg(argList.at(0));
 }
 
-QStringList help_ambientOnHysteresis(void) {
-  return QStringList() << "005E Ambient On Hysteresis -- 3B -- RW"
-                       << "Version 1.2.6+"
-                       << "Amount of Sensor hysteresis to apply when off before letting fixture turn on. (Min Out - Off)";
-}
-
-QStringList help_ambientDivisor(void) {
-  return QStringList() << "0069 Ambient Divisor -- 2B -- R"
-                       << "Version 2.0.8+"
-                       << "The divisor to use when calibrating Ambient Environmental Gain. (255 or 663 currently)";
-}
-
-QStringList help_get_ambientConfig(void) {
-  return QStringList() << help_ambientSensorValue()
-                       << help_ambientActiveLevel()
-                       << help_ambientInactiveLevel()
-                       << help_ambientEnvironmentalGain()
-                       << help_ambientOffHysteresis()
-                       << help_ambientOnHysteresis()
-                       << help_ambientDivisor();
-}
-
 QStringList build_get_powerboardProtocol(QStringList argList) {
   (void) argList;
   return QStringList() << "G005F";
-}
-
-QStringList help_powerboardProtocol(void) {
-  return QStringList() << "005F Power Board Protocol -- 4B -- R"
-                       << "Version 1.2.12+"
-                       << "Only on Swan";
 }
 
 QStringList build_get_ledOverride(QStringList argList) {
@@ -1616,12 +992,6 @@ QStringList build_set_ledOverride(QStringList argList) {
   return QStringList() << QString("S0060 %1").arg(argList.at(0));
 }
 
-QStringList help_ledOverride(void) {
-  return QStringList() << "0060 LED Override -- 1B -- RW"
-                       << "Version 1.2.12+"
-                       << "Override the Status LED Outputs (0xFF is no override)";
-}
-
 QStringList build_get_fadeUpStep(QStringList argList) {
   (void) argList;
   return QStringList() << "G0061";
@@ -1632,12 +1002,6 @@ QStringList build_set_fadeUpStep(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0061 %1").arg(argList.at(0));
-}
-
-QStringList help_fadeUpStep(void) {
-  return QStringList() << "0061 Fade Up Step -- 2B -- RW"
-                       << "Ajax 1.2.6+"
-                       << "PWM steps per 0.01 sec when lights fading up (default 500)";
 }
 
 QStringList build_get_fadeDownStep(QStringList argList) {
@@ -1652,12 +1016,6 @@ QStringList build_set_fadeDownStep(QStringList argList) {
   return QStringList() << QString("S0062 %1").arg(argList.at(0));
 }
 
-QStringList help_fadeDownStep(void) {
-  return QStringList() << "0062 Fade Down Step -- 2B -- RW"
-                       << "Ajax 1.2.6+"
-                       << "PWM steps per 0.01 sec when lights fading down (default 500)";
-}
-
 QStringList build_get_maxBrightness(QStringList argList) {
   (void) argList;
   return QStringList() << "G0063";
@@ -1670,21 +1028,9 @@ QStringList build_set_maxBrightness(QStringList argList) {
   return QStringList() << QString("S0063 %1").arg(argList.at(0));
 }
 
-QStringList help_maxBrightness(void) {
-  return QStringList() << "0063 Max Brightness -- 2B -- RW"
-                       << "XLE 1.2.15+"
-                       << "XLE only. The maximum PWM brightness supported by fixture.";
-}
-
 QStringList build_get_i2cResets(QStringList argList) {
   (void) argList;
   return QStringList() << "G0064";
-}
-
-QStringList help_i2cResets(void) {
-  return QStringList() << "0064 I2C resets -- 2B -- R"
-                       << "Version 1.2.17+"
-                       << "Number of I2C resets seen since power up.";
 }
 
 QStringList build_get_sensorGuardTime(QStringList argList) {
@@ -1699,21 +1045,9 @@ QStringList build_set_sensorGuardTime(QStringList argList) {
   return QStringList() << QString("S0065 %1").arg(argList.at(0));
 }
 
-QStringList help_sensorGuardTime(void) {
-  return QStringList() << "0065 Sensor Guard Time -- 2B -- RW"
-                       << "Version 1.2.18+"
-                       << "Time in milliseconds to wait after switching to inactive before allowing the sensor to re-trigger active state. (EEPROM)";
-}
-
 QStringList build_get_inputVoltage(QStringList argList) {
   (void) argList;
   return QStringList() << "G0066";
-}
-
-QStringList help_inputVoltage(void) {
-  return QStringList() << "0066 Input Voltage -- 2B -- R"
-                       << "Version 2.0.1+"
-                       << "Input voltage in mV if calibrated. If 0067 is 0, then this is the ADC value instead to allow for calibration. Cowboy only.";
 }
 
 QStringList build_get_inputVoltageCalibration(QStringList argList) {
@@ -1728,12 +1062,6 @@ QStringList build_set_inputVoltageCalibration(QStringList argList) {
   return QStringList() << QString("S0067 %1").arg(argList.at(0));
 }
 
-QStringList help_inputVoltageCalibration(void) {
-  return QStringList() << "0067 Input Voltage Calibration -- 2B -- RW -- BAK"
-                       << "Version 2.0.1+"
-                       << "Input voltage Calibration in 3.13 format. round((42000/ADC) * (2^13)). Cowboy only";
-}
-
 QStringList build_get_numLightbars(QStringList argList) {
   (void) argList;
   return QStringList() << "G0068";
@@ -1744,12 +1072,6 @@ QStringList build_set_numLightbars(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0068 %1").arg(argList.at(0));
-}
-
-QStringList help_numLightbars(void) {
-  return QStringList() << "0068 Number of LightBars -- 1B -- R(W) -- BAK"
-                       << "Version 2.0.1+"
-                       << "Swan = 3, Cowboy = Settable between 1 and 4";
 }
 
 QStringList build_get_currentLimit(QStringList argList) {
@@ -1764,21 +1086,9 @@ QStringList build_set_currentLimit(QStringList argList) {
   return QStringList() << QString("S006A %1").arg(argList.at(0));
 }
 
-QStringList help_currentLimit(void) {
-  return QStringList() << "006A Current Limit -- 2B -- RW"
-                       << "Version 2.0.10+"
-                       << "The maximum number of mA that the Cowboy Light Bars are allowed to pull from the 42V line combined. Cowboy only.";
-}
-
 QStringList build_get_bootloaderCode(QStringList argList) {
   (void) argList;
   return QStringList() << "G006B";
-}
-
-QStringList help_bootloaderCode(void) {
-  return QStringList() << "006B Bootloader Code -- 4B -- R"
-                       << "Version 2.0.14+"
-                       << "The unique code used to describe the bootloader installed on the Ember Chip.";
 }
 
 QStringList build_get_xpressMode(QStringList argList) {
@@ -1791,12 +1101,6 @@ QStringList build_set_xpressMode(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S006C %1").arg(argList.at(0));
-}
-
-QStringList help_xpressMode(void) {
-  return QStringList() << "006C Xpress Mode -- 1B -- RW"
-                       << "Version 2.0.X+"
-                       << "0 for normal operation. 1 for Xpress operation. (Kills radio, change DIP meanings)";
 }
 
 QStringList build_get_batteryBackupStatus(QStringList argList) {
@@ -1850,32 +1154,14 @@ QStringList build_set_batteryBackupStatus(QStringList argList) {
   return QStringList() << QString("S006D %1").arg(argList.at(0));
 }
 
-QStringList help_batteryBackupStatus(void) {
-  return QStringList() << "006D Battery Backup -- 4B -- RW"
-                       << "Version 2.0.X+"
-                       << "Battery Backup status (only the Short and Long test start bits (10 & 11) are writable)";
-}
-
 QStringList build_get_sensorSeconds(QStringList argList) {
   (void) argList;
   return QStringList() << "G006E";
 }
 
-QStringList help_sensorSeconds(void) {
-  return QStringList() << "006E Sensor Seconds -- 4B -- R"
-                       << "Version 2.0.X+"
-                       << "Number of Seconds that the sensor has been active. (EEPROM) Reset by !U";
-}
-
 QStringList build_get_inputVoltageTwo(QStringList argList) {
   (void) argList;
   return QStringList() << "G006F";
-}
-
-QStringList help_inputVoltageTwo(void) {
-  return QStringList() << "006F Input Voltage Two -- 2B -- R"
-                       << "Version 2.0.X+"
-                       << "Input voltage (2nd supply) in mV if calibrated. If 0070 is 0, then this is the ADC value instead to allow for calibration. Cowboy only 36k/48k";
 }
 
 QStringList build_get_inputVoltageTwoCalibration(QStringList argList) {
@@ -1890,12 +1176,6 @@ QStringList build_set_inputVoltageTwoCalibration(QStringList argList) {
   return QStringList() << QString("S0070 %1").arg(argList.at(0));
 }
 
-QStringList help_inputVoltageTwoCalibration(void) {
-  return QStringList() << "0070 Input Voltage Two Calibration -- 2B -- RW"
-                       << "Version 2.0.X+"
-                       << "Input voltage (2nd supply) Calibration in 3.13 format. round((42000/ADC) * (2^13)). Cowboy only 36k/48k";
-}
-
 QStringList build_get_maxRampUpSpeed(QStringList argList) {
   (void) argList;
   return QStringList() << "G0071";
@@ -1906,12 +1186,6 @@ QStringList build_set_maxRampUpSpeed(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0071 %1").arg(argList.at(0));
-}
-
-QStringList help_maxRampUpSpeed(void) {
-  return QStringList() << "0071 Max Ramp Up Speed -- 2B -- RW"
-                       << "Version 2.1.X+"
-                       << "Max speed fixture will increase light level. (80us/%) (On Gen2 this rounds down multiples of 128)";
 }
 
 QStringList build_get_maxRampDownSpeed(QStringList argList) {
@@ -1926,21 +1200,9 @@ QStringList build_set_maxRampDownSpeed(QStringList argList) {
   return QStringList() << QString("S0072 %1").arg(argList.at(0));
 }
 
-QStringList help_maxRampDownSpeed(void) {
-  return QStringList() << "0072 Max Ramp Down Speed -- 2B -- RW"
-                       << "Version 2.1.X+"
-                       << "Max speed fixture will decrease light level. (80us/%) (On Gen2 this rounds down to multiples of 128)";
-}
-
 QStringList build_get_emergencyLightLevel(QStringList argList) {
   (void) argList;
   return QStringList() << "G0074";
-}
-
-QStringList help_emergencyLightLevel(void) {
-  return QStringList() << "0074 Emergency Light Level -- 2B -- R"
-                       << "Version 2.1.X+"
-                       << "Light level battery backup will use when in emergency mode";
 }
 
 QStringList build_get_batteryBackupPowerCalibration(QStringList argList) {
@@ -1955,12 +1217,6 @@ QStringList build_set_batteryBackupPowerCalibration(QStringList argList) {
   return QStringList() << QString("S0075 %1").arg(argList.at(0));
 }
 
-QStringList help_batteryBackupPowerCalibration(void) {
-  return QStringList() << "0075 Battery Backup Power Calibration -- 2B -- RW"
-                       << "Version 2.1.X+"
-                       << "Amount of Power (mW) used by the battery backup while charging";
-}
-
 QStringList build_get_motionSensorProfile(QStringList argList) {
   (void) argList;
   return QStringList() << "G0076";
@@ -1971,12 +1227,6 @@ QStringList build_set_motionSensorProfile(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0076 %1").arg(argList.at(0));
-}
-
-QStringList help_motionSensorProfile(void) {
-  return QStringList() << "0076 Motion Sensor Profile -- 1B -- RW -- BAK"
-                       << "Version 2.1.X+"
-                       << "Sensor Profile Setting (FF to use Custom Profile)";
 }
 
 QStringList build_get_powerMeterConfig(QStringList argList) {
@@ -2002,23 +1252,11 @@ QStringList build_set_powerMeterLevelAtOff(QStringList argList) {
   return QStringList() << QString("S0077 %1").arg(argList.at(0));
 }
 
-QStringList help_powerMeterLevelAtOff(void) {
-  return QStringList() << "0077 Power Meter Level At Off -- 4B -- RW"
-                       << "Version 2.1.X+"
-                       << "Power consumption of devices on DALI bus at light level off";
-}
-
 QStringList build_set_powerMeterLevelAtMin(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S0078 %1").arg(argList.at(0));
-}
-
-QStringList help_powerMeterLevelAtMin(void) {
-  return QStringList() << "0078 Power Meter Level At Min -- 4B -- RW"
-                       << "Version 2.1.X+"
-                       << "Power consumption of devices on DALI bus at light level min";
 }
 
 QStringList build_set_powerMeterLevelAtMax(QStringList argList) {
@@ -2028,30 +1266,11 @@ QStringList build_set_powerMeterLevelAtMax(QStringList argList) {
   return QStringList() << QString("S0079 %1").arg(argList.at(0));
 }
 
-QStringList help_powerMeterLevelAtMax(void) {
-  return QStringList() << "0079 Power Meter Level At Max -- 4B -- RW"
-                       << "Version 2.1.X+"
-                       << "Power consumption of devices on DALI bus at light level max";
-}
-
 QStringList build_set_powerMeterType(QStringList argList) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S007A %1").arg(argList.at(0));
-}
-
-QStringList help_powerMeterType(void) {
-  return QStringList() << "007A Power Meter Type -- 1B -- RW"
-                       << "Version 2.1.X+"
-                       << "Method of Power Metering used by DLA (0 = DL, 1 = Philips, 2 = Estimate)";
-}
-
-QStringList help_get_powerMeterConfig(void) {
-  return QStringList() << help_powerMeterLevelAtOff()
-                       << help_powerMeterLevelAtMin()
-                       << help_powerMeterLevelAtMax()
-                       << help_powerMeterType();
 }
 
 QStringList build_get_DLAiSlaveMode(QStringList argList) {
@@ -2066,20 +1285,9 @@ QStringList build_set_DLAiSlaveMode(QStringList argList) {
   return QStringList() << QString("S007B %1").arg(argList.at(0));
 }
 
-QStringList help_DLAiSlaveMode(void) {
-  return QStringList() << "007B DLAi Slave Mode -- 1B -- RW"
-                       << "Set for DALI slave operation, clear for normal operation";
-}
-
 QStringList build_get_DALIBootlodingActive(QStringList argList) {
   (void) argList;
   return QStringList() << "G007C";
-}
-
-QStringList help_DALIBootlodingActive(void) {
-  return QStringList() << "007C DALI Bootloading Active -- 1B -- R"
-                       << "Version 2.1.X+"
-                       << "Set while bootload is in progress";
 }
 
 QStringList build_get_testingMode(QStringList argList) {
@@ -2094,13 +1302,6 @@ QStringList build_set_testingMode(QStringList argList) {
   return QStringList() << QString("S007D %1").arg(argList.at(0));
 }
 
-QStringList help_testingMode(void) {
-  return QStringList() << "007D Testing Modes -- 1B -- RW"
-                       << "Version 2.1.2+"
-                       << "0 = None"
-                       << "1 = Occupancy Sensor Test.";
-}
-
 QStringList build_get_numBatteriesSupported(QStringList argList) {
   (void) argList;
   return QStringList() << "G007E";
@@ -2111,12 +1312,6 @@ QStringList build_set_numBatteriesSupported(QStringList argList) {
     return QStringList() << "ERROR: expected a value";
   }
   return QStringList() << QString("S007E %1").arg(argList.at(0));
-}
-
-QStringList help_numBatteriesSupported(void) {
-  return QStringList() << "007E Number of Batteries Supported -- 1B -- RW -- BAK"
-                       << "Version 2.1.10+"
-                       << "Only on Cowboy, Set at manufacturing time to 2 for 48K and 1 for other DLEs";
 }
 
 /*** lightbar register commands ***/
@@ -2149,11 +1344,6 @@ QStringList parse_get_lbVersion(QStringList pmuResponse) {
   parsedResponse << QString("Firmware code: %1%2").arg(pmuResponse.at(1)).arg(pmuResponse.at(2));
   parsedResponse << QString("Protocol version: %1").arg(pmuResponse.at(0));
   return parsedResponse;
-}
-
-QStringList help_get_lbVersion(void) {
-  return QStringList() << "Get Lightbar version information -- 1B -- R"
-                       << "Lightbar number 00 to 07 (no argument = 00), Only on Cowboy";
 }
 
 QStringList build_get_lbStatus(QStringList argList) {
@@ -2214,11 +1404,6 @@ QStringList parse_get_lbStatus(QStringList pmuResponse) {
   return parsedResponse;
 }
 
-QStringList help_get_lbStatus(void) {
-  return QStringList() << "Get Lightbar status information -- 1B -- R"
-                       << "Lightbar number 00 to 07 (no argument = 00), Only on Cowboy";
-}
-
 QStringList build_get_lbConfig(QStringList argList) {
   QString barNum;
   QStringList cmdList;
@@ -2260,11 +1445,6 @@ QStringList parse_get_lbConfig(QStringList pmuResponse) {
   return parsedResponse;
 }
 
-QStringList help_get_lbConfig(void) {
-  return QStringList() << "Get Lightbar MFG configuration -- 1B -- R"
-                       << "Lightbar number 00 to 07 (no argument = 00), Only on Cowboy";
-}
-
 /*** battery backup register commands ***/
 QStringList build_get_bbVersion(QStringList argList) {
   QString battNum;
@@ -2300,11 +1480,6 @@ QStringList parse_get_bbVersion(QStringList pmuResponse) {
   parsedResponse << QString("Firmware code: %1%2").arg(pmuResponse.at(1)).arg(pmuResponse.at(2));
   parsedResponse << QString("Protocol version: %1").arg(pmuResponse.at(0));
   return parsedResponse;
-}
-
-QStringList help_get_bbVersion(void) {
-  return QStringList() << "Get Battery Backup version information -- 1B -- R"
-                       << "Battery number 00 to 01 (no argument = 00), Only on Cowboy";
 }
 
 QStringList build_get_bbStatus(QStringList argList) {
@@ -2408,11 +1583,6 @@ QStringList parse_get_bbStatus(QStringList pmuResponse) {
   return QStringList() << parsedResponse;
 }
 
-QStringList help_get_bbStatus(void) {
-  return QStringList() << "Get Battery Backup status information -- 1B -- R"
-                       << "Battery number 00 to 01 (no argument = 00), Only on Cowboy";
-}
-
 QStringList build_get_bbConfig(QStringList argList) {
   QString battNum;
   QStringList cmdList;
@@ -2475,19 +1645,10 @@ QStringList parse_get_bbConfig(QStringList pmuResponse) {
   return parsedResponse;
 }
 
-QStringList help_get_bbConfig(void) {
-  return QStringList() << "Get Battery Backup MFG configuration -- 1B -- R"
-                       << "Battery number 00 to 01 (no argument = 00), Only on Cowboy";
-}
-
 /*** reset commands ***/
 QStringList build_reset_usage(QStringList argList) {
   (void) argList;
   return QStringList() << "!U";
-}
-
-QStringList help_reset_usage(void) {
-  return QStringList() << "!U -- Reset Usage (non Permanent)";
 }
 
 QStringList build_reset_oldLog(QStringList argList) {
@@ -2495,26 +1656,13 @@ QStringList build_reset_oldLog(QStringList argList) {
   return QStringList() << "!L";
 }
 
-QStringList help_reset_oldLog(void) {
-  return QStringList() << "!L -- Reset Log";
-}
-
 QStringList build_reset_log(QStringList argList) {
   (void) argList;
   return QStringList() << "!K";
 }
 
-QStringList help_reset_log(void) {
-  return QStringList() << "!K -- Reset New Log (Do not use in normal operation!) (2.0 command)";
-}
-
 QStringList build_reset_logIndex(QStringList argList) {
   return QStringList() << QString("J%1").arg(argList.at(0));
-}
-
-QStringList help_reset_logIndex(void) {
-  return QStringList() << "J Seen up to command for new logging (2.0 command)"
-                       << "JIIII\r -- Tell the PMU that you have seen up to I index, so that it can clean up log space. It does not guarantee removal of seen log entries. It will return an Error unless the index is between the Tail and the Head as returned by the K command.";
 }
 
 QStringList build_reset_eeprom(QStringList argList) {
@@ -2522,17 +1670,9 @@ QStringList build_reset_eeprom(QStringList argList) {
   return QStringList() << "!Z";
 }
 
-QStringList help_reset_eeprom(void) {
-  return QStringList() << "!Z -- Zaps entire EEPROM (1.0.2 command)";
-}
-
 QStringList build_reset_eepromToDefault(QStringList argList) {
   (void) argList;
   return QStringList() << "!C";
-}
-
-QStringList help_reset_eepromToDefault(void) {
-  return QStringList() << "!C -- Initializes EEPROM (Resets everything to default)";
 }
 
 QStringList build_reset_eepromToLatestMapVersion(QStringList argList) {
@@ -2540,17 +1680,9 @@ QStringList build_reset_eepromToLatestMapVersion(QStringList argList) {
   return QStringList() << "!E";
 }
 
-QStringList help_reset_eepromToLatestMapVersion(void) {
-  return QStringList() << "!E -- Upgrades EEPROM to latest map version (1.0.7 command)";
-}
-
 QStringList build_reset_network(QStringList argList) {
   (void) argList;
   return QStringList() << "!N";
-}
-
-QStringList help_reset_network(void) {
-  return QStringList() << "!E -- Upgrades EEPROM to latest map version (1.0.7 command)";
 }
 
 QStringList build_reset_networkWithoutChecking(QStringList argList) {
@@ -2558,26 +1690,14 @@ QStringList build_reset_networkWithoutChecking(QStringList argList) {
   return QStringList() << "!N1";
 }
 
-QStringList help_reset_networkWithoutChecking(void) {
-  return QStringList() << "!N1 -- Changes the network to the network specified in registers 003B to 003E, immediately (1.0.10 command)";
-}
-
 QStringList build_reset_daliCommissioning(QStringList argList) {
   (void) argList;
   return QStringList() << "!Y";
 }
 
-QStringList help_reset_daliCommissioning(void) {
-  return QStringList() << "!Y -- Commission DALI devices. Search and assign devices starting at addr 0x0";
-}
-
 QStringList build_reset_daliPowerMetering(QStringList argList) {
   (void) argList;
   return QStringList() << "!A";
-}
-
-QStringList help_reset_daliPowerMetering(void) {
-  return QStringList() << "!A -- Power Meter DALI devices. Will run DALI devices to three light levels, then record sum of power meter values 0x8001, 0x8000, 0x0000";
 }
 
 /*** reboot commands ***/
@@ -2586,26 +1706,14 @@ QStringList build_reboot_pmu(QStringList argList) {
   return QStringList() << "!R";
 }
 
-QStringList help_reboot_pmu(void) {
-  return QStringList() << "!R -- Reboot";
-}
-
 QStringList build_reboot_wirelessCard(QStringList argList) {
   (void) argList;
   return QStringList() << "!W";
 }
 
-QStringList help_reboot_wirelessCard(void) {
-  return QStringList() << "!W -- Restarts Wireless Card (1.0 command)";
-}
-
 QStringList build_reboot_i2cDevices(QStringList argList) {
   (void) argList;
   return QStringList() << "!X";
-}
-
-QStringList help_reboot_i2cDevices(void) {
-  return QStringList() << "!X -- Reset all I2C devices (Cowboy only, Version 2.1.10 and later)";
 }
 
 /*** reload commands ***/
@@ -2614,17 +1722,9 @@ QStringList build_reload_dlaFirmware(QStringList argList) {
   return QStringList() << "!B";
 }
 
-QStringList help_reload_dlaFirmware(void) {
-  return QStringList() << "!B -- Bootload PIC from stored image";
-}
-
 QStringList build_reload_wirelessModuleFirmware(QStringList argList) {
   (void) argList;
   return QStringList() << "!M";
-}
-
-QStringList help_reload_wirelessModuleFirmware(void) {
-  return QStringList() << "!M -- Bootload Wireless Module from stored image";
 }
 
 QStringList build_reload_powerboardFirmware(QStringList argList) {
@@ -2632,17 +1732,9 @@ QStringList build_reload_powerboardFirmware(QStringList argList) {
   return QStringList() << "!P";
 }
 
-QStringList help_reload_powerboardFirmware(void) {
-  return QStringList() << "!P -- Bootload Power Board from stored image";
-}
-
 QStringList build_reload_lightbarFirmware(QStringList argList) {
   (void) argList;
   return QStringList() << "!P";
-}
-
-QStringList help_reload_lightbarFirmware(void) {
-  return QStringList() << "PAA -- Bootload DLE light bar or battery backup unit, where AA is the driver address (Version 2.1.0 and later)";
 }
 
 QStringList build_reload_batteryBackupFirmware(QStringList argList) {
@@ -2650,17 +1742,9 @@ QStringList build_reload_batteryBackupFirmware(QStringList argList) {
   return QStringList() << "!P";
 }
 
-QStringList help_reload_batteryBackupFirmware(void) {
-  return QStringList() << "PAA -- Bootload DLE light bar or battery backup unit, where AA is the driver address (Version 2.1.0 and later)";
-}
-
 QStringList build_reload_motionSensorFirmware(QStringList argList) {
   (void) argList;
   return QStringList() << "!V";
-}
-
-QStringList help_reload_motionSensorFirmware(void) {
-  return QStringList() << "V -- Bootload Motion Sensor from stored image";
 }
 
 /*** log commands ***/
@@ -2680,12 +1764,6 @@ QStringList parse_get_logIndex(QStringList pmuResponse) {
     first = "none";
   }
   return QStringList() << QString("head: %1<br>tail: %2<br>first recent: %3").arg(head).arg(tail).arg(first);
-}
-
-QStringList help_get_logIndex(void) {
-  return QStringList() << "K New Logging Command (2.0 command)"
-                       << "K\r -- returns tail and head indices of the log (P values added in 2.0.2)"
-                       << "K: TTTTHHHHPPPP -- T is a 15 bit tail index inclusive. H is a 15 bit head exclusive. P is the index of the most recent power up, set to 0xFFFF if there isn't one.";
 }
 
 QStringList build_get_log(QStringList argList) {
@@ -2829,222 +1907,212 @@ QStringList parse_get_log(QStringList pmuResponse) {
   return QStringList() << log;
 }
 
-QStringList help_get_log(void) {
-  return QStringList() << "Get the fixture log starting at index IIII (no arguments = index 0000) -- 2 bytes";
-}
-
 QStringList build_insert_logEntry(QStringList argList) {
   return QStringList() << QString("E%1").arg(argList.at(0));
-}
-
-QStringList help_insert_logEntry(void) {
-  return QStringList() << "E Insert Event into logger (2.0.1 command)"
-                       << "ETTVVVVVVVV\r -- Force the PMU to insert an event into the log with type T (1 byte) and V (4 byte). V is big endian and will be converted to correct size for type T."
-                       << "ETTVVVVVVVVSSSSSSSS\r -- Same as above but adds S (4 bytes) seconds to the uptime before inserting the event.";
 }
 
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   QStringList keywordList;
   // get & set PMU register commands
-  m_cmdTable.insert("get firmwareVersion", new cmdEntry(build_get_firmwareVersion, parse_get_firmwareVersion, help_firmwareVersion));
-  m_cmdTable.insert("get productCode", new cmdEntry(build_get_productCode, help_productCode));
-  m_cmdTable.insert("set productCode", new cmdEntry(build_set_productCode, help_productCode));
-  m_cmdTable.insert("get serialNumber", new cmdEntry(build_get_serialNumber, help_serialNumber));
-  m_cmdTable.insert("set serialNumber", new cmdEntry(build_set_serialNumber, help_serialNumber));
-  m_cmdTable.insert("get unixTime", new cmdEntry(build_get_unixTime, help_unixTime));
-  m_cmdTable.insert("set unixTime", new cmdEntry(build_set_unixTime, help_unixTime));
-  m_cmdTable.insert("get temperature", new cmdEntry(build_get_temperature, parse_get_temperature, help_temperature));
-  m_cmdTable.insert("get lightLevel", new cmdEntry(build_get_lightLevel, parse_get_lightLevel, help_get_lightLevel));
-  m_cmdTable.insert("set lightManualLevel", new cmdEntry(build_set_lightManualLevel, help_lightManualLevel));
-  m_cmdTable.insert("set lightOverrideActiveLevel", new cmdEntry(build_set_lightOverrideActiveLevel, help_lightOverrideActiveLevel));
-  m_cmdTable.insert("set lightOverrideInactiveLevel", new cmdEntry(build_set_lightOverrideInactiveLevel, help_lightOverrideInactiveLevel));
-  m_cmdTable.insert("get sensorDelayTime", new cmdEntry(build_get_sensorDelayTime, help_sensorDelayTime));
-  m_cmdTable.insert("get sensorOverrideDelayTime", new cmdEntry(build_get_sensorOverrideDelayTime, help_sensorOverrideDelayTime));
-  m_cmdTable.insert("set sensorOverrideDelayTime", new cmdEntry(build_set_sensorOverrideDelayTime, help_sensorOverrideDelayTime));
-  m_cmdTable.insert("get upTime", new cmdEntry(build_get_upTime, parse_get_upTime, help_upTime));
-  m_cmdTable.insert("get usage", new cmdEntry(build_get_usage, parse_get_usage, help_get_usage));
-  m_cmdTable.insert("get numLogEntries", new cmdEntry(build_get_numLogEntries, help_numLogEntries));
-  m_cmdTable.insert("get configCalibration", new cmdEntry(build_get_configCalibration, parse_get_configCalibration, help_configCalibration));
-  m_cmdTable.insert("set configCalibrationP0", new cmdEntry(build_set_configCalibrationP0, help_configCalibrationP0));
-  m_cmdTable.insert("set configCalibrationP1", new cmdEntry(build_set_configCalibrationP1, help_configCalibrationP1));
-  m_cmdTable.insert("set configCalibrationP2", new cmdEntry(build_set_configCalibrationP2, help_configCalibrationP2));
-  m_cmdTable.insert("set configCalibrationP3", new cmdEntry(build_set_configCalibrationP3, help_configCalibrationP3));
-  m_cmdTable.insert("get buildTime", new cmdEntry(build_get_buildTime, help_buildTime));
-  m_cmdTable.insert("set buildTime", new cmdEntry(build_set_buildTime, help_buildTime));
-  m_cmdTable.insert("get sensorTimeoutCountdown", new cmdEntry(build_get_sensorTimeoutCountdown, help_sensorTimeoutCountdown));
-  m_cmdTable.insert("get currentLightLevel", new cmdEntry(build_get_currentLightLevel, help_currentLightLevel));
-  m_cmdTable.insert("get safeMode", new cmdEntry(build_get_safeMode, help_safeMode));
-  m_cmdTable.insert("get lightBarSelect", new cmdEntry(build_get_lightBarSelect, help_lightBarSelect));
-  m_cmdTable.insert("set lightBarSelect", new cmdEntry(build_set_lightBarSelect, help_lightBarSelect));
-  m_cmdTable.insert("get powerConsumption", new cmdEntry(build_get_powerConsumption, parse_get_powerConsumption, help_powerConsumption));
-  m_cmdTable.insert("get wirelessDataAggregator", new cmdEntry(build_get_wirelessDataAggregator, help_wirelessDataAggregator));
-  m_cmdTable.insert("set wirelessDataAggregator", new cmdEntry(build_set_wirelessDataAggregator, help_wirelessDataAggregator));
-  m_cmdTable.insert("get resetUsageTimestamp", new cmdEntry(build_get_resetUsageTimestamp, help_resetUsageTimestamp));
-  m_cmdTable.insert("get pwmPeriodRegister", new cmdEntry(build_get_pwmPeriodRegister, help_pwmPeriodRegister));
-  m_cmdTable.insert("set pwmPeriodRegister", new cmdEntry(build_set_pwmPeriodRegister, help_pwmPeriodRegister));
-  m_cmdTable.insert("get analogSensorValue", new cmdEntry(build_get_analogSensorValue, help_analogSensorValue));
-  m_cmdTable.insert("get analogReportingHysteresis", new cmdEntry(build_get_analogReportingHysteresis, help_analogReportingHysteresis));
-  m_cmdTable.insert("get zone", new cmdEntry(build_get_zone, help_zone));
-  m_cmdTable.insert("set zone", new cmdEntry(build_set_zone, help_zone));
-  m_cmdTable.insert("get lightTemporaryActiveLevel", new cmdEntry(build_get_lightTemporaryActiveLevel, help_lightTemporaryActiveLevel));
-  m_cmdTable.insert("set lightTemporaryActiveLevel", new cmdEntry(build_set_lightTemporaryActiveLevel, help_lightTemporaryActiveLevel));
-  m_cmdTable.insert("get lightTemporaryInactiveLevel", new cmdEntry(build_get_lightTemporaryInactiveLevel, help_lightTemporaryInactiveLevel));
-  m_cmdTable.insert("set lightTemporaryInactiveLevel", new cmdEntry(build_set_lightTemporaryInactiveLevel, help_lightTemporaryInactiveLevel));
-  m_cmdTable.insert("get sensorTemporaryDelayTime", new cmdEntry(build_get_sensorTemporaryDelayTime, help_sensorTemporaryDelayTime));
-  m_cmdTable.insert("set sensorTemporaryDelayTime", new cmdEntry(build_set_sensorTemporaryDealyTime, help_sensorTemporaryDelayTime));
-  m_cmdTable.insert("get temporaryOverrideTimeout", new cmdEntry(build_get_temporaryOverrideTimeout, help_temporaryOverrideTimeout));
-  m_cmdTable.insert("set temporaryOverrideTimeout", new cmdEntry(build_set_temporaryOverrideTiemout, help_temporaryOverrideTimeout));
-  m_cmdTable.insert("get setRemoteState", new cmdEntry(build_get_setRemoteState, help_setRemoteState));
-  m_cmdTable.insert("set setRemoteState", new cmdEntry(build_set_setRemoteState, help_setRemoteState));
-  m_cmdTable.insert("get remoteSetDelayTime", new cmdEntry(build_get_remoteStateDelayTime, help_remoteStateDelayTime));
-  m_cmdTable.insert("set remoteSetDelayTime", new cmdEntry(build_set_remoteStateDelayTime, help_remoteStateDelayTime));
-  m_cmdTable.insert("get remoteSecondsCountdown", new cmdEntry(build_get_remoteSecondsCountdown, help_remoteSecondsCountdown));
-  m_cmdTable.insert("get minimumDimmingValue", new cmdEntry(build_get_minimumDimmingValue, help_minimumDimmingValue));
-  m_cmdTable.insert("get powerCalibration", new cmdEntry(build_get_powerCalibration, parse_get_powerCalibration, help_get_powerCalibration));
-  m_cmdTable.insert("set powerCalibrationA0", new cmdEntry(build_set_powerCalibrationA0, help_powerCalibrationA0));
-  m_cmdTable.insert("set powerCalibrationB0", new cmdEntry(build_set_powerCalibrationB0, help_powerCalibrationB0));
-  m_cmdTable.insert("set powerCalibrationC0", new cmdEntry(build_set_powerCalibrationC0, help_powerCalibrationC0));
-  m_cmdTable.insert("set powerCalibrationMA", new cmdEntry(build_set_powerCalibrationMA, help_powerCalibrationMA));
-  m_cmdTable.insert("set powerCalibrationMB", new cmdEntry(build_set_powerCalibrationMB, help_powerCalibrationMB));
-  m_cmdTable.insert("set powerCalibrationMC", new cmdEntry(build_set_powerCalibrationMC, help_powerCalibrationMC));
-  m_cmdTable.insert("set powerCalibrationPOff", new cmdEntry(build_set_powerCalibrationPOff, help_powerCalibrationPOff));
-  m_cmdTable.insert("set powerCalibrationPOn", new cmdEntry(build_set_powerCalibrationPOn, help_powerCalibrationPOn));
-  m_cmdTable.insert("set powerCalibrationT0", new cmdEntry(build_set_powerCalibrationT0, help_powerCalibrationT0));
-  m_cmdTable.insert("get powerEstimatorTemperatureOverride", new cmdEntry(build_get_powerEstimatorTemperatureOverride, help_powerEstimatorTemperatureOverride));
-  m_cmdTable.insert("set powerEstimatorTemperatureOverride", new cmdEntry(build_set_powerEstimatorTemperatureOverride, help_powerEstimatorTemperatureOverride));
-  m_cmdTable.insert("get cachedTemperatureValue", new cmdEntry(build_get_cachedTemperatureValue, help_cachedTemperatureValue));
-  m_cmdTable.insert("get eepromSize", new cmdEntry(build_get_eepromSize, help_eepromSize));
-  m_cmdTable.insert("get hardwareRevision", new cmdEntry(build_get_hardwareRevision, help_hardwareRevision));
-  m_cmdTable.insert("get wirelessConfig", new cmdEntry(build_get_wirelessConfig, parse_get_wirelessConfig, help_get_wirelessConfig));
-  m_cmdTable.insert("set wirelessPanId", new cmdEntry(build_set_wirelessPanId, help_wirelessPanId));
-  m_cmdTable.insert("set wirelessChannelMask", new cmdEntry(build_set_wirelessChannelMask, help_wirelessChannelMask));
-  m_cmdTable.insert("set wirelessShortAddress", new cmdEntry(build_set_wirelessShortAddress, help_wirelessShortAddress));
-  m_cmdTable.insert("set wirelessRole", new cmdEntry(build_set_wirelessRole, help_wirelessRole));
-  m_cmdTable.insert("set wirelessWatchdogHold", new cmdEntry(build_set_wirelessWatchdogHold, help_wirelessWatchdogHold));
-  m_cmdTable.insert("set wirelessWatchdogPeriod", new cmdEntry(build_set_wirelessWatchdogPeriod, help_wirelessWatchdogPeriod));
-  m_cmdTable.insert("set wirelessNetworkKey", new cmdEntry(build_set_wirelessNetworkKey, help_wirelessNetworkKey));
-  m_cmdTable.insert("get firmwareCode", new cmdEntry(build_get_firmwareCode, help_firmwareCode));
-  m_cmdTable.insert("get moduleFirmwareCode", new cmdEntry(build_get_moduleFirmwareCode, help_moduleFirmwareCode));
-  m_cmdTable.insert("get maxTemperature", new cmdEntry(build_get_maxTemperature, parse_get_maxTemperature, help_get_maxTemperature));
-  m_cmdTable.insert("get overTemperatureConfig", new cmdEntry(build_get_overTemperatureConfig, parse_get_overTemperatureConfig, help_get_overTemperatureConfig));
-  m_cmdTable.insert("set overTemperatureThresholdLow", new cmdEntry(build_set_overTemperatureThresholdLow, help_overTemperatureThresholdLow));
-  m_cmdTable.insert("set overTemperatureThresholdHigh", new cmdEntry(build_get_overTemperatureThresholdHigh, help_overTemperatureThresholdHigh));
-  m_cmdTable.insert("set overTemperatureDimmingLimit", new cmdEntry(build_set_overTemperatureDimmingLimit, help_overTemperatureDimmingLimit));
-  m_cmdTable.insert("get analogDimmingMode", new cmdEntry(build_get_analogDimmingMode, parse_get_analogDimmingMode, help_analogDimmingMode));
-  m_cmdTable.insert("set analogDimmingMode", new cmdEntry(build_set_analogDimmingMode, help_analogDimmingMode));
-  m_cmdTable.insert("get fixtureIdMode", new cmdEntry(build_get_fixtureIdMode, help_fixtureIdMode));
-  m_cmdTable.insert("set fixtureIdMode", new cmdEntry(build_set_fixtureIdMode, help_fixtureIdMode));
-  m_cmdTable.insert("get acFrequency", new cmdEntry(build_get_acFrequency, help_acFrequency));
-  m_cmdTable.insert("get sensorBits", new cmdEntry(build_get_sensorBits, help_sensorBits));
-  m_cmdTable.insert("get powerMeterCommand", new cmdEntry(build_get_powerMeterCommand, help_powerMeterCommand));
-  m_cmdTable.insert("set powerMeterCommand", new cmdEntry(build_set_powerMeterCommand, help_powerMeterCommand));
-  m_cmdTable.insert("get powerMeterRegister", new cmdEntry(build_get_powerMeterRegister, help_powerMeterRegister));
-  m_cmdTable.insert("set powerMeterRegister", new cmdEntry(build_set_powerMeterRegister, help_powerMeterRegister));
-  m_cmdTable.insert("get ambientTemperature", new cmdEntry(build_get_ambientTemperature, help_ambientTemperature));
-  m_cmdTable.insert("get lightSensorLevel", new cmdEntry(build_get_lightSensorLevel, help_lightSensorLevel));
-  m_cmdTable.insert("get sensorConfig", new cmdEntry(build_get_sensorConfig, parse_get_sensorConfig, help_get_sensorConfig));
-  m_cmdTable.insert("set sensor0Timeout", new cmdEntry(build_set_sensor0Timeout, help_sensor0Timeout));
-  m_cmdTable.insert("set sensor0Offset", new cmdEntry(build_set_sensor0Offset, help_sensor0Offset));
-  m_cmdTable.insert("set sensor1Timeout", new cmdEntry(build_set_sensor1Timeout, help_sensor1Timeout));
-  m_cmdTable.insert("set sensor1Offset", new cmdEntry(build_set_sensor1Offset, help_sensor1Offset));
-  m_cmdTable.insert("get analogDimmingConfig", new cmdEntry(build_get_analogDimmingConfig, parse_get_analogDimmingConfig, help_get_analogDimmingConfig));
-  m_cmdTable.insert("set analogDimmingLowValue", new cmdEntry(build_set_analogDimmingLowValue, help_analogDimmingLowValue));
-  m_cmdTable.insert("set analogDimmingHighValue", new cmdEntry(build_set_analogDimmingHighValue, help_analogDimmingHighValue));
-  m_cmdTable.insert("set analogDimmingOffValue", new cmdEntry(build_set_analogDimmingOffValue, help_analogDimmingOffValue));
-  m_cmdTable.insert("get powerMeasurementMode", new cmdEntry(build_get_powerMeasurementMode, help_powerMeasurementMode));
-  m_cmdTable.insert("set powerMeasurementMode", new cmdEntry(build_set_powerMeasurementMode, help_powerMeasurementMode));
-  m_cmdTable.insert("get externalPowerMeter", new cmdEntry(build_get_externalPowerMeter, help_externalPowerMeter));
-  m_cmdTable.insert("set externalPowerMeter", new cmdEntry(build_set_externalPowerMeter, help_externalPowerMeter));
-  m_cmdTable.insert("get ambientSensorValue", new cmdEntry(build_get_ambientSensorValue, help_ambientSensorValue));
-  m_cmdTable.insert("get ambientConfig", new cmdEntry(build_get_ambientConfig, parse_get_ambientConfig, help_get_ambientConfig));
-  m_cmdTable.insert("set ambientActiveLevel", new cmdEntry(build_set_ambientActiveLevel, help_ambientActiveLevel));
-  m_cmdTable.insert("set ambientInactiveLevel", new cmdEntry(build_set_ambientInactiveLevel, help_ambientInactiveLevel));
-  m_cmdTable.insert("set ambientEnvironmentalGain", new cmdEntry(build_set_ambientEnvironmentalGain, help_ambientEnvironmentalGain));
-  m_cmdTable.insert("set ambientOffHysteresis", new cmdEntry(build_set_ambientOffHysteresis, help_ambientOffHysteresis));
-  m_cmdTable.insert("set ambientOnHysteresis", new cmdEntry(build_set_ambientOnHysteresis, help_ambientOnHysteresis));
-  m_cmdTable.insert("get powerboardProtocol", new cmdEntry(build_get_powerboardProtocol, help_powerboardProtocol));
-  m_cmdTable.insert("get ledOverride", new cmdEntry(build_get_ledOverride, help_ledOverride));
-  m_cmdTable.insert("set ledOverride", new cmdEntry(build_set_ledOverride, help_ledOverride));
-  m_cmdTable.insert("get fadeUpStep", new cmdEntry(build_get_fadeUpStep, help_fadeUpStep));
-  m_cmdTable.insert("set fadeUpStep", new cmdEntry(build_set_fadeUpStep, help_fadeUpStep));
-  m_cmdTable.insert("get fadeDownStep", new cmdEntry(build_get_fadeDownStep, help_fadeDownStep));
-  m_cmdTable.insert("set fadeDownStep", new cmdEntry(build_set_fadeDownStep, help_fadeDownStep));
-  m_cmdTable.insert("get maxBrightness", new cmdEntry(build_get_maxBrightness, help_maxBrightness));
-  m_cmdTable.insert("set maxBrightness", new cmdEntry(build_set_maxBrightness, help_maxBrightness));
-  m_cmdTable.insert("get i2cResets", new cmdEntry(build_get_i2cResets, help_i2cResets));
-  m_cmdTable.insert("get sensorGuardTime", new cmdEntry(build_get_sensorGuardTime, help_sensorGuardTime));
-  m_cmdTable.insert("set sensorGuardTime", new cmdEntry(build_set_sensorGuardTime, help_sensorGuardTime));
-  m_cmdTable.insert("get inputVoltage", new cmdEntry(build_get_inputVoltage, help_inputVoltage));
-  m_cmdTable.insert("get inputVoltageCalibration", new cmdEntry(build_get_inputVoltageCalibration, help_inputVoltageCalibration));
-  m_cmdTable.insert("set inputVoltageCalibration", new cmdEntry(build_set_inputVoltageCalibration, help_inputVoltageCalibration));
-  m_cmdTable.insert("get numLightbars", new cmdEntry(build_get_numLightbars, help_numLightbars));
-  m_cmdTable.insert("set numLightbars", new cmdEntry(build_set_numLightbars, help_numLightbars));
-  m_cmdTable.insert("get currentLimit", new cmdEntry(build_get_currentLimit, help_currentLimit));
-  m_cmdTable.insert("set currentLimit", new cmdEntry(build_set_currentLimit, help_currentLimit));
-  m_cmdTable.insert("get bootloaderCode", new cmdEntry(build_get_bootloaderCode, help_bootloaderCode));
-  m_cmdTable.insert("get xpressMode", new cmdEntry(build_get_xpressMode, help_xpressMode));
-  m_cmdTable.insert("set xpressMode", new cmdEntry(build_set_xpressMode, help_xpressMode));
-  m_cmdTable.insert("get batteryBackupStatus", new cmdEntry(build_get_batteryBackupStatus, parse_get_batteryBackupStatus, help_batteryBackupStatus));
-  m_cmdTable.insert("set batteryBackupStatus", new cmdEntry(build_set_batteryBackupStatus, help_batteryBackupStatus));
-  m_cmdTable.insert("get sensorSeconds", new cmdEntry(build_get_sensorSeconds, help_sensorSeconds));
-  m_cmdTable.insert("get inputVoltageTwo", new cmdEntry(build_get_inputVoltageTwo, help_inputVoltageTwo));
-  m_cmdTable.insert("get inputVoltageTwoCalibration", new cmdEntry(build_get_inputVoltageTwoCalibration, help_inputVoltageTwoCalibration));
-  m_cmdTable.insert("set inputVoltageTwoCalibration", new cmdEntry(build_set_inputVoltageTwoCalibration, help_inputVoltageTwoCalibration));
-  m_cmdTable.insert("get maxRampUpSpeed", new cmdEntry(build_get_maxRampUpSpeed, help_maxRampUpSpeed));
-  m_cmdTable.insert("set maxRampUpSpeed", new cmdEntry(build_set_maxRampUpSpeed, help_maxRampUpSpeed));
-  m_cmdTable.insert("get maxRampDownSpeed", new cmdEntry(build_get_maxRampDownSpeed, help_maxRampDownSpeed));
-  m_cmdTable.insert("set maxRampDownSpeed", new cmdEntry(build_set_maxRampDownSpeed, help_maxRampDownSpeed));
-  m_cmdTable.insert("get emergencyLightLevel", new cmdEntry(build_get_emergencyLightLevel, help_emergencyLightLevel));
-  m_cmdTable.insert("get batteryBackupPowerCalibration", new cmdEntry(build_get_batteryBackupPowerCalibration, help_batteryBackupPowerCalibration));
-  m_cmdTable.insert("set batteryBackupPowerCalibration", new cmdEntry(build_set_batteryBackupPowerCalibration, help_batteryBackupPowerCalibration));
-  m_cmdTable.insert("get motionSensorProfile", new cmdEntry(build_get_motionSensorProfile, help_motionSensorProfile));
-  m_cmdTable.insert("set motionSensorProfile", new cmdEntry(build_set_motionSensorProfile, help_motionSensorProfile));
-  m_cmdTable.insert("get powerMeterConfig", new cmdEntry(build_get_powerMeterConfig, parse_get_powerMeterConfig, help_get_powerMeterConfig));
-  m_cmdTable.insert("set powerMeterLevelAtOff", new cmdEntry(build_set_powerMeterLevelAtOff, help_powerMeterLevelAtOff));
-  m_cmdTable.insert("set powerMeterLevelAtMin", new cmdEntry(build_set_powerMeterLevelAtMin, help_powerMeterLevelAtMin));
-  m_cmdTable.insert("set powerMeterLevelAtMax", new cmdEntry(build_set_powerMeterLevelAtMax, help_powerMeterLevelAtMax));
-  m_cmdTable.insert("set powerMeterType", new cmdEntry(build_set_powerMeterType, help_powerMeterType));
-  m_cmdTable.insert("get DLAiSlaveMode", new cmdEntry(build_get_DLAiSlaveMode, help_DLAiSlaveMode));
-  m_cmdTable.insert("set DLAiSlaveMode", new cmdEntry(build_set_DLAiSlaveMode, help_DLAiSlaveMode));
-  m_cmdTable.insert("get DALIBootloadingActive", new cmdEntry(build_get_DALIBootlodingActive, help_DALIBootlodingActive));
-  m_cmdTable.insert("get testingMode", new cmdEntry(build_get_testingMode, help_testingMode));
-  m_cmdTable.insert("set testingMode", new cmdEntry(build_set_testingMode, help_testingMode));
-  m_cmdTable.insert("get numBatteriesSupported", new cmdEntry(build_get_numBatteriesSupported, help_numBatteriesSupported));
+  m_cmdTable.insert("get firmwareVersion", new cmdEntry(build_get_firmwareVersion, parse_get_firmwareVersion));
+  m_cmdTable.insert("get productCode", new cmdEntry(build_get_productCode));
+  m_cmdTable.insert("set productCode", new cmdEntry(build_set_productCode));
+  m_cmdTable.insert("get serialNumber", new cmdEntry(build_get_serialNumber));
+  m_cmdTable.insert("set serialNumber", new cmdEntry(build_set_serialNumber));
+  m_cmdTable.insert("get unixTime", new cmdEntry(build_get_unixTime));
+  m_cmdTable.insert("set unixTime", new cmdEntry(build_set_unixTime));
+  m_cmdTable.insert("get temperature", new cmdEntry(build_get_temperature, parse_get_temperature));
+  m_cmdTable.insert("get lightLevel", new cmdEntry(build_get_lightLevel, parse_get_lightLevel));
+  m_cmdTable.insert("set lightManualLevel", new cmdEntry(build_set_lightManualLevel));
+  m_cmdTable.insert("set lightOverrideActiveLevel", new cmdEntry(build_set_lightOverrideActiveLevel));
+  m_cmdTable.insert("set lightOverrideInactiveLevel", new cmdEntry(build_set_lightOverrideInactiveLevel));
+  m_cmdTable.insert("get sensorDelayTime", new cmdEntry(build_get_sensorDelayTime));
+  m_cmdTable.insert("get sensorOverrideDelayTime", new cmdEntry(build_get_sensorOverrideDelayTime));
+  m_cmdTable.insert("set sensorOverrideDelayTime", new cmdEntry(build_set_sensorOverrideDelayTime));
+  m_cmdTable.insert("get upTime", new cmdEntry(build_get_upTime, parse_get_upTime));
+  m_cmdTable.insert("get usage", new cmdEntry(build_get_usage, parse_get_usage));
+  m_cmdTable.insert("get numLogEntries", new cmdEntry(build_get_numLogEntries));
+  m_cmdTable.insert("get configCalibration", new cmdEntry(build_get_configCalibration, parse_get_configCalibration));
+  m_cmdTable.insert("set configCalibrationP0", new cmdEntry(build_set_configCalibrationP0));
+  m_cmdTable.insert("set configCalibrationP1", new cmdEntry(build_set_configCalibrationP1));
+  m_cmdTable.insert("set configCalibrationP2", new cmdEntry(build_set_configCalibrationP2));
+  m_cmdTable.insert("set configCalibrationP3", new cmdEntry(build_set_configCalibrationP3));
+  m_cmdTable.insert("get buildTime", new cmdEntry(build_get_buildTime));
+  m_cmdTable.insert("set buildTime", new cmdEntry(build_set_buildTime));
+  m_cmdTable.insert("get sensorTimeoutCountdown", new cmdEntry(build_get_sensorTimeoutCountdown));
+  m_cmdTable.insert("get currentLightLevel", new cmdEntry(build_get_currentLightLevel));
+  m_cmdTable.insert("get safeMode", new cmdEntry(build_get_safeMode));
+  m_cmdTable.insert("get lightBarSelect", new cmdEntry(build_get_lightBarSelect));
+  m_cmdTable.insert("set lightBarSelect", new cmdEntry(build_set_lightBarSelect));
+  m_cmdTable.insert("get powerConsumption", new cmdEntry(build_get_powerConsumption, parse_get_powerConsumption));
+  m_cmdTable.insert("get wirelessDataAggregator", new cmdEntry(build_get_wirelessDataAggregator));
+  m_cmdTable.insert("set wirelessDataAggregator", new cmdEntry(build_set_wirelessDataAggregator));
+  m_cmdTable.insert("get resetUsageTimestamp", new cmdEntry(build_get_resetUsageTimestamp));
+  m_cmdTable.insert("get pwmPeriodRegister", new cmdEntry(build_get_pwmPeriodRegister));
+  m_cmdTable.insert("set pwmPeriodRegister", new cmdEntry(build_set_pwmPeriodRegister));
+  m_cmdTable.insert("get analogSensorValue", new cmdEntry(build_get_analogSensorValue));
+  m_cmdTable.insert("get analogReportingHysteresis", new cmdEntry(build_get_analogReportingHysteresis));
+  m_cmdTable.insert("get zone", new cmdEntry(build_get_zone));
+  m_cmdTable.insert("set zone", new cmdEntry(build_set_zone));
+  m_cmdTable.insert("get lightTemporaryActiveLevel", new cmdEntry(build_get_lightTemporaryActiveLevel));
+  m_cmdTable.insert("set lightTemporaryActiveLevel", new cmdEntry(build_set_lightTemporaryActiveLevel));
+  m_cmdTable.insert("get lightTemporaryInactiveLevel", new cmdEntry(build_get_lightTemporaryInactiveLevel));
+  m_cmdTable.insert("set lightTemporaryInactiveLevel", new cmdEntry(build_set_lightTemporaryInactiveLevel));
+  m_cmdTable.insert("get sensorTemporaryDelayTime", new cmdEntry(build_get_sensorTemporaryDelayTime));
+  m_cmdTable.insert("set sensorTemporaryDelayTime", new cmdEntry(build_set_sensorTemporaryDealyTime));
+  m_cmdTable.insert("get temporaryOverrideTimeout", new cmdEntry(build_get_temporaryOverrideTimeout));
+  m_cmdTable.insert("set temporaryOverrideTimeout", new cmdEntry(build_set_temporaryOverrideTiemout));
+  m_cmdTable.insert("get setRemoteState", new cmdEntry(build_get_setRemoteState));
+  m_cmdTable.insert("set setRemoteState", new cmdEntry(build_set_setRemoteState));
+  m_cmdTable.insert("get remoteSetDelayTime", new cmdEntry(build_get_remoteStateDelayTime));
+  m_cmdTable.insert("set remoteSetDelayTime", new cmdEntry(build_set_remoteStateDelayTime));
+  m_cmdTable.insert("get remoteSecondsCountdown", new cmdEntry(build_get_remoteSecondsCountdown));
+  m_cmdTable.insert("get minimumDimmingValue", new cmdEntry(build_get_minimumDimmingValue));
+  m_cmdTable.insert("get powerCalibration", new cmdEntry(build_get_powerCalibration, parse_get_powerCalibration));
+  m_cmdTable.insert("set powerCalibrationA0", new cmdEntry(build_set_powerCalibrationA0));
+  m_cmdTable.insert("set powerCalibrationB0", new cmdEntry(build_set_powerCalibrationB0));
+  m_cmdTable.insert("set powerCalibrationC0", new cmdEntry(build_set_powerCalibrationC0));
+  m_cmdTable.insert("set powerCalibrationMA", new cmdEntry(build_set_powerCalibrationMA));
+  m_cmdTable.insert("set powerCalibrationMB", new cmdEntry(build_set_powerCalibrationMB));
+  m_cmdTable.insert("set powerCalibrationMC", new cmdEntry(build_set_powerCalibrationMC));
+  m_cmdTable.insert("set powerCalibrationPOff", new cmdEntry(build_set_powerCalibrationPOff));
+  m_cmdTable.insert("set powerCalibrationPOn", new cmdEntry(build_set_powerCalibrationPOn));
+  m_cmdTable.insert("set powerCalibrationT0", new cmdEntry(build_set_powerCalibrationT0));
+  m_cmdTable.insert("get powerEstimatorTemperatureOverride", new cmdEntry(build_get_powerEstimatorTemperatureOverride));
+  m_cmdTable.insert("set powerEstimatorTemperatureOverride", new cmdEntry(build_set_powerEstimatorTemperatureOverride));
+  m_cmdTable.insert("get cachedTemperatureValue", new cmdEntry(build_get_cachedTemperatureValue));
+  m_cmdTable.insert("get eepromSize", new cmdEntry(build_get_eepromSize));
+  m_cmdTable.insert("get hardwareRevision", new cmdEntry(build_get_hardwareRevision));
+  m_cmdTable.insert("get wirelessConfig", new cmdEntry(build_get_wirelessConfig, parse_get_wirelessConfig));
+  m_cmdTable.insert("set wirelessPanId", new cmdEntry(build_set_wirelessPanId));
+  m_cmdTable.insert("set wirelessChannelMask", new cmdEntry(build_set_wirelessChannelMask));
+  m_cmdTable.insert("set wirelessShortAddress", new cmdEntry(build_set_wirelessShortAddress));
+  m_cmdTable.insert("set wirelessRole", new cmdEntry(build_set_wirelessRole));
+  m_cmdTable.insert("set wirelessWatchdogHold", new cmdEntry(build_set_wirelessWatchdogHold));
+  m_cmdTable.insert("set wirelessWatchdogPeriod", new cmdEntry(build_set_wirelessWatchdogPeriod));
+  m_cmdTable.insert("set wirelessNetworkKey", new cmdEntry(build_set_wirelessNetworkKey));
+  m_cmdTable.insert("get firmwareCode", new cmdEntry(build_get_firmwareCode));
+  m_cmdTable.insert("get moduleFirmwareCode", new cmdEntry(build_get_moduleFirmwareCode));
+  m_cmdTable.insert("get maxTemperature", new cmdEntry(build_get_maxTemperature, parse_get_maxTemperature));
+  m_cmdTable.insert("get overTemperatureConfig", new cmdEntry(build_get_overTemperatureConfig, parse_get_overTemperatureConfig));
+  m_cmdTable.insert("set overTemperatureThresholdLow", new cmdEntry(build_set_overTemperatureThresholdLow));
+  m_cmdTable.insert("set overTemperatureThresholdHigh", new cmdEntry(build_get_overTemperatureThresholdHigh));
+  m_cmdTable.insert("set overTemperatureDimmingLimit", new cmdEntry(build_set_overTemperatureDimmingLimit));
+  m_cmdTable.insert("get analogDimmingMode", new cmdEntry(build_get_analogDimmingMode, parse_get_analogDimmingMode));
+  m_cmdTable.insert("set analogDimmingMode", new cmdEntry(build_set_analogDimmingMode));
+  m_cmdTable.insert("get fixtureIdMode", new cmdEntry(build_get_fixtureIdMode));
+  m_cmdTable.insert("set fixtureIdMode", new cmdEntry(build_set_fixtureIdMode));
+  m_cmdTable.insert("get acFrequency", new cmdEntry(build_get_acFrequency));
+  m_cmdTable.insert("get sensorBits", new cmdEntry(build_get_sensorBits));
+  m_cmdTable.insert("get powerMeterCommand", new cmdEntry(build_get_powerMeterCommand));
+  m_cmdTable.insert("set powerMeterCommand", new cmdEntry(build_set_powerMeterCommand));
+  m_cmdTable.insert("get powerMeterRegister", new cmdEntry(build_get_powerMeterRegister));
+  m_cmdTable.insert("set powerMeterRegister", new cmdEntry(build_set_powerMeterRegister));
+  m_cmdTable.insert("get ambientTemperature", new cmdEntry(build_get_ambientTemperature));
+  m_cmdTable.insert("get lightSensorLevel", new cmdEntry(build_get_lightSensorLevel));
+  m_cmdTable.insert("get sensorConfig", new cmdEntry(build_get_sensorConfig, parse_get_sensorConfig));
+  m_cmdTable.insert("set sensor0Timeout", new cmdEntry(build_set_sensor0Timeout));
+  m_cmdTable.insert("set sensor0Offset", new cmdEntry(build_set_sensor0Offset));
+  m_cmdTable.insert("set sensor1Timeout", new cmdEntry(build_set_sensor1Timeout));
+  m_cmdTable.insert("set sensor1Offset", new cmdEntry(build_set_sensor1Offset));
+  m_cmdTable.insert("get analogDimmingConfig", new cmdEntry(build_get_analogDimmingConfig, parse_get_analogDimmingConfig));
+  m_cmdTable.insert("set analogDimmingLowValue", new cmdEntry(build_set_analogDimmingLowValue));
+  m_cmdTable.insert("set analogDimmingHighValue", new cmdEntry(build_set_analogDimmingHighValue));
+  m_cmdTable.insert("set analogDimmingOffValue", new cmdEntry(build_set_analogDimmingOffValue));
+  m_cmdTable.insert("get powerMeasurementMode", new cmdEntry(build_get_powerMeasurementMode));
+  m_cmdTable.insert("set powerMeasurementMode", new cmdEntry(build_set_powerMeasurementMode));
+  m_cmdTable.insert("get externalPowerMeter", new cmdEntry(build_get_externalPowerMeter));
+  m_cmdTable.insert("set externalPowerMeter", new cmdEntry(build_set_externalPowerMeter));
+  m_cmdTable.insert("get ambientSensorValue", new cmdEntry(build_get_ambientSensorValue));
+  m_cmdTable.insert("get ambientConfig", new cmdEntry(build_get_ambientConfig, parse_get_ambientConfig));
+  m_cmdTable.insert("set ambientActiveLevel", new cmdEntry(build_set_ambientActiveLevel));
+  m_cmdTable.insert("set ambientInactiveLevel", new cmdEntry(build_set_ambientInactiveLevel));
+  m_cmdTable.insert("set ambientEnvironmentalGain", new cmdEntry(build_set_ambientEnvironmentalGain));
+  m_cmdTable.insert("set ambientOffHysteresis", new cmdEntry(build_set_ambientOffHysteresis));
+  m_cmdTable.insert("set ambientOnHysteresis", new cmdEntry(build_set_ambientOnHysteresis));
+  m_cmdTable.insert("get powerboardProtocol", new cmdEntry(build_get_powerboardProtocol));
+  m_cmdTable.insert("get ledOverride", new cmdEntry(build_get_ledOverride));
+  m_cmdTable.insert("set ledOverride", new cmdEntry(build_set_ledOverride));
+  m_cmdTable.insert("get fadeUpStep", new cmdEntry(build_get_fadeUpStep));
+  m_cmdTable.insert("set fadeUpStep", new cmdEntry(build_set_fadeUpStep));
+  m_cmdTable.insert("get fadeDownStep", new cmdEntry(build_get_fadeDownStep));
+  m_cmdTable.insert("set fadeDownStep", new cmdEntry(build_set_fadeDownStep));
+  m_cmdTable.insert("get maxBrightness", new cmdEntry(build_get_maxBrightness));
+  m_cmdTable.insert("set maxBrightness", new cmdEntry(build_set_maxBrightness));
+  m_cmdTable.insert("get i2cResets", new cmdEntry(build_get_i2cResets));
+  m_cmdTable.insert("get sensorGuardTime", new cmdEntry(build_get_sensorGuardTime));
+  m_cmdTable.insert("set sensorGuardTime", new cmdEntry(build_set_sensorGuardTime));
+  m_cmdTable.insert("get inputVoltage", new cmdEntry(build_get_inputVoltage));
+  m_cmdTable.insert("get inputVoltageCalibration", new cmdEntry(build_get_inputVoltageCalibration));
+  m_cmdTable.insert("set inputVoltageCalibration", new cmdEntry(build_set_inputVoltageCalibration));
+  m_cmdTable.insert("get numLightbars", new cmdEntry(build_get_numLightbars));
+  m_cmdTable.insert("set numLightbars", new cmdEntry(build_set_numLightbars));
+  m_cmdTable.insert("get currentLimit", new cmdEntry(build_get_currentLimit));
+  m_cmdTable.insert("set currentLimit", new cmdEntry(build_set_currentLimit));
+  m_cmdTable.insert("get bootloaderCode", new cmdEntry(build_get_bootloaderCode));
+  m_cmdTable.insert("get xpressMode", new cmdEntry(build_get_xpressMode));
+  m_cmdTable.insert("set xpressMode", new cmdEntry(build_set_xpressMode));
+  m_cmdTable.insert("get batteryBackupStatus", new cmdEntry(build_get_batteryBackupStatus, parse_get_batteryBackupStatus));
+  m_cmdTable.insert("set batteryBackupStatus", new cmdEntry(build_set_batteryBackupStatus));
+  m_cmdTable.insert("get sensorSeconds", new cmdEntry(build_get_sensorSeconds));
+  m_cmdTable.insert("get inputVoltageTwo", new cmdEntry(build_get_inputVoltageTwo));
+  m_cmdTable.insert("get inputVoltageTwoCalibration", new cmdEntry(build_get_inputVoltageTwoCalibration));
+  m_cmdTable.insert("set inputVoltageTwoCalibration", new cmdEntry(build_set_inputVoltageTwoCalibration));
+  m_cmdTable.insert("get maxRampUpSpeed", new cmdEntry(build_get_maxRampUpSpeed));
+  m_cmdTable.insert("set maxRampUpSpeed", new cmdEntry(build_set_maxRampUpSpeed));
+  m_cmdTable.insert("get maxRampDownSpeed", new cmdEntry(build_get_maxRampDownSpeed));
+  m_cmdTable.insert("set maxRampDownSpeed", new cmdEntry(build_set_maxRampDownSpeed));
+  m_cmdTable.insert("get emergencyLightLevel", new cmdEntry(build_get_emergencyLightLevel));
+  m_cmdTable.insert("get batteryBackupPowerCalibration", new cmdEntry(build_get_batteryBackupPowerCalibration));
+  m_cmdTable.insert("set batteryBackupPowerCalibration", new cmdEntry(build_set_batteryBackupPowerCalibration));
+  m_cmdTable.insert("get motionSensorProfile", new cmdEntry(build_get_motionSensorProfile));
+  m_cmdTable.insert("set motionSensorProfile", new cmdEntry(build_set_motionSensorProfile));
+  m_cmdTable.insert("get powerMeterConfig", new cmdEntry(build_get_powerMeterConfig, parse_get_powerMeterConfig));
+  m_cmdTable.insert("set powerMeterLevelAtOff", new cmdEntry(build_set_powerMeterLevelAtOff));
+  m_cmdTable.insert("set powerMeterLevelAtMin", new cmdEntry(build_set_powerMeterLevelAtMin));
+  m_cmdTable.insert("set powerMeterLevelAtMax", new cmdEntry(build_set_powerMeterLevelAtMax));
+  m_cmdTable.insert("set powerMeterType", new cmdEntry(build_set_powerMeterType));
+  m_cmdTable.insert("get DLAiSlaveMode", new cmdEntry(build_get_DLAiSlaveMode));
+  m_cmdTable.insert("set DLAiSlaveMode", new cmdEntry(build_set_DLAiSlaveMode));
+  m_cmdTable.insert("get DALIBootloadingActive", new cmdEntry(build_get_DALIBootlodingActive));
+  m_cmdTable.insert("get testingMode", new cmdEntry(build_get_testingMode));
+  m_cmdTable.insert("set testingMode", new cmdEntry(build_set_testingMode));
+  m_cmdTable.insert("get numBatteriesSupported", new cmdEntry(build_get_numBatteriesSupported));
   // get & set lightbar commands
-  m_cmdTable.insert("get lbVersion", new cmdEntry(build_get_lbVersion, parse_get_lbVersion, help_get_lbVersion));
-  m_cmdTable.insert("get lbStatus", new cmdEntry(build_get_lbStatus, parse_get_lbStatus, help_get_lbStatus));
-  m_cmdTable.insert("get lbConfig", new cmdEntry(build_get_lbConfig, parse_get_lbConfig, help_get_lbConfig));
+  m_cmdTable.insert("get lbVersion", new cmdEntry(build_get_lbVersion, parse_get_lbVersion));
+  m_cmdTable.insert("get lbStatus", new cmdEntry(build_get_lbStatus, parse_get_lbStatus));
+  m_cmdTable.insert("get lbConfig", new cmdEntry(build_get_lbConfig, parse_get_lbConfig));
   // get & set battery backup commands
-  m_cmdTable.insert("get bbVersion", new cmdEntry(build_get_bbVersion, parse_get_bbVersion, help_get_bbVersion));
-  m_cmdTable.insert("get bbStatus", new cmdEntry(build_get_bbStatus, parse_get_bbStatus, help_get_bbStatus));
-  m_cmdTable.insert("get bbConfig", new cmdEntry(build_get_bbConfig, parse_get_bbConfig, help_get_bbConfig));
+  m_cmdTable.insert("get bbVersion", new cmdEntry(build_get_bbVersion, parse_get_bbVersion));
+  m_cmdTable.insert("get bbStatus", new cmdEntry(build_get_bbStatus, parse_get_bbStatus));
+  m_cmdTable.insert("get bbConfig", new cmdEntry(build_get_bbConfig, parse_get_bbConfig));
   // reset commands
-  m_cmdTable.insert("reset usage", new cmdEntry(build_reset_usage, help_reset_usage));
-  m_cmdTable.insert("reset oldLog", new cmdEntry(build_reset_oldLog, help_reset_oldLog));
-  m_cmdTable.insert("reset log", new cmdEntry(build_reset_log, help_reset_log));
-  m_cmdTable.insert("reset logIndex", new cmdEntry(build_reset_logIndex, help_reset_logIndex));
-  m_cmdTable.insert("reset eeprom", new cmdEntry(build_reset_eeprom, help_reset_eeprom));
-  m_cmdTable.insert("reset eepromToDefault", new cmdEntry(build_reset_eepromToDefault, help_reset_eepromToDefault));
-  m_cmdTable.insert("reset eepromToLatestMapVersion", new cmdEntry(build_reset_eepromToLatestMapVersion, help_reset_eepromToLatestMapVersion));
-  m_cmdTable.insert("reset network", new cmdEntry(build_reset_network, help_reset_network));
-  m_cmdTable.insert("reset networkWithoutChecking", new cmdEntry(build_reset_networkWithoutChecking, help_reset_networkWithoutChecking));
-  m_cmdTable.insert("reset daliCommissioning", new cmdEntry(build_reset_daliCommissioning, help_reset_daliCommissioning));
-  m_cmdTable.insert("reset daliPowerMetering", new cmdEntry(build_reset_daliPowerMetering, help_reset_daliPowerMetering));
+  m_cmdTable.insert("reset usage", new cmdEntry(build_reset_usage));
+  m_cmdTable.insert("reset oldLog", new cmdEntry(build_reset_oldLog));
+  m_cmdTable.insert("reset log", new cmdEntry(build_reset_log));
+  m_cmdTable.insert("reset logIndex", new cmdEntry(build_reset_logIndex));
+  m_cmdTable.insert("reset eeprom", new cmdEntry(build_reset_eeprom));
+  m_cmdTable.insert("reset eepromToDefault", new cmdEntry(build_reset_eepromToDefault));
+  m_cmdTable.insert("reset eepromToLatestMapVersion", new cmdEntry(build_reset_eepromToLatestMapVersion));
+  m_cmdTable.insert("reset network", new cmdEntry(build_reset_network));
+  m_cmdTable.insert("reset networkWithoutChecking", new cmdEntry(build_reset_networkWithoutChecking));
+  m_cmdTable.insert("reset daliCommissioning", new cmdEntry(build_reset_daliCommissioning));
+  m_cmdTable.insert("reset daliPowerMetering", new cmdEntry(build_reset_daliPowerMetering));
   // reboot commands
-  m_cmdTable.insert("reboot pmu", new cmdEntry(build_reboot_pmu, help_reboot_pmu));
-  m_cmdTable.insert("reboot wirelessCard", new cmdEntry(build_reboot_wirelessCard, help_reboot_wirelessCard));
-  m_cmdTable.insert("reboot i2cDevices", new cmdEntry(build_reboot_i2cDevices, help_reboot_i2cDevices));
+  m_cmdTable.insert("reboot pmu", new cmdEntry(build_reboot_pmu));
+  m_cmdTable.insert("reboot wirelessCard", new cmdEntry(build_reboot_wirelessCard));
+  m_cmdTable.insert("reboot i2cDevices", new cmdEntry(build_reboot_i2cDevices));
   // reload commands
-  m_cmdTable.insert("reload dlaFirmware", new cmdEntry(build_reload_dlaFirmware, help_reload_dlaFirmware));
-  m_cmdTable.insert("reload wirelessModuleFirmware", new cmdEntry(build_reload_wirelessModuleFirmware, help_reload_wirelessModuleFirmware));
-  m_cmdTable.insert("reload powerboardFirmware", new cmdEntry(build_reload_powerboardFirmware, help_reload_powerboardFirmware));
-  m_cmdTable.insert("reload lightbarFirmware", new cmdEntry(build_reload_lightbarFirmware, help_reload_lightbarFirmware));
-  m_cmdTable.insert("reload batteryBackupFirmware", new cmdEntry(build_reload_batteryBackupFirmware, help_reload_batteryBackupFirmware));
-  m_cmdTable.insert("reload motionSensorFirmware", new cmdEntry(build_reload_motionSensorFirmware, help_reload_motionSensorFirmware));
+  m_cmdTable.insert("reload dlaFirmware", new cmdEntry(build_reload_dlaFirmware));
+  m_cmdTable.insert("reload wirelessModuleFirmware", new cmdEntry(build_reload_wirelessModuleFirmware));
+  m_cmdTable.insert("reload powerboardFirmware", new cmdEntry(build_reload_powerboardFirmware));
+  m_cmdTable.insert("reload lightbarFirmware", new cmdEntry(build_reload_lightbarFirmware));
+  m_cmdTable.insert("reload batteryBackupFirmware", new cmdEntry(build_reload_batteryBackupFirmware));
+  m_cmdTable.insert("reload motionSensorFirmware", new cmdEntry(build_reload_motionSensorFirmware));
   // log commands
-  m_cmdTable.insert("get logIndex", new cmdEntry(build_get_logIndex, parse_get_logIndex, help_get_logIndex));
-  m_cmdTable.insert("get log", new cmdEntry(build_get_log, parse_get_log, help_get_log));
-  m_cmdTable.insert("insert logEntry", new cmdEntry(build_insert_logEntry, help_insert_logEntry));
+  m_cmdTable.insert("get logIndex", new cmdEntry(build_get_logIndex, parse_get_logIndex));
+  m_cmdTable.insert("get log", new cmdEntry(build_get_log, parse_get_log));
+  m_cmdTable.insert("insert logEntry", new cmdEntry(build_insert_logEntry));
   // build the dictionary of helper commands
   m_cmdCompleter = new QCompleter(m_cmdTable.keys(), this);
   m_cmdCompleter->setCaseSensitivity(Qt::CaseInsensitive);
