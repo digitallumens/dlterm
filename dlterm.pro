@@ -1,5 +1,5 @@
 REQUIRED_QT = 5.5.0
-APPLICATION_VERSION = 0.2.0
+APPLICATION_VERSION = 0.3.0
 
 QT       += core gui network xml
 

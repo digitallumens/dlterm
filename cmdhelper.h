@@ -28,6 +28,7 @@ public:
   QString parseError(QString pmuResponse);
   QString getNextCompletion(void);
   int getCurrentCompletionLength(void);
+  QStringList help(void);
 
 signals:
 

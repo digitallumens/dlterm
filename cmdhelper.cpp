@@ -3086,3 +3086,18 @@ QString cmdHelper::getNextCompletion(void) {
 int cmdHelper::getCurrentCompletionLength(void) {
   return m_cmdCompleter->currentCompletion().length();
 }
+
+QStringList cmdHelper::help(void) {
+  return QStringList() << "COMMAND VERBS:"
+                       << "- get, set, reset, reboot, reload"
+                       << "REGISTER MODIFIERS:"
+                       << "- lb (lightBar), bb (batteryBackup)"
+                       << "EXAMPLES:"
+                       << "- get firmwareVersion"
+                       << "- set serialNumber 04FACE15"
+                       << "- reset network"
+                       << "- reboot i2cDevices"
+                       << "- reload lightbarFirmware"
+                       << "- get bbVersion"
+                       << "- get lbConfig";
+}

@@ -82,6 +82,10 @@ QString MainWindow::processUserRequest(QString *request) {
   QStringList pmuResponseList;
   QStringList parsedResponseList;
   QString response;
+  if (request->startsWith("help")) {
+    m_solarized->setTextColor(request, SOLAR_MAGENTA);
+    return buildAppHelp();
+  }
   if (request->contains(" ")) {
     // helper command format "verb object argList"
     // ex: set serialNumber 0400DEAD
@@ -235,6 +239,19 @@ QString MainWindow::buildHelp(struct cmdEntry * cmdEntry) {
   return response;
 }
 
+QString MainWindow::buildAppHelp(void) {
+  QString response;
+  QStringList helpList = m_cmdHelper->help();
+  foreach(QString h, helpList) {
+    response.append(h + "<br>");
+  }
+  m_solarized->setTextColor(&response, SOLAR_BASE_01);
+  if (response.endsWith("<br>") == false) {
+    response.append("<br>");
+  }
+  return response;
+}
+
 QString MainWindow::buildUserInputError(QStringList cmdList) {
   QString response = cmdList.at(0);
   m_solarized->setTextColor(&response, SOLAR_RED);
@@ -359,7 +376,7 @@ void MainWindow::on_actionPreferences_triggered() {
 void MainWindow::on_actionAbout_triggered() {
   QMessageBox::about(this, "About DLTerm",
                      tr("<p><b>Digital Lumens Terminal</b></p>"
-                        "<p><small>Version 0.2.0</small></p>"
-                        "<p><small>Build date 10/14/15</small></p>"
+                        "<p><small>Version 0.3.0</small></p>"
+                        "<p><small>Build date 10/21/15</small></p>"
                         "<small>Copyright &copy; 2010-2015. All rights reserved.</small>"));
 }
