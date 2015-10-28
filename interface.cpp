@@ -122,9 +122,29 @@ void interface::connectToFixture(void) {
   }
 }
 
-void interface::queryPmu(QStringList cmdList, QStringList *responseList) {
+QStringList interface::queryPmu(QStringList cmdList) {
   DLResult ret;
   QString response;
+  QStringList responseList;
+  QMap <QString, QString> errorResponses;
+  errorResponses.insert("ERROR: FFFF", "ERROR: Invalid opcode");
+  errorResponses.insert("ERROR: FFFE", "ERROR: Syntax error");
+  errorResponses.insert("ERROR: FFFD", "ERROR: Invalid register");
+  errorResponses.insert("ERROR: FFFC", "ERROR: Register is read only");
+  errorResponses.insert("ERROR: FFFB", "ERROR: Invalid register length");
+  errorResponses.insert("ERROR: FFFA", "ERROR: ARP not addressed");
+  errorResponses.insert("ERROR: FFF9", "ERROR: Flash error");
+  errorResponses.insert("ERROR: FFF8", "ERROR: Storage out of bounds");
+  errorResponses.insert("ERROR: FFF7", "ERROR: Storage unaligned");
+  errorResponses.insert("ERROR: FFF6", "ERROR: Message queue full");
+  errorResponses.insert("ERROR: FFF5", "ERROR: I2C error");
+  errorResponses.insert("ERROR: FFF4", "ERROR: Internal error");
+  errorResponses.insert("ERROR: FFF3", "ERROR: Insufficient free buffers");
+  errorResponses.insert("ERROR: FFF2", "ERROR: Bad image");
+  errorResponses.insert("ERROR: FFF1", "ERROR: Remote install fail");
+  errorResponses.insert("ERROR: FFF0", "ERROR: Bus error");
+  errorResponses.insert("ERROR: FFEF", "ERROR: Bus busy");
+  errorResponses.insert("ERROR: FFEE", "ERROR: Resource busy");
   foreach (const QString &cmd, cmdList) {
     // figure out the length NOT including the space
     int len = cmd.length();
@@ -139,6 +159,11 @@ void interface::queryPmu(QStringList cmdList, QStringList *responseList) {
     } else {
       ret = m_pmuUSB->issueCommand(cmd, response, len);
     }
-    responseList->append(response);
+    // parse error
+    if (response.startsWith("ERROR")) {
+      responseList << errorResponses[response];
+    } else {
+      responseList << response;
+    }
   }
 }

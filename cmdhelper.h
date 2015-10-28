@@ -4,17 +4,6 @@
 #include <QObject>
 #include <QCompleter>
 
-typedef QStringList(*buildCmd_t)(QStringList argList);
-typedef QStringList(*parseResponse_t)(QStringList pmuResponse);
-
-struct cmdEntry {
-  cmdEntry(){}
-  cmdEntry(buildCmd_t def_buildCmd) : buildCmd(def_buildCmd), parseResponse(NULL) {}
-  cmdEntry(buildCmd_t def_buildCmd, parseResponse_t def_parseResponse) : buildCmd(def_buildCmd), parseResponse(def_parseResponse) {}
-  buildCmd_t buildCmd;
-  parseResponse_t parseResponse;
-};
-
 class cmdHelper : public QObject
 {
     Q_OBJECT
@@ -22,7 +11,7 @@ class cmdHelper : public QObject
 public:
   explicit cmdHelper(QObject *parent = 0);
   QCompleter *m_cmdCompleter;
-  struct cmdEntry *getCmdEntry(QString cmd);
+  exe_t *getExe(QString cmd);
   QString parseError(QString pmuResponse);
   QString getNextCompletion(void);
   int getCurrentCompletionLength(void);
@@ -33,7 +22,8 @@ signals:
 public slots:
 
 private:
-  QHash <QString, struct cmdEntry*> m_cmdTable;
+  typedef QStringList(*exe_t)(QStringList argList, interface *io);
+  QHash <QString, cmd_t> m_cmdTable;
   QMap <QString, QString> m_errorResponses;
 };
 

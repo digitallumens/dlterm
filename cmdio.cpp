@@ -31,20 +31,24 @@ QString cmdIO::processUserRequest(QString *request, bool showPmuCommand, interfa
   // find the associated helper entry
   struct cmdEntry *cmdEntry = helper->getCmdEntry(cmd);
   if (cmdEntry != NULL) {
-    // translate helper command
-    cmdList = cmdEntry->buildCmd(argList);
-    // command translator returned an error
-    if (cmdList.at(0).startsWith("ERROR")) {
-      return buildUserInputError(cmdList);
-    }
-    solarized::setTextColor(request, solarized::SOLAR_YELLOW);
-    // send commands & get responses
-    io->queryPmu(cmdList, &pmuResponseList);
-    // parse responses
-    if (cmdEntry->parseResponse != NULL) {
-      response = buildParsedResponse(cmdEntry, cmdList, pmuResponseList, showPmuCommand);
+    if (cmdEntry->buildCmd == NULL) {
+      cmdEntry->macro(argList, &io->queryPmu);
     } else {
-      response = buildUnparsedResponse(cmdList, pmuResponseList, showPmuCommand, helper);
+      // translate helper command
+      cmdList = cmdEntry->buildCmd(argList);
+      // command translator returned an error
+      if (cmdList.at(0).startsWith("ERROR")) {
+        return buildUserInputError(cmdList);
+      }
+      solarized::setTextColor(request, solarized::SOLAR_YELLOW);
+      // send commands & get responses
+      io->queryPmu(cmdList, &pmuResponseList);
+      // parse responses
+      if (cmdEntry->parseResponse != NULL) {
+        response = buildParsedResponse(cmdEntry, cmdList, pmuResponseList, showPmuCommand);
+      } else {
+        response = buildUnparsedResponse(cmdList, pmuResponseList, showPmuCommand, helper);
+      }
     }
   } else {
     // not a helper command

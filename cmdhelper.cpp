@@ -40,656 +40,657 @@ QString toYDHMS(QString timeInSec) {
 }
 
 /*** PMU register commands ***/
-QStringList build_get_firmwareVersion(QStringList argList) {
+QStringList get_firmwareVersion(QStringList argList, interface *iface) {
+  QStringList responseList;
   (void) argList;
-  return QStringList() << "G0000";
+  responseList = iface->queryPmu(QStringList << "G0000");
+  if (responseList.at(0).startsWith("ERROR")) {
+    return responseList;
+  } else {
+    bool ok;
+    qulonglong verInt = responseList.at(0).toULongLong(&ok, 16);
+    // format verMajor.verMinor.verBuild (buildMonth/buildDay/BuildYear)
+    return QStringList() << (QString("+%1.%2.%3 (%5/%6/%4)").arg((verInt >> 40) & 0xFF).arg((verInt >> 32) & 0xFF).arg((verInt >> 24) & 0xFF).arg((verInt >> 16) & 0xFF).arg((verInt >> 8) & 0xFF).arg(verInt & 0xFF));
+  }
 }
 
-QStringList parse_get_firmwareVersion(QStringList pmuResponse) {
+QStringList get_productCode(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0001");
+}
+
+QStringList set_productCode(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0001 %1").arg(argList.at(0)));
+}
+
+QStringList get_serialNumber(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0002");
+}
+
+QStringList set_serialNumber(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0002 %1").arg(argList.at(0)));
+}
+
+QStringList get_unixTime(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0003");
+}
+
+QStringList set_unixTime(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0003 %1").arg(argList.at(0));
+}
+
+QStringList get_temperature(QStringList argList, interface *iface) {
+  QStringList responseList;
+  (void) argList;
+  responseList = iface->queryPmu(QStringList() << "G0004");
+  if (responseList.at(0).startsWith("ERROR")) {
+    return responseList;
+  } else {
+    bool ok;
+    quint16 tInt = responseList.at(0).toUShort(&ok, 16);
+    float tFloat = (tInt / 128);
+    return QStringList() << QString("+%1 C").arg(tFloat);
+  }
+}
+
+QStringList get_lightLevel(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
+  (void) argList;
+  cmdList << "G001C" // current level
+          << "G0005" // light manual level
+          << "G0006" // light active level
+          << "G0007" // light inactive level
+          << "G0008" // light overrirde active level
+          << "G0009"; // light override inactive level
+  responseList = iface->queryPmu(cmdList);
+  return QStringList << QString("+Current level: %1").arg(responseList.at(0))
+                     << QString("+Manual level: %1").arg(responseList.at(1))
+                     << QString("+Active level: %1").arg(responseList.at(2))
+                     << QString("+Inactive level: %1").arg(responseList.at(3))
+                     << QString("+Override active level: %1").arg(responseList.at(4))
+                     << QString("+Override inactive level: %1").arg(responseList.at(5));
+}
+
+QStringList set_lightManualLevel(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0005 %1").arg(argList.at(0)));
+}
+
+QStringList set_lightOverrideActiveLevel(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0008 %1").arg(argList.at(0)));
+}
+
+QStringList set_lightOverrideInactiveLevel(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0009 %1").arg(argList.at(0)));
+}
+
+QStringList get_sensorDelayTime(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G000A");
+}
+
+QStringList get_sensorOverrideDelayTime(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G000B");
+}
+
+QStringList set_sensorOverrideDelayTime(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S000B %1").arg(argList.at(0)));
+}
+
+QStringList get_upTime(QStringList argList, interface *iface) {
+  QStringList responseList;
+  (void) argList;
+  responseList = iface->queryPmu(QStringList() << "G000C");
+  return QStringList() << QString("+%1").arg(toYDHMS(responseList.at(0)));
+}
+
+QStringList get_usage(QStringList argList, interface *iface) {
+  QStringList cmdlist;
+  QStringList responseList;
   bool ok;
-  qulonglong verInt = pmuResponse.at(0).toULongLong(&ok, 16);
-  // format verMajor.verMinor.verBuild (buildMonth/buildDay/BuildYear)
-  return QStringList() << QString("%1.%2.%3 (%5/%6/%4)").arg((verInt >> 40) & 0xFF).arg((verInt >> 32) & 0xFF).arg((verInt >> 24) & 0xFF).arg((verInt >> 16) & 0xFF).arg((verInt >> 8) & 0xFF).arg(verInt & 0xFF);
-}
-
-QStringList build_get_productCode(QStringList argList) {
   (void) argList;
-  return QStringList() << "G0001";
+  cmdList << "G000C" // uptime
+          << "G000D" // active seconds
+          << "G000E" // inactive seconds
+          << "G000F" // perm active seconds
+          << "G0010" // perm inactive seconds
+          << "G0011" // Wh
+          << "G0012" // perm Wh
+          << "G0013" // sensor events
+          << "G0014"; // perm sensor events
+  responseList = iface->queryPmu(cmdlist);
+  return QStringList() << QString("+Up time: %1").arg(toYDHMS(responseList.at(0)))
+                       << QString("+Active time: %1").arg(toYDHMS(responseList.at(1)))
+                       << QString("+Inactive time: %1").arg(toYDHMS(responseList.at(2)))
+                       << QString("+Perm active time: %1").arg(toYDHMS(responseList.at(3)))
+                       << QString("+Perm inactive time: %1").arg(toYDHMS(responseList.at(4)))
+                       << QString("+Power: %1 Wh").arg(responseList.at(5).toUShort(&ok, 16))
+                       << QString("+Perm power: %1 Wh").arg(responseList.at(6).toUShort(&ok, 16))
+                       << QString("+Sensor events: %1").arg(responseList.at(7).toUShort(&ok, 16))
+                       << QString("+Perm sensor events: %1").arg(responseList.at(8).toUShort(&ok, 16));
 }
 
-QStringList build_set_productCode(QStringList argList) {
+QStringList get_numLogEntries(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0015");
+}
+
+QStringList get_configCalibration(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
+  (void) argList;
+  cmdList << "G0016" // P0
+          << "G0017" // P1
+          << "G0018" // P2
+          << "G0019"; // P3
+  responseList = iface->queryPmu(cmdList);
+  return QStringList() << QString("+P0: %1").arg(pmuReponseList.at(0))
+                       << QString("+P1: %1").arg(pmuReponseList.at(1))
+                       << QString("+P2: %1").arg(pmuReponseList.at(2))
+                       << QString("+P3: %1").arg(pmuReponseList.at(3));
+}
+
+QStringList set_configCalibrationP0(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0001 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0016 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_serialNumber(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0002";
-}
-
-QStringList build_set_serialNumber(QStringList argList) {
+QStringList set_configCalibrationP1(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0002 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0017 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_unixTime(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0003";
-}
-
-QStringList build_set_unixTime(QStringList argList) {
+QStringList set_configCalibrationP2(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0003 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0018 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_temperature(QStringList argList) {
+QStringList set_configCalibrationP3(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0019 %1").arg(argList.at(0)));
+}
+
+QStringList get_buildTime(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0004";
+  return iface->queryPmu(QStringList() << "G001A");
 }
 
-QStringList parse_get_temperature(QStringList pmuResponse) {
+QStringList set_buildTime(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S001A %1").arg(argList.at(0)));
+}
+
+QStringList get_sensorTimeoutCountdown(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G001B");
+}
+
+QStringList get_currentLightLevel(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G001C");
+}
+
+QStringList get_safeMode(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G001D");
+}
+
+QStringList get_lightBarSelect(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G001E");
+}
+
+QStringList set_lightBarSelect(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S001E %1").arg(argList.at(0)));
+}
+
+QStringList get_powerConsumption(QStringList argList, interface *iface) {
+  QStringList responseList;
+  (void) argList;
+  responseList = iface->queryPmu(QStringList() << "G001F");
+  if (responseList.at(0).startsWith("ERROR")) {
+    return responseList;
+  } else {
+    bool ok;
+    quint16 powerInt = responseList.at(0).toUShort(&ok, 16);
+    return QStringList() << QString("+%1 mW").arg(powerInt);
+  }
+}
+
+QStringList get_wirelessDataAggregator(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0020");
+}
+
+QStringList set_wirelessDataAggregator(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0020 %1").arg(argList.at(0)));
+}
+
+QStringList get_resetUsageTimestamp(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0021");
+}
+
+QStringList get_pwmPeriodRegister(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0022");
+}
+
+QStringList set_pwmPeriodRegister(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0022 %1").arg(argList.at(0)));
+}
+
+QStringList get_analogSensorValue(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0023");
+}
+
+QStringList get_analogReportingHysteresis(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0024");
+}
+
+QStringList get_zone(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0025");
+}
+
+QStringList set_zone(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0025 %1").arg(argList.at(0)));
+}
+
+QStringList get_lightTemporaryActiveLevel(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0026");
+}
+
+QStringList set_lightTemporaryActiveLevel(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0026 %1").arg(argList.at(0)));
+}
+
+QStringList get_lightTemporaryInactiveLevel(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0027");
+}
+
+QStringList set_lightTemporaryInactiveLevel(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0027 %1").arg(argList.at(0)));
+}
+
+QStringList get_sensorTemporaryDelayTime(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0028");
+}
+
+QStringList set_sensorTemporaryDealyTime(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0028 %1").arg(argList.at(0)));
+}
+
+QStringList get_temporaryOverrideTimeout(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0029");
+}
+
+QStringList set_temporaryOverrideTiemout(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0029 %1").arg(argList.at(0)));
+}
+
+QStringList get_setRemoteState(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G002A");
+}
+
+QStringList set_setRemoteState(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S002A %1").arg(argList.at(0)));
+}
+
+QStringList get_remoteStateDelayTime(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G002B");
+}
+
+QStringList set_remoteStateDelayTime(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S002B %1").arg(argList.at(0)));
+}
+
+QStringList get_remoteSecondsCountdown(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G002C");
+}
+
+QStringList get_minimumDimmingValue(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G002D");
+}
+
+QStringList get_powerCalibration(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
+  (void) argList;
+  cmdList << QString("G002E") // a0
+          << QString("G002F") // b0
+          << QString("G0030") // c0
+          << QString("G0031") // ma
+          << QString("G0032") // mb
+          << QString("G0033") // mc
+          << QString("G0034") // poff
+          << QString("G0035") // pon
+          << QString("G0036"); // t0
+  responseList = iface->queryPmu(cmdList);
+  return QStringList() << QString("+A0: %1").arg(responseList.at(0))
+                       << QString("+B0: %1").arg(responseList.at(1))
+                       << QString("+C0: %1").arg(responseList.at(2))
+                       << QString("+MA: %1").arg(responseList.at(3))
+                       << QString("+MB: %1").arg(responseList.at(4))
+                       << QString("+MC: %1").arg(responseList.at(5))
+                       << QString("+POff: %1").arg(responseList.at(6))
+                       << QString("+POn: %1").arg(responseList.at(7))
+                       << QString("+T0: %1").arg(responseList.at(8));
+}
+
+QStringList set_powerCalibrationA0(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S002E %1").arg(argList.at(0)));
+}
+
+QStringList set_powerCalibrationB0(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S002F %1").arg(argList.at(0)));
+}
+
+QStringList set_powerCalibrationC0(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0030 %1").arg(argList.at(0)));
+}
+
+QStringList set_powerCalibrationMA(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0031 %1").arg(argList.at(0)));
+}
+
+QStringList set_powerCalibrationMB(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0032 %1").arg(argList.at(0)));
+}
+
+QStringList set_powerCalibrationMC(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0033 %1").arg(argList.at(0)));
+}
+
+QStringList set_powerCalibrationPOff(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0034 %1").arg(argList.at(0)));
+}
+
+QStringList set_powerCalibrationPOn(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0035 %1").arg(argList.at(0)));
+}
+
+QStringList set_powerCalibrationT0(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0036 %1").arg(argList.at(0)));
+}
+
+QStringList get_powerEstimatorTemperatureOverride(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0037");
+}
+
+QStringList set_powerEstimatorTemperatureOverride(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("S0037 %1").arg(argList.at(0)));
+}
+
+QStringList get_cachedTemperatureValue(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0038");
+}
+
+QStringList get_eepromSize(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G0039");
+}
+
+QStringList get_hardwareRevision(QStringList argList, interface *iface) {
+  (void) argList;
+  return iface->queryPmu(QStringList() << "G003A");
+}
+
+QStringList get_wirelessConfig(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
+  (void) argList;
+  cmdList << "G003B" // pan id
+          << "G003C" // channel mask
+          << "G003D" // short address
+          << "G003E" // role
+          << "G003F" // watchdog hold
+          << "G0040" // watchdog period
+          << "G0073"; // network key
+  responseList = iface->queryPmu(cmdList);
   bool ok;
-  quint16 tInt = pmuResponse.at(0).toUShort(&ok, 16);
-  float tFloat = tInt / 128;
-  return QStringList() << QString("%1 C").arg(tFloat);
-}
-
-QStringList build_get_lightLevel(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G001C" // current level
-                       << "G0005" // light manual level
-                       << "G0006" // light active level
-                       << "G0007" // light inactive level
-                       << "G0008" // light overrirde active level
-                       << "G0009"; // light override inactive level
-}
-
-QStringList parse_get_lightLevel(QStringList pmuResponse) {
-  QStringList parsedResponse;
-  parsedResponse << QString("Current level: %1").arg(pmuResponse.at(0));
-  parsedResponse << QString("Manual level: %1").arg(pmuResponse.at(1));
-  parsedResponse << QString("Active level: %1").arg(pmuResponse.at(2));
-  parsedResponse << QString("Inactive level: %1").arg(pmuResponse.at(3));
-  parsedResponse << QString("Override active level: %1").arg(pmuResponse.at(4));
-  parsedResponse << QString("Override inactive level: %1").arg(pmuResponse.at(5));
-  return parsedResponse;
-}
-
-QStringList build_set_lightManualLevel(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0005 %1").arg(argList.at(0));
-}
-
-QStringList build_set_lightOverrideActiveLevel(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0008 %1").arg(argList.at(0));
-}
-
-QStringList build_set_lightOverrideInactiveLevel(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0009 %1").arg(argList.at(0));
-}
-
-QStringList help_lightOverrideInactiveLevel(void) {
-  return QStringList() << "0009 Light Override Inactive Level (FFFF is no override) -- 2B -- RW";
-}
-
-QStringList build_get_sensorDelayTime(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G000A";
-}
-
-QStringList build_get_sensorOverrideDelayTime(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G000B";
-}
-
-QStringList build_set_sensorOverrideDelayTime(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S000B %1").arg(argList.at(0));
-}
-
-QStringList build_get_upTime(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G000C";
-}
-
-QStringList parse_get_upTime(QStringList pmuResponse) {
-  return QStringList() << toYDHMS(pmuResponse.at(0));
-}
-
-QStringList build_get_usage(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G000C" // uptime
-                       << "G000D" // active seconds
-                       << "G000E" // inactive seconds
-                       << "G000F" // perm active seconds
-                       << "G0010" // perm inactive seconds
-                       << "G0011" // Wh
-                       << "G0012" // perm Wh
-                       << "G0013" // sensor events
-                       << "G0014"; // perm sensor events
-}
-
-QStringList parse_get_usage(QStringList pmuResponse) {
-  bool ok;
-  QStringList parsedResponse;
-  parsedResponse << QString("Up time: %1").arg(toYDHMS(pmuResponse.at(0)));
-  parsedResponse << QString("Active time: %1").arg(toYDHMS(pmuResponse.at(1)));
-  parsedResponse << QString("Inactive time: %1").arg(toYDHMS(pmuResponse.at(2)));
-  parsedResponse << QString("Perm active time: %1").arg(toYDHMS(pmuResponse.at(3)));
-  parsedResponse << QString("Perm inactive time: %1").arg(toYDHMS(pmuResponse.at(4)));
-  parsedResponse << QString("Power: %1 Wh").arg(pmuResponse.at(5).toUShort(&ok, 16));
-  parsedResponse << QString("Perm power: %1 Wh").arg(pmuResponse.at(6).toUShort(&ok, 16));
-  parsedResponse << QString("Sensor events: %1").arg(pmuResponse.at(7).toUShort(&ok, 16));
-  parsedResponse << QString("Perm sensor events: %1").arg(pmuResponse.at(8).toUShort(&ok, 16));
-  return parsedResponse;
-}
-
-QStringList build_get_numLogEntries(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0015";
-}
-
-QStringList build_get_configCalibration(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0016" // P0
-                       << "G0017" // P1
-                       << "G0018" // P2
-                       << "G0019"; // P3
-}
-
-QStringList parse_get_configCalibration(QStringList pmuReponse) {
-  QStringList parsedResponse;
-  parsedResponse << QString("P0: %1").arg(pmuReponse.at(0));
-  parsedResponse << QString("P1: %1").arg(pmuReponse.at(1));
-  parsedResponse << QString("P2: %1").arg(pmuReponse.at(2));
-  parsedResponse << QString("P3: %1").arg(pmuReponse.at(3));
-  return parsedResponse;
-}
-
-QStringList build_set_configCalibrationP0(QStringList argList) {
-  return QStringList() << QString("S0016 %1").arg(argList.at(0));
-}
-
-QStringList build_set_configCalibrationP1(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0017 %1").arg(argList.at(0));
-}
-
-QStringList build_set_configCalibrationP2(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0018 %1").arg(argList.at(0));
-}
-
-QStringList build_set_configCalibrationP3(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0019 %1").arg(argList.at(0));
-}
-
-QStringList build_get_buildTime(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G001A";
-}
-
-QStringList build_set_buildTime(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S001A %1").arg(argList.at(0));
-}
-
-QStringList build_get_sensorTimeoutCountdown(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G001B";
-}
-
-QStringList build_get_currentLightLevel(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G001C";
-}
-
-QStringList build_get_safeMode(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G001D";
-}
-
-QStringList build_get_lightBarSelect(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G001E";
-}
-
-QStringList build_set_lightBarSelect(QStringList argList) {
-  return QStringList() << QString("S001E %1").arg(argList.at(0));
-}
-
-QStringList build_get_powerConsumption(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G001F";
-}
-
-QStringList parse_get_powerConsumption(QStringList pmuResponse) {
-  bool ok;
-  quint16 powerInt = pmuResponse.at(0).toUShort(&ok, 16);
-  return QStringList() << QString("%1 mW").arg(powerInt);
-}
-
-QStringList build_get_wirelessDataAggregator(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0020";
-}
-
-QStringList build_set_wirelessDataAggregator(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0020 %1").arg(argList.at(0));
-}
-
-QStringList build_get_resetUsageTimestamp(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0021";
-}
-
-QStringList build_get_pwmPeriodRegister(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0022";
-}
-
-QStringList build_set_pwmPeriodRegister(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0022 %1").arg(argList.at(0));
-}
-
-QStringList build_get_analogSensorValue(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0023";
-}
-
-QStringList build_get_analogReportingHysteresis(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0024";
-}
-
-QStringList build_get_zone(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0025";
-}
-
-QStringList build_set_zone(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0025 %1").arg(argList.at(0));
-}
-
-QStringList build_get_lightTemporaryActiveLevel(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0026";
-}
-
-QStringList build_set_lightTemporaryActiveLevel(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0026 %1").arg(argList.at(0));
-}
-
-QStringList build_get_lightTemporaryInactiveLevel(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0027";
-}
-
-QStringList build_set_lightTemporaryInactiveLevel(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0027 %1").arg(argList.at(0));
-}
-
-QStringList build_get_sensorTemporaryDelayTime(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0028";
-}
-
-QStringList build_set_sensorTemporaryDealyTime(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0028 %1").arg(argList.at(0));
-}
-
-QStringList build_get_temporaryOverrideTimeout(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0029";
-}
-
-QStringList build_set_temporaryOverrideTiemout(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0029 %1").arg(argList.at(0));
-}
-
-QStringList build_get_setRemoteState(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G002A";
-}
-
-QStringList build_set_setRemoteState(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S002A %1").arg(argList.at(0));
-}
-
-QStringList build_get_remoteStateDelayTime(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G002B";
-}
-
-QStringList build_set_remoteStateDelayTime(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S002B %1").arg(argList.at(0));
-}
-
-QStringList build_get_remoteSecondsCountdown(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G002C";
-}
-
-QStringList build_get_minimumDimmingValue(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G002D";
-}
-
-QStringList build_get_powerCalibration(QStringList argList) {
-  (void) argList;
-  return QStringList() << QString("G002E")
-                       << QString("G002F")
-                       << QString("G0030")
-                       << QString("G0031")
-                       << QString("G0032")
-                       << QString("G0033")
-                       << QString("G0034")
-                       << QString("G0035")
-                       << QString("G0036");
-}
-
-QStringList parse_get_powerCalibration(QStringList pmuResponse) {
-  QStringList parsedResponse;
-  parsedResponse << QString("A0: %1").arg(pmuResponse.at(0));
-  parsedResponse << QString("B0: %1").arg(pmuResponse.at(1));
-  parsedResponse << QString("C0: %1").arg(pmuResponse.at(2));
-  parsedResponse << QString("MA: %1").arg(pmuResponse.at(3));
-  parsedResponse << QString("MB: %1").arg(pmuResponse.at(4));
-  parsedResponse << QString("MC: %1").arg(pmuResponse.at(5));
-  parsedResponse << QString("POff: %1").arg(pmuResponse.at(6));
-  parsedResponse << QString("POn: %1").arg(pmuResponse.at(7));
-  parsedResponse << QString("T0: %1").arg(pmuResponse.at(8));
-  return parsedResponse;
-}
-
-QStringList build_set_powerCalibrationA0(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S002E %1").arg(argList.at(0));
-}
-
-QStringList build_set_powerCalibrationB0(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S002F %1").arg(argList.at(0));
-}
-
-QStringList build_set_powerCalibrationC0(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0030 %1").arg(argList.at(0));
-}
-
-QStringList build_set_powerCalibrationMA(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0031 %1").arg(argList.at(0));
-}
-
-QStringList build_set_powerCalibrationMB(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0032 %1").arg(argList.at(0));
-}
-
-QStringList build_set_powerCalibrationMC(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0033 %1").arg(argList.at(0));
-}
-
-QStringList build_set_powerCalibrationPOff(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0034 %1").arg(argList.at(0));
-}
-
-QStringList build_set_powerCalibrationPOn(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0035 %1").arg(argList.at(0));
-}
-
-QStringList build_set_powerCalibrationT0(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0036 %1").arg(argList.at(0));
-}
-
-QStringList build_get_powerEstimatorTemperatureOverride(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0037";
-}
-
-QStringList build_set_powerEstimatorTemperatureOverride(QStringList argList) {
-  if (argList.length() == 0) {
-    return QStringList() << "ERROR: expected a value";
-  }
-  return QStringList() << QString("S0037 %1").arg(argList.at(0));
-}
-
-QStringList build_get_cachedTemperatureValue(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0038";
-}
-
-QStringList build_get_eepromSize(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G0039";
-}
-
-QStringList build_get_hardwareRevision(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G003A";
-}
-
-QStringList build_get_wirelessConfig(QStringList argList) {
-  (void) argList;
-  return QStringList() << "G003B" // pan id
-                       << "G003C" // channel mask
-                       << "G003D" // short address
-                       << "G003E" // role
-                       << "G003F" // watchdog hold
-                       << "G0040" // watchdog period
-                       << "G0073"; // network key
-}
-
-QStringList parse_get_wirelessConfig(QStringList pmuResponse) {
-  bool ok;
-  unsigned long long panid = pmuResponse.at(0).toULongLong(&ok, 16);
-  unsigned long chmask = pmuResponse.at(1).toULong(&ok, 16);
+  unsigned long long panid = responseList.at(0).toULongLong(&ok, 16);
+  unsigned long chmask = responseList.at(1).toULong(&ok, 16);
   unsigned group;
   unsigned freq;
   bool encrypted;
-  LRNetwork::groupAndFreqFromPanidAndChmask(panid, chmask, &group, &freq, &encrypted);
-  QString netId = LRNetwork::nwidFromGroupAndFreq(group, freq, encrypted);
+  LRNetwork+groupAndFreqFromPanidAndChmask(panid, chmask, &group, &freq, &encrypted);
+  QString netId = LRNetwork+nwidFromGroupAndFreq(group, freq, encrypted);
   QStringList parsedResponse;
-  parsedResponse << QString("Network ID: %1").arg(netId);
-  parsedResponse << QString("Pan ID: %1").arg(pmuResponse.at(0));
-  parsedResponse << QString("Channel mask: %1").arg(pmuResponse.at(1));
-  parsedResponse << QString("Short address: %1").arg(pmuResponse.at(2));
-  parsedResponse << QString("Role: %1").arg(pmuResponse.at(3));
-  parsedResponse << QString("Watchdog hold: %1").arg(pmuResponse.at(4));
-  parsedResponse << QString("Watchdog period: %1").arg(pmuResponse.at(5));
-  return parsedResponse << QString("Network key: %1").arg(pmuResponse.at(6));
+  return QStringList() << QString("+Network ID: %1").arg(netId)
+                       << QString("+Pan ID: %1").arg(responseList.at(0))
+                       << QString("+Channel mask: %1").arg(responseList.at(1))
+                       << QString("+Short address: %1").arg(responseList.at(2))
+                       << QString("+Role: %1").arg(responseList.at(3))
+                       << QString("+Watchdog hold: %1").arg(responseList.at(4))
+                       << QString("+Watchdog period: %1").arg(responseList.at(5))
+                       << QString("+Network key: %1").arg(responseList.at(6));
 }
 
-QStringList build_set_wirelessPanId(QStringList argList) {
+QStringList set_wirelessPanId(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S003B %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S003B %1").arg(argList.at(0)));
 }
 
-QStringList build_set_wirelessChannelMask(QStringList argList) {
+QStringList set_wirelessChannelMask(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S003C %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S003C %1").arg(argList.at(0)));
 }
 
-QStringList build_set_wirelessShortAddress(QStringList argList) {
+QStringList set_wirelessShortAddress(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S003D %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S003D %1").arg(argList.at(0)));
 }
 
-QStringList build_set_wirelessRole(QStringList argList) {
+QStringList set_wirelessRole(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S003E %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S003E %1").arg(argList.at(0)));
 }
 
-QStringList build_set_wirelessWatchdogHold(QStringList argList) {
+QStringList set_wirelessWatchdogHold(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S003F %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S003F %1").arg(argList.at(0)));
 }
 
-QStringList build_set_wirelessWatchdogPeriod(QStringList argList) {
+QStringList set_wirelessWatchdogPeriod(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0040 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0040 %1").arg(argList.at(0)));
 }
 
-QStringList build_set_wirelessNetworkKey(QStringList argList) {
+QStringList set_wirelessNetworkKey(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0073 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0073 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_firmwareCode(QStringList argList) {
+QStringList get_firmwareCode(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0041";
+  return iface->queryPmu(QStringList() << "G0041");
 }
 
-QStringList build_get_moduleFirmwareCode(QStringList argList) {
+QStringList get_moduleFirmwareCode(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0042";
+  return iface->queryPmu(QStringList() << "G0042");
 }
 
-QStringList build_get_maxTemperature(QStringList argList) {
+QStringList get_maxTemperature(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
   (void) argList;
-  return QStringList() << "G0043" // observed temperature
-                       << "G0044"; // observed time
+  cmdList << "G0043" // observed temperature
+          << "G0044"; // observed time
+  responseList = iface->queryPmu(cmdList);
+  QString temperature = responseList.at(0);
+  QString time = responseList.at(1);
+  time = (time.startsWith("ERROR")) ? time : toYDHMS(time);
+  responseList->append(QString("+Temperature: %1").arg(temperature));
+  responseList->append(QString("+Time: %1").arg(time));
 }
 
-QStringList parse_get_maxTemperature(QStringList pmuResponse) {
-  return QStringList() << QString("%1 at time %2").arg(pmuResponse.at(0)).arg(toYDHMS(pmuResponse.at(1)));
-}
-
-QStringList build_get_overTemperatureConfig(QStringList argList) {
+QStringList get_overTemperatureConfig(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
   (void) argList;
-  return QStringList() << "G0045" // low threshold
-                       << "G0046" // high threshold
-                       << "G0047"; // dimming limit
+  cmdList << "G0045" // low threshold
+          << "G0046" // high threshold
+          << "G0047"; // dimming limit
+  responseList = iface(cmdList);
+  return QStringList() << QString("+Low threshold: %1").arg(responseList.at(0))
+                       << QString("+High threshold: %1").arg(responseList.at(1))
+                       << QString("+Dimming limit: %1").arg(responseList.at(2));
 }
 
-QStringList parse_get_overTemperatureConfig(QStringList pmuResponse) {
-  QStringList parsedResponse;
-  parsedResponse << QString("Low threshold: %1").arg(pmuResponse.at(0));
-  parsedResponse << QString("High threshold: %1").arg(pmuResponse.at(1));
-  return parsedResponse << QString("Dimming limit: %1").arg(pmuResponse.at(2));
-}
-
-QStringList build_set_overTemperatureThresholdLow(QStringList argList) {
+QStringList set_overTemperatureThresholdLow(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0045 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0045 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_overTemperatureThresholdHigh(QStringList argList) {
+QStringList get_overTemperatureThresholdHigh(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0046";
+  return iface->queryPmu(QStringList() << "G0046");
 }
 
-QStringList build_set_overTemperatureThresholdHigh(QStringList argList) {
+QStringList set_overTemperatureThresholdHigh(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0046 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0046 %1").arg(argList.at(0)));
 }
 
-QStringList build_set_overTemperatureDimmingLimit(QStringList argList) {
+QStringList set_overTemperatureDimmingLimit(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0047 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0047 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_analogDimmingMode(QStringList argList) {
+QStringList get_analogDimmingMode(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0048";
+  return iface->queryPmu(QStringList() << "G0048");
 }
 
-QStringList parse_get_analogDimmingMode(QStringList pmuResponse) {
+QStringList parse_get_analogDimmingMode(QStringList responseList) {
   QMap <QString, QString> analogDimmingModeDict;
   analogDimmingModeDict.insert("00", "Analog dimming off");
   analogDimmingModeDict.insert("01", "Analog dimming on");
@@ -697,627 +698,626 @@ QStringList parse_get_analogDimmingMode(QStringList pmuResponse) {
   analogDimmingModeDict.insert("03", "Analog dimming using registers 54-56");
   analogDimmingModeDict.insert("04", "Analog dimming using registers 54-56 with full off support");
   analogDimmingModeDict.insert("05", "Ambient sensor dimming");
-  return QStringList() << QString("%1").arg(analogDimmingModeDict[pmuResponse.at(0)]);
+  return QStringList() << QString("+%1").arg(analogDimmingModeDict[responseList.at(0)]);
 }
 
-QStringList build_set_analogDimmingMode(QStringList argList) {
+QStringList set_analogDimmingMode(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0048 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0048 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_fixtureIdMode(QStringList argList) {
+QStringList get_fixtureIdMode(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0049";
+  return iface->queryPmu(QStringList() << "G0049");
 }
 
-QStringList build_set_fixtureIdMode(QStringList argList) {
+QStringList set_fixtureIdMode(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0049 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0049 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_acFrequency(QStringList argList) {
+QStringList get_acFrequency(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G004A";
+  return iface->queryPmu(QStringList() << "G004A");
 }
 
-QStringList build_get_sensorBits(QStringList argList) {
+QStringList get_sensorBits(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G004B";
+  return iface->queryPmu(QStringList() << "G004B");
 }
 
-QStringList build_get_powerMeterCommand(QStringList argList) {
+QStringList get_powerMeterCommand(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G004C";
+  return iface->queryPmu(QStringList() << "G004C");
 }
 
-QStringList build_set_powerMeterCommand(QStringList argList) {
+QStringList set_powerMeterCommand(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S004C %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S004C %1").arg(argList.at(0)));
 }
 
-QStringList build_get_powerMeterRegister(QStringList argList) {
+QStringList get_powerMeterRegister(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G004D";
+  return iface->queryPmu(QStringList() << "G004D");
 }
 
-QStringList build_set_powerMeterRegister(QStringList argList) {
+QStringList set_powerMeterRegister(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S004D %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S004D %1").arg(argList.at(0)));
 }
 
-QStringList build_get_ambientTemperature(QStringList argList) {
+QStringList get_ambientTemperature(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G004E";
+  return iface->queryPmu(QStringList() << "G004E");
 }
 
-QStringList build_get_lightSensorLevel(QStringList argList) {
+QStringList get_lightSensorLevel(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G004F";
+  return iface->queryPmu(QStringList() << "G004F");
 }
 
-QStringList build_get_sensorConfig(QStringList argList) {
+QStringList get_sensorConfig(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
   (void) argList;
-  return QStringList() << "G004F" // sensor level
-                       << "G0050" // sensor 0 timeout
-                       << "G0051" // sensor 0 offset
-                       << "G0052" // sensor 1 timeout
-                       << "G0053"; // sensor 1 offset
+  cmdList << "G004F" // sensor level
+          << "G0050" // sensor 0 timeout
+          << "G0051" // sensor 0 offset
+          << "G0052" // sensor 1 timeout
+          << "G0053"; // sensor 1 offset
+  responseList = iface->queryPmu(cmdList);
+  return QStringList() << QString("+Sensor level: %1").arg(responseList.at(0))
+                       << QString("+Sensor 0 timeout: %1").arg(responseList.at(1))
+                       << QString("+Sensor 0 offset: %1").arg(responseList.at(2))
+                       << QString("+Sensor 1 timeout: %1").arg(responseList.at(3))
+                       << QString("+Sensor 1 offset: %1").arg(responseList.at(4));
 }
 
-QStringList parse_get_sensorConfig(QStringList pmuResponse) {
-  QStringList parsedResponse;
-  parsedResponse << QString("Sensor level: %1").arg(pmuResponse.at(0));
-  parsedResponse << QString("Sensor 0 timeout: %1").arg(pmuResponse.at(1));
-  parsedResponse << QString("Sensor 0 offset: %1").arg(pmuResponse.at(2));
-  parsedResponse << QString("Sensor 1 timeout: %1").arg(pmuResponse.at(3));
-  return parsedResponse << QString("Sensor 1 offset: %1").arg(pmuResponse.at(4));
-}
-
-QStringList build_set_sensor0Timeout(QStringList argList) {
+QStringList set_sensor0Timeout(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0050 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0050 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_sensor0Offset(QStringList argList) {
+QStringList get_sensor0Offset(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0051";
+  return iface->queryPmu(QStringList() << "G0051");
 }
 
-QStringList build_set_sensor0Offset(QStringList argList) {
+QStringList set_sensor0Offset(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0051 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0051 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_sensor1Timeout(QStringList argList) {
+QStringList get_sensor1Timeout(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0052";
+  return iface->queryPmu(QStringList() << "G0052");
 }
 
-QStringList build_set_sensor1Timeout(QStringList argList) {
+QStringList set_sensor1Timeout(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0052 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0052 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_sensor1Offset(QStringList argList) {
+QStringList get_sensor1Offset(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0053";
+  return iface->queryPmu(QStringList() << "G0053");
 }
 
-QStringList build_set_sensor1Offset(QStringList argList) {
+QStringList set_sensor1Offset(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0053 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0053 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_analogDimmingConfig(QStringList argList) {
+QStringList get_analogDimmingConfig(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
   (void) argList;
-  return QStringList() << "G0054" // low value
-                       << "G0055" // high value
-                       << "G0056"; // off value
+  cmdList << "G0054" // low value
+          << "G0055" // high value
+          << "G0056"; // off value
+  responseList = iface->queryPmu(cmdList);
+  return QStringList() << QString("+Low value: %1").arg(responseList.at(0))
+                       << QString("+High value: %1").arg(responseList.at(1))
+                       << QString("+Off value: %1").arg(responseList.at(2));
 }
 
-QStringList parse_get_analogDimmingConfig(QStringList pmuResponse) {
-  QStringList parsedResponse;
-  parsedResponse << QString("Low value: %1").arg(pmuResponse.at(0));
-  parsedResponse << QString("High value: %1").arg(pmuResponse.at(1));
-  return parsedResponse << QString("Off value: %1").arg(pmuResponse.at(2));
-}
-
-QStringList build_set_analogDimmingLowValue(QStringList argList) {
+QStringList set_analogDimmingLowValue(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0054 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0054 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_analogDimmingHighValue(QStringList argList) {
+QStringList get_analogDimmingHighValue(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0055";
+  return iface->queryPmu(QStringList() << "G0055");
 }
 
-QStringList build_set_analogDimmingHighValue(QStringList argList) {
+QStringList set_analogDimmingHighValue(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0055 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0055 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_analogDimmingOffValue(QStringList argList) {
+QStringList get_analogDimmingOffValue(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0056";
+  return iface->queryPmu(QStringList() << "G0056");
 }
 
-QStringList build_set_analogDimmingOffValue(QStringList argList) {
+QStringList set_analogDimmingOffValue(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0056 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0056 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_powerMeasurementMode(QStringList argList) {
+QStringList get_powerMeasurementMode(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0057";
+  return iface->queryPmu(QStringList() << "G0057");
 }
 
-QStringList build_set_powerMeasurementMode(QStringList argList) {
+QStringList set_powerMeasurementMode(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0057 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0057 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_externalPowerMeter(QStringList argList) {
+QStringList get_externalPowerMeter(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0058";
+  return iface->queryPmu(QStringList() << "G0058");
 }
 
-QStringList build_set_externalPowerMeter(QStringList argList) {
+QStringList set_externalPowerMeter(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0058 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0058 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_ambientSensorValue(QStringList argList) {
+QStringList get_ambientSensorValue(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0059";
+  return iface->queryPmu(QStringList() << "G0059");
 }
 
-QStringList build_get_ambientConfig(QStringList argList) {
+QStringList get_ambientConfig(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
   (void) argList;
-  return QStringList() << "G0059" // sensor value
-                       << "G005A" // active level
-                       << "G005B" // inactive level
-                       << "G005C" // environmental gain
-                       << "G005D" // off hysteresis
-                       << "G005E" // on hysteresis
-                       << "G0069"; // divisor
+  cmdList << "G0059" // sensor value
+          << "G005A" // active level
+          << "G005B" // inactive level
+          << "G005C" // environmental gain
+          << "G005D" // off hysteresis
+          << "G005E" // on hysteresis
+          << "G0069"; // divisor
+  responseList = iface->queryPmu(cmdList);
+  return QStringList() << QString("+Sensor value: %1").arg(responseList.at(0))
+                       << QString("+Active level: %1").arg(responseList.at(1))
+                       << QString("+Inactive level: %1").arg(responseList.at(2))
+                       << QString("+Environmental gain: %1").arg(responseList.at(3))
+                       << QString("+Off hysteresis: %1").arg(responseList.at(4))
+                       << QString("+On hysteresis: %1").arg(responseList.at(5))
+                       << QString("+Divisor: %1").arg(responseList.at(6));
 }
 
-QStringList parse_get_ambientConfig(QStringList pmuResponse) {
-  QStringList parsedResponse;
-  parsedResponse << QString("Sensor value: %1").arg(pmuResponse.at(0));
-  parsedResponse << QString("Active level: %1").arg(pmuResponse.at(1));
-  parsedResponse << QString("Inactive level: %1").arg(pmuResponse.at(2));
-  parsedResponse << QString("Environmental gain: %1").arg(pmuResponse.at(3));
-  parsedResponse << QString("Off hysteresis: %1").arg(pmuResponse.at(4));
-  parsedResponse << QString("On hysteresis: %1").arg(pmuResponse.at(5));
-  return parsedResponse << QString("Divisor: %1").arg(pmuResponse.at(6));
-}
-
-QStringList build_set_ambientActiveLevel(QStringList argList) {
+QStringList set_ambientActiveLevel(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S005A %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S005A %1").arg(argList.at(0)));
 }
 
-QStringList build_get_ambientInactiveLevel(QStringList argList) {
+QStringList get_ambientInactiveLevel(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G005B";
+  return iface->queryPmu(QStringList() << "G005B");
 }
 
-QStringList build_set_ambientInactiveLevel(QStringList argList) {
+QStringList set_ambientInactiveLevel(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S005B %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S005B %1").arg(argList.at(0)));
 }
 
-QStringList build_get_ambientEnvironmentalGain(QStringList argList) {
+QStringList get_ambientEnvironmentalGain(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G005C";
+  return iface->queryPmu(QStringList() << "G005C");
 }
 
-QStringList build_set_ambientEnvironmentalGain(QStringList argList) {
+QStringList set_ambientEnvironmentalGain(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S005C %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S005C %1").arg(argList.at(0)));
 }
 
-QStringList build_get_ambientOffHysteresis(QStringList argList) {
+QStringList get_ambientOffHysteresis(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G005D";
+  return iface->queryPmu(QStringList() << "G005D");
 }
 
-QStringList build_set_ambientOffHysteresis(QStringList argList) {
+QStringList set_ambientOffHysteresis(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S005D %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S005D %1").arg(argList.at(0)));
 }
 
-QStringList build_get_ambientOnHysteresis(QStringList argList) {
+QStringList get_ambientOnHysteresis(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G005E";
+  return iface->queryPmu(QStringList() << "G005E");
 }
 
-QStringList build_set_ambientOnHysteresis(QStringList argList) {
+QStringList set_ambientOnHysteresis(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S005E %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S005E %1").arg(argList.at(0)));
 }
 
-QStringList build_get_powerboardProtocol(QStringList argList) {
+QStringList get_powerboardProtocol(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G005F";
+  return iface->queryPmu(QStringList() << "G005F");
 }
 
-QStringList build_get_ledOverride(QStringList argList) {
+QStringList get_ledOverride(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0060";
+  return iface->queryPmu(QStringList() << "G0060");
 }
 
-QStringList build_set_ledOverride(QStringList argList) {
+QStringList set_ledOverride(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0060 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0060 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_fadeUpStep(QStringList argList) {
+QStringList get_fadeUpStep(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0061";
+  return iface->queryPmu(QStringList() << "G0061");
 }
 
-QStringList build_set_fadeUpStep(QStringList argList) {
+QStringList set_fadeUpStep(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0061 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0061 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_fadeDownStep(QStringList argList) {
+QStringList get_fadeDownStep(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0062";
+  return iface->queryPmu(QStringList() << "G0062");
 }
 
-QStringList build_set_fadeDownStep(QStringList argList) {
+QStringList set_fadeDownStep(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0062 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0062 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_maxBrightness(QStringList argList) {
+QStringList get_maxBrightness(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0063";
+  return iface->queryPmu(QStringList() << "G0063");
 }
 
-QStringList build_set_maxBrightness(QStringList argList) {
+QStringList set_maxBrightness(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0063 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0063 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_i2cResets(QStringList argList) {
+QStringList get_i2cResets(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0064";
+  return iface->queryPmu(QStringList() << "G0064");
 }
 
-QStringList build_get_sensorGuardTime(QStringList argList) {
+QStringList get_sensorGuardTime(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0065";
+  return iface->queryPmu(QStringList() << "G0065");
 }
 
-QStringList build_set_sensorGuardTime(QStringList argList) {
+QStringList set_sensorGuardTime(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0065 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0065 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_inputVoltage(QStringList argList) {
+QStringList get_inputVoltage(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0066";
+  return iface->queryPmu(QStringList() << "G0066");
 }
 
-QStringList build_get_inputVoltageCalibration(QStringList argList) {
+QStringList get_inputVoltageCalibration(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0067";
+  return iface->queryPmu(QStringList() << "G0067");
 }
 
-QStringList build_set_inputVoltageCalibration(QStringList argList) {
+QStringList set_inputVoltageCalibration(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0067 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0067 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_numLightbars(QStringList argList) {
+QStringList get_numLightbars(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0068";
+  return iface->queryPmu(QStringList() << "G0068");
 }
 
-QStringList build_set_numLightbars(QStringList argList) {
+QStringList set_numLightbars(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0068 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0068 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_currentLimit(QStringList argList) {
+QStringList get_currentLimit(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G006A";
+  return iface->queryPmu(QStringList() << "G006A");
 }
 
-QStringList build_set_currentLimit(QStringList argList) {
+QStringList set_currentLimit(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S006A %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S006A %1").arg(argList.at(0)));
 }
 
-QStringList build_get_bootloaderCode(QStringList argList) {
+QStringList get_bootloaderCode(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G006B";
+  return iface->queryPmu(QStringList() << "G006B");
 }
 
-QStringList build_get_xpressMode(QStringList argList) {
+QStringList get_xpressMode(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G006C";
+  return iface->queryPmu(QStringList() << "G006C");
 }
 
-QStringList build_set_xpressMode(QStringList argList) {
+QStringList set_xpressMode(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S006C %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S006C %1").arg(argList.at(0)));
 }
 
-QStringList build_get_batteryBackupStatus(QStringList argList) {
+QStringList get_batteryBackupStatus(QStringList argList, interface *iface) {
+  QStringList responseList;
   (void) argList;
-  return QStringList() << "G006D";
+  responseList = iface->queryPmu(QStringList() << "G006D");
+  if (responseList.at(0).startsWith("ERROR")) {
+    return responseList;
+  } else {
+    bool ok;
+    QString response;
+    QMap <int, QString> battDetectedDict;
+    QMap <int, QString> testReportDict;
+    QMap <int, QString> testRunningDict;
+    quint32 status = responseList.at(0).toLong(&ok, 16);
+    // parse batteries detected bits
+    battDetectedDict.insert(0, "No batteries detected");
+    battDetectedDict.insert(1, "Battery 1 detected");
+    battDetectedDict.insert(2, "Battery 2 detected");
+    battDetectedDict.insert(3, "Batteries 1 & 2 detected");
+    response += (battDetectedDict[status & 0x3] + "<br>");
+    // parse test running bits
+    testRunningDict.insert(0, "No tests running");
+    testRunningDict.insert(1, "Short test running");
+    testRunningDict.insert(2, "Long test running");
+    testRunningDict.insert(4, "Push button test running");
+    response += (testRunningDict[(status >> 10) & 0x3] + "<br>");
+    // parse test reports
+    testReportDict.insert(0, "Passed");
+    testReportDict.insert(1, "Battery disconnected");
+    testReportDict.insert(2, "Battery over temperature");
+    testReportDict.insert(3, "Lightbar powered from PSU");
+    testReportDict.insert(4, "Lightbar voltage out of range");
+    testReportDict.insert(5, "Emergency activated");
+    testReportDict.insert(6, "Battery drained");
+    testReportDict.insert(7, "Unexpected lightbar pattern");
+    testReportDict.insert(8, "Certification mismatch");
+    response += "Battery 1 test report: ";
+    response += (testReportDict[(status >> 2) & 0xF] + "<br>");
+    response += "Battery 2 test report: ";
+    response += (testReportDict[(status >> 6) & 0xF] + "<br>");
+    // parse test time
+    response += "Test time: ";
+    response += QString("%1 seconds").arg(status >> 16);
+    return QStringList() << QString("+%1").arg(response);
+  }
 }
 
-QStringList parse_get_batteryBackupStatus(QStringList pmuResponse) {
-  bool ok;
-  QString parsedResponse;
-  QMap <int, QString> battDetectedDict;
-  QMap <int, QString> testReportDict;
-  QMap <int, QString> testRunningDict;
-  quint32 status = pmuResponse.at(0).toLong(&ok, 16);
-  // parse batteries detected bits
-  battDetectedDict.insert(0, "No batteries detected");
-  battDetectedDict.insert(1, "Battery 1 detected");
-  battDetectedDict.insert(2, "Battery 2 detected");
-  battDetectedDict.insert(3, "Batteries 1 & 2 detected");
-  parsedResponse += (battDetectedDict[status & 0x3] + "<br>");
-  // parse test running bits
-  testRunningDict.insert(0, "No tests running");
-  testRunningDict.insert(1, "Short test running");
-  testRunningDict.insert(2, "Long test running");
-  testRunningDict.insert(4, "Push button test running");
-  parsedResponse += (testRunningDict[(status >> 10) & 0x3] + "<br>");
-  // parse test reports
-  testReportDict.insert(0, "Passed");
-  testReportDict.insert(1, "Battery disconnected");
-  testReportDict.insert(2, "Battery over temperature");
-  testReportDict.insert(3, "Lightbar powered from PSU");
-  testReportDict.insert(4, "Lightbar voltage out of range");
-  testReportDict.insert(5, "Emergency activated");
-  testReportDict.insert(6, "Battery drained");
-  testReportDict.insert(7, "Unexpected lightbar pattern");
-  testReportDict.insert(8, "Certification mismatch");
-  parsedResponse += "Battery 1 test report: ";
-  parsedResponse += (testReportDict[(status >> 2) & 0xF] + "<br>");
-  parsedResponse += "Battery 2 test report: ";
-  parsedResponse += (testReportDict[(status >> 6) & 0xF] + "<br>");
-  // parse test time
-  parsedResponse += "Test time: ";
-  parsedResponse += QString("%1 seconds").arg(status >> 16);
-  return QStringList() << parsedResponse;
-}
-
-QStringList build_set_batteryBackupStatus(QStringList argList) {
+QStringList set_batteryBackupStatus(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S006D %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S006D %1").arg(argList.at(0)));
 }
 
-QStringList build_get_sensorSeconds(QStringList argList) {
+QStringList get_sensorSeconds(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G006E";
+  return iface->queryPmu(QStringList() << "G006E");
 }
 
-QStringList build_get_inputVoltageTwo(QStringList argList) {
+QStringList get_inputVoltageTwo(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G006F";
+  return iface->queryPmu(QStringList() << "G006F");
 }
 
-QStringList build_get_inputVoltageTwoCalibration(QStringList argList) {
+QStringList get_inputVoltageTwoCalibration(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0070";
+  return iface->queryPmu(QStringList() << "G0070");
 }
 
-QStringList build_set_inputVoltageTwoCalibration(QStringList argList) {
+QStringList set_inputVoltageTwoCalibration(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0070 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0070 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_maxRampUpSpeed(QStringList argList) {
+QStringList get_maxRampUpSpeed(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0071";
+  return iface->queryPmu(QStringList() << "G0071");
 }
 
-QStringList build_set_maxRampUpSpeed(QStringList argList) {
+QStringList set_maxRampUpSpeed(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0071 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0071 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_maxRampDownSpeed(QStringList argList) {
+QStringList get_maxRampDownSpeed(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0072";
+  return iface->queryPmu(QStringList() << "G0072");
 }
 
-QStringList build_set_maxRampDownSpeed(QStringList argList) {
+QStringList set_maxRampDownSpeed(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0072 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0072 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_emergencyLightLevel(QStringList argList) {
+QStringList get_emergencyLightLevel(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0074";
+  return iface->queryPmu(QStringList() << "G0074");
 }
 
-QStringList build_get_batteryBackupPowerCalibration(QStringList argList) {
+QStringList get_batteryBackupPowerCalibration(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0075";
+  return iface->queryPmu(QStringList() << "G0075");
 }
 
-QStringList build_set_batteryBackupPowerCalibration(QStringList argList) {
+QStringList set_batteryBackupPowerCalibration(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0075 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0075 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_motionSensorProfile(QStringList argList) {
+QStringList get_motionSensorProfile(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G0076";
+  return iface->queryPmu(QStringList() << "G0076");
 }
 
-QStringList build_set_motionSensorProfile(QStringList argList) {
+QStringList set_motionSensorProfile(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0076 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0076 %1").arg(argList.at(0)));
 }
 
-QStringList build_get_powerMeterConfig(QStringList argList) {
+QStringList get_powerMeterConfig(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
   (void) argList;
-  return QStringList() << "G0077" // level at off
-                       << "G0078" // level at min
-                       << "G0079" // level at max
-                       << "G007A"; // type
+  cmdList << "G0077" // level at off
+          << "G0078" // level at min
+          << "G0079" // level at max
+          << "G007A"; // type
+  responseList = iface->queryPmu(cmdList);
+  return QStringList() << QString("+Level at off: %1").arg(responseList.at(0))
+                       << QString("+Level at min: %1").arg(responseList.at(1))
+                       << QString("+Level at max: %1").arg(responseList.at(2))
+                       << QString("+Type: %1").arg(responseList.at(3));
 }
 
-QStringList parse_get_powerMeterConfig(QStringList pmuResponse) {
-  QStringList parsedResponse;
-  parsedResponse << QString("Level at off: %1").arg(pmuResponse.at(0));
-  parsedResponse << QString("Level at min: %1").arg(pmuResponse.at(1));
-  parsedResponse << QString("Level at max: %1").arg(pmuResponse.at(2));
-  return parsedResponse << QString("Type: %1").arg(pmuResponse.at(3));
-}
-
-QStringList build_set_powerMeterLevelAtOff(QStringList argList) {
+QStringList set_powerMeterLevelAtOff(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0077 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0077 %1").arg(argList.at(0)));
 }
 
-QStringList build_set_powerMeterLevelAtMin(QStringList argList) {
+QStringList set_powerMeterLevelAtMin(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0078 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0078 %1").arg(argList.at(0)));
 }
 
-QStringList build_set_powerMeterLevelAtMax(QStringList argList) {
+QStringList set_powerMeterLevelAtMax(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S0079 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0079 %1").arg(argList.at(0)));
 }
 
-QStringList build_set_powerMeterType(QStringList argList) {
+QStringList set_powerMeterType(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S007A %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S007A %1").arg(argList.at(0)));
 }
 
-QStringList build_get_DLAiSlaveMode(QStringList argList) {
+QStringList get_DLAiSlaveMode(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G007B";
+  return iface->queryPmu(QStringList() << "G007B");
 }
 
-QStringList build_set_DLAiSlaveMode(QStringList argList) {
+QStringList set_DLAiSlaveMode(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S007B %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S007B %1").arg(argList.at(0)));
 }
 
-QStringList build_get_DALIBootlodingActive(QStringList argList) {
+QStringList get_DALIBootlodingActive(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G007C";
+  return iface->queryPmu(QStringList() << "G007C");
 }
 
-QStringList build_get_testingMode(QStringList argList) {
+QStringList get_testingMode(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G007D";
+  return iface->queryPmu(QStringList() << "G007D");
 }
 
-QStringList build_set_testingMode(QStringList argList) {
+QStringList set_testingMode(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S007D %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S007D %1").arg(argList.at(0)));
 }
 
-QStringList build_get_numBatteriesSupported(QStringList argList) {
+QStringList get_numBatteriesSupported(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "G007E";
+  return iface->queryPmu(QStringList() << "G007E");
 }
 
-QStringList build_set_numBatteriesSupported(QStringList argList) {
+QStringList set_numBatteriesSupported(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return QStringList() << QString("S007E %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S007E %1").arg(argList.at(0)));
 }
 
 /*** lightbar register commands ***/
-QStringList build_get_lbVersion(QStringList argList) {
+QStringList get_lbVersion(QStringList argList, interface *iface) {
   QString barNum;
   QStringList cmdList;
+  QStringList responseList;
   if (argList.length() == 0) {
     barNum = "00";
   } else if (argList.length() == 1) {
@@ -1332,31 +1332,37 @@ QStringList build_get_lbVersion(QStringList argList) {
   cmdList << QString("R%1%2").arg(barNum).arg("02"); // firmware code low
   cmdList << QString("R%1%2").arg(barNum).arg("03"); // firmware version high
   cmdList << QString("R%1%2").arg(barNum).arg("04"); // firmware version low
-  return cmdList;
+  responseList = iface->queryPmu(cmdList);
+  QString version;
+  QString code;
+  QString protocol;
+  if (responseList.at(3).startsWith("ERROR") || responseList.at(4).startsWith("ERROR")) {
+    version = responseList.at(3);
+  } else {
+    bool ok;
+    quint16 verHiInt = responseList.at(3).toUShort(&ok, 16);
+    quint16 verLoInt = responseList.at(4).toUShort(&ok, 16);
+    version = QString("%1.%2.%3").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
+  }
+  if (responseList.at(1).startsWith("ERROR") || responseList.at(2).startsWith("ERROR")) {
+    code = responseList.at(1);
+  } else {
+    code = QString("%1%2").arg(responseList.at(1)).arg(responseList.at(2));
+  }
+  protocol = responseList.at(0);
+  return QStringList() << QString("+Firmware version: %1").arg(version)
+                       << QString("+Firmware code: %1%2").arg(code)
+                       << QString("+Protocol version: %1").arg(protocol);
 }
 
-QStringList parse_get_lbVersion(QStringList pmuResponse) {
-  bool ok;
-  QStringList parsedResponse;
-  quint16 verHiInt = pmuResponse.at(3).toUShort(&ok, 16);
-  quint16 verLoInt = pmuResponse.at(4).toUShort(&ok, 16);
-  parsedResponse << QString("Firmware version: %1.%2.%3").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
-  parsedResponse << QString("Firmware code: %1%2").arg(pmuResponse.at(1)).arg(pmuResponse.at(2));
-  parsedResponse << QString("Protocol version: %1").arg(pmuResponse.at(0));
-  return parsedResponse;
-}
-
-QStringList build_get_lbStatus(QStringList argList) {
+QStringList get_lbStatus(QStringList argList, interface *iface) {
   QString barNum;
   QStringList cmdList;
+  QStringList responseList;
   if (argList.length() == 0) {
     barNum = "00";
-  } else if (argList.length() == 1) {
-   barNum = argList.at(0);
   } else {
-    cmdList << "ERROR: expected bar number<br>";
-    cmdList << "Example: get lbStatus 00";
-    return cmdList;
+   barNum = argList.at(0);
   }
   cmdList << QString("R%1%2").arg(barNum).arg("40"); // status
   cmdList << QString("R%1%2").arg(barNum).arg("41"); // string 1 current
@@ -1370,51 +1376,82 @@ QStringList build_get_lbStatus(QStringList argList) {
   cmdList << QString("R%1%2").arg(barNum).arg("80"); // light level
   cmdList << QString("R%1%2").arg(barNum).arg("81"); // light active slew rate
   cmdList << QString("R%1%2").arg(barNum).arg("82"); // light inactive slew rate
-  return cmdList;
-}
-
-QStringList parse_get_lbStatus(QStringList pmuResponse) {
+  QString bypass = responseList.at(0);
+  QString stringCurrent1 = responseList.at(1);
+  QString stringCurrent2 = responseList.at(2);
+  QString stringCurrent3 = responseList.at(3);
+  QString stringCurrent4 = responseList.at(4);
+  QString stringCurrentMin = responseList.at(5);
+  QString temperature = responseList.at(6);
+  QString stringCurrentSum = responseList.at(7);
+  QString voltageRef = responseList.at(8);
+  QString lightLevel = responseList.at(9);
+  QString lightActiveSlew = responseList.at(10);
+  QString lightInactiveSlew = responseList.at(11);
   bool ok;
-  quint16 statusInt = pmuResponse.at(0).toUShort(&ok, 16);
-  QStringList parsedResponse;
-  if (statusInt & 4) {
-    parsedResponse << "Bypass: activate";
-  } else {
-    parsedResponse << "Bypass: inactive";
+  quint16 val;
+  if (bypass.startsWith("ERROR") == false) {
+    val = responseList.at(0).toUShort(&ok, 16);
+    if (statusInt & 4) {
+      bypass << "active";
+    } else {
+      bypass << "inactive";
+    }
   }
-  statusInt = pmuResponse.at(1).toUShort(&ok, 16);
-  parsedResponse << QString("String 1 current: %1 mA").arg(1.4 * statusInt);
-  statusInt = pmuResponse.at(2).toUShort(&ok, 16);
-  parsedResponse << QString("String 2 current: %1 mA").arg(1.4 * statusInt);
-  statusInt = pmuResponse.at(3).toUShort(&ok, 16);
-  parsedResponse << QString("String 3 current: %1 mA").arg(1.4 * statusInt);
-  statusInt = pmuResponse.at(4).toUShort(&ok, 16);
-  parsedResponse << QString("String 4 current: %1 mA").arg(1.4 * statusInt);
-  statusInt = pmuResponse.at(5).toUShort(&ok, 16);
-  parsedResponse << QString("String current minimum: %1 mA").arg(1.4 * statusInt);
-  statusInt = pmuResponse.at(6).toUShort(&ok, 16);
-  parsedResponse << QString("Temperature: %1 C").arg((125 * statusInt / 1024) - 40);
-  statusInt = pmuResponse.at(7).toUShort(&ok, 16);
-  parsedResponse << QString("String current sum: %1 mA").arg(1.4 * statusInt);
-  statusInt = pmuResponse.at(8).toUShort(&ok, 16);
-  parsedResponse << QString("Voltage reference: %1 volts").arg(2.5 * statusInt / 1024);
-  parsedResponse << QString("Light level (0x029C = OFF): %1").arg(pmuResponse.at(9));
-  parsedResponse << QString("Light active slew rate: %1").arg(pmuResponse.at(10));
-  parsedResponse << QString("Light inactive slew rate: %1").arg(pmuResponse.at(11));
-  return parsedResponse;
+  if (stringCurrent1.startsWith("ERROR") == false) {
+    val = stringCurrent1.toUShort(&ok, 16);
+    stringCurrent1 = QString("%1 mA").arg(1.4 * val);
+  }
+  if (stringCurrent2.startsWith("ERROR") == false) {
+    val = stringCurrent2.toUShort(&ok, 16);
+    stringCurrent2 = QString("%1 mA").arg(1.4 * val);
+  }
+  if (stringCurrent3.startsWith("ERROR") == false) {
+    val = stringCurrent3.toUShort(&ok, 16);
+    stringCurrent3 = QString("%1 mA").arg(1.4 * val);
+  }
+  if (stringCurrent4.startsWith("ERROR") == false) {
+    val = stringCurrent4.toUShort(&ok, 16);
+    stringCurrent4 = QString("%1 mA").arg(1.4 * val);
+  }
+  if (stringCurrentSum.startsWith("ERROR") == false) {
+    val = stringCurrentSum.toUShort(&ok, 16);
+    stringCurrentSum = QString("%1 mA").arg(1.4 * val);
+  }
+  if (stringCurrentMin.startsWith("ERROR") == false) {
+    val = stringCurrentMin.toUShort(&ok, 16);
+    stringCurrentMin = QString("%1 mA").arg(1.4 * val);
+  }
+  if (temperature.startsWith("ERROR") == false) {
+    val = temperature.toUShort(&ok, 16);
+    temperature = QString("%1 C").arg((125 * val / 1024) - 40);
+  }
+  if (voltageRef.startsWith("ERROR") == false) {
+    val = voltageRef.toUShort(&ok, 16);
+    voltageRef = QString("%1 volts").arg(2.5 * val / 1024);
+  }
+  return QStringList() << QString("+Bypass: %1").arg(bypass)
+                       << QString("+String 1 current: %1").arg(stringCurrent1)
+                       << QString("+String 2 current: %1").arg(stringCurrent2)
+                       << QString("+String 3 current: %1").arg(stringCurrent3)
+                       << QString("+String 4 current: %1").arg(stringCurrent4)
+                       << QString("+String current sum: %1").arg(stringCurrentSum)
+                       << QString("+String current min: %1").arg(stringCurrentMin)
+                       << QString("+Temperature: %1").arg(temperature)
+                       << QString("+Voltage reference: %1").arg(voltageRef)
+                       << QString("+Light level (0x029C = OFF): %1").arg(lightLevel)
+                       << QString("+Light active slew rate: %1").arg(lightActiveSlew)
+                       << QString("+Light inactive slew rate: %1").arg(lightInactiveSlew);
 }
 
-QStringList build_get_lbConfig(QStringList argList) {
+QStringList get_lbConfig(QStringList argList, interface *iface) {
   QString barNum;
   QStringList cmdList;
+  QStringList responseList;
   if (argList.length() == 0) {
     barNum = "00";
-  } else if (argList.length() == 1) {
-   barNum = argList.at(0);
   } else {
-    cmdList << "ERROR: expected bar number<br>";
-    cmdList << "Example: get lbConfig 00";
-    return cmdList;
+    barNum = argList.at(0);
   }
   cmdList << QString("R%1%2").arg(barNum).arg("85"); // hardware rev
   cmdList << QString("R%1%2").arg(barNum).arg("86"); // temperature cal
@@ -1427,77 +1464,75 @@ QStringList build_get_lbConfig(QStringList argList) {
   cmdList << QString("R%1%2").arg(barNum).arg("8D"); // estimator current sense exponent
   cmdList << QString("R%1%2").arg(barNum).arg("8E"); // bypass override temperature
   cmdList << QString("R%1%2").arg(barNum).arg("8F"); // temperature throttle limit
-  return cmdList;
-}
-
-QStringList parse_get_lbConfig(QStringList pmuResponse) {
-  QStringList parsedResponse;
-  parsedResponse << QString("Hardware revision: %1").arg(pmuResponse.at(0));
-  parsedResponse << QString("Temperature calibration: %1").arg(pmuResponse.at(1));
-  parsedResponse << QString("LED device type: %1").arg(pmuResponse.at(2));
-  parsedResponse << QString("Serial number: %1%2").arg(pmuResponse.at(3)).arg(pmuResponse.at(4));
-  parsedResponse << QString("Current sense bypass threshold: %1").arg(pmuResponse.at(5));
-  parsedResponse << QString("Current sense bypass hysteresis: %1").arg(pmuResponse.at(6));
-  parsedResponse << QString("Estimator current sense coefficient: %1").arg(pmuResponse.at(7));
-  parsedResponse << QString("Estimator current sense exponent: %1").arg(pmuResponse.at(8));
-  parsedResponse << QString("Bypass override temperature: %1").arg(pmuResponse.at(9));
-  parsedResponse << QString("Temperature throttle limit: %1").arg(pmuResponse.at(10));
-  return parsedResponse;
+  responseList = iface->queryPmu(cmdList);
+  return QStringList() << QString("Hardware revision: %1").arg(responseList.at(0))
+                       << QString("Temperature calibration: %1").arg(responseList.at(1))
+                       << QString("LED device type: %1").arg(responseList.at(2))
+                       << QString("Serial number: %1%2").arg(responseList.at(3)).arg(responseList.at(4))
+                       << QString("Current sense bypass threshold: %1").arg(responseList.at(5))
+                       << QString("Current sense bypass hysteresis: %1").arg(responseList.at(6))
+                       << QString("Estimator current sense coefficient: %1").arg(responseList.at(7))
+                       << QString("Estimator current sense exponent: %1").arg(responseList.at(8))
+                       << QString("Bypass override temperature: %1").arg(responseList.at(9))
+                       << QString("Temperature throttle limit: %1").arg(responseList.at(10));
 }
 
 /*** battery backup register commands ***/
-QStringList build_get_bbVersion(QStringList argList) {
+QStringList get_bbVersion(QStringList argList, interface *iface) {
   QString battNum;
   QStringList cmdList;
+  QStringList responseList;
   if (argList.length() == 0) {
     battNum = "C0";
-  } else if (argList.length() == 1) {
+  } else {
     // map battery number to I2C address
     if (argList.at(0) == "00") {
       battNum = "C0";
     } else {
       battNum = "C2";
     }
-  } else {
-    cmdList << "ERROR: expected battery number<br>";
-    cmdList << "Example: get bbVersion 00";
-    return cmdList;
   }
   cmdList << QString("R%1%2").arg(battNum).arg("00"); // protocol version
   cmdList << QString("R%1%2").arg(battNum).arg("01"); // firmware code high
   cmdList << QString("R%1%2").arg(battNum).arg("02"); // firmware code low
   cmdList << QString("R%1%2").arg(battNum).arg("03"); // firmware version high
   cmdList << QString("R%1%2").arg(battNum).arg("04"); // firmware version low
-  return cmdList;
+  responseList = iface->queryPmu(cmdList);
+  QString version;
+  QString code;
+  QString protocol;
+  if (responseList.at(3).startsWith("ERROR") || responseList.at(4).startsWith("ERROR")) {
+    version = responseList.at(3);
+  } else {
+    bool ok;
+    quint16 verHiInt = responseList.at(3).toUShort(&ok, 16);
+    quint16 verLoInt = responseList.at(4).toUShort(&ok, 16);
+    version = QString("%1.%2.%3").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
+  }
+  if (responseList.at(1).startsWith("ERROR") || responseList.at(2).startsWith("ERROR")) {
+    code = responseList.at(1);
+  } else {
+    code = QString("%1%2").arg(responseList.at(1)).arg(responseList.at(2));
+  }
+  protocol = responseList.at(0);
+  return QStringList() << QString("+Firmware version: %1").arg(version)
+                       << QString("+Firmware code: %1%2").arg(code)
+                       << QString("+Protocol version: %1").arg(protocol);
 }
 
-QStringList parse_get_bbVersion(QStringList pmuResponse) {
-  bool ok;
-  QStringList parsedResponse;
-  quint16 verHiInt = pmuResponse.at(3).toUShort(&ok, 16);
-  quint16 verLoInt = pmuResponse.at(4).toUShort(&ok, 16);
-  parsedResponse << QString("Firmware version: %1.%2.%3").arg((verHiInt >> 8) & 0xFF).arg(verHiInt & 0xFF).arg((verLoInt >> 8) & 0xFF);
-  parsedResponse << QString("Firmware code: %1%2").arg(pmuResponse.at(1)).arg(pmuResponse.at(2));
-  parsedResponse << QString("Protocol version: %1").arg(pmuResponse.at(0));
-  return parsedResponse;
-}
-
-QStringList build_get_bbStatus(QStringList argList) {
+QStringList get_bbStatus(QStringList argList, interface *iface) {
   QString battNum;
   QStringList cmdList;
+  QStringList responseList;
   if (argList.length() == 0) {
     battNum = "C0";
-  } else if (argList.length() == 1) {
+  } else {
     // map battery number to I2C address
     if (argList.at(0) == "00") {
       battNum = "C0";
     } else {
       battNum = "C2";
     }
-  } else {
-    cmdList << "ERROR: expected battery number<br>";
-    cmdList << "Example: get bbVersion 00";
-    return cmdList;
   }
   cmdList << QString("R%1%2").arg(battNum).arg("40"); // status
   cmdList << QString("R%1%2").arg(battNum).arg("41"); // battery voltage
@@ -1509,101 +1544,136 @@ QStringList build_get_bbStatus(QStringList argList) {
   cmdList << QString("R%1%2").arg(battNum).arg("47"); // uptime minutes
   cmdList << QString("R%1%2").arg(battNum).arg("48"); // uptime hours
   cmdList << QString("R%1%2").arg(battNum).arg("49"); // error count
-  return cmdList;
-}
-
-QStringList parse_get_bbStatus(QStringList pmuResponse) {
+  responseList = iface->queryPmu(cmdList);
   bool ok;
-  QString parsedResponse;
-  QMap <int, QString> statusDict;
-  quint32 statusInt = pmuResponse.at(0).toLong(&ok, 16);
-  // parse mode bits
-  statusDict.insert(0, "Invalid");
-  statusDict.insert(1, "Charging");
-  statusDict.insert(2, "Standby");
-  statusDict.insert(3, "Shutdown");
-  statusDict.insert(4, "Error");
-  statusDict.insert(5, "Emergency");
-  statusDict.insert(6, "Test");
-  statusDict.insert(7, "Powerdown");
-  parsedResponse += QString("Mode: %1<br>").arg(statusDict[statusInt & 0xF]);
-  // parse battery status bits
-  statusDict.clear();
-  statusDict.insert(0, "Good");
-  statusDict.insert(1, "Disconnected");
-  statusDict.insert(2, "Fully charged");
-  statusDict.insert(3, "Fully discharged");
-  statusDict.insert(4, "Needs charge");
-  statusDict.insert(5, "Needs powerdown");
-  parsedResponse += QString("Battery status: %1<br>").arg(statusDict[(statusInt >> 4) & 0xF]);
-  // parse temperature status bits
-  statusDict.clear();
-  statusDict.insert(0, "Good");
-  statusDict.insert(1, "Charge limit exceeded");
-  statusDict.insert(2, "Emergency limit exceeded");
-  parsedResponse += QString("Temperature status: %1<br>").arg(statusDict[(statusInt >> 8) & 0x3]);
-  // parse lightbar voltage status bits
-  statusDict.clear();
-  statusDict.insert(0, "Good");
-  statusDict.insert(1, "Exceeded limits");
-  parsedResponse += QString("Lightbar voltage status: %1<br>").arg(statusDict[(statusInt >> 10) & 0x1]);
-  // parse lightbar current status bits
-  statusDict.clear();
-  statusDict.insert(0, "Good");
-  statusDict.insert(1, "Exceeded limits");
-  parsedResponse += QString("Lightbar current status: %1<br>").arg(statusDict[(statusInt >> 11) & 0x1]);
-  // parse test button status bits
-  statusDict.clear();
-  statusDict.insert(0, "Released");
-  statusDict.insert(1, "Pressed");
-  parsedResponse += QString("Test button status: %1<br>").arg(statusDict[(statusInt >> 12) & 0x1]);
-  // parse PSU status bits
-  statusDict.clear();
-  statusDict.insert(0, "42v on");
-  statusDict.insert(1, "42v off");
-  parsedResponse += QString("PSU status: %1<br>").arg(statusDict[(statusInt >> 13) & 0x1]);
-  // parse certification mark status
-  statusDict.clear();
-  statusDict.insert(0, "UL");
-  statusDict.insert(1, "CE");
-  parsedResponse += QString("Certification mark: %1<br>").arg(statusDict[(statusInt >> 15) & 0x1]);
-  // other regs
-  parsedResponse += QString("Battery voltage: %1 volts<br>").arg(0.04 * pmuResponse.at(1).toUShort(&ok, 16));
-  parsedResponse += QString("Battery temperature: %1 C<br>").arg(0.125 * (pmuResponse.at(2).toUShort(&ok, 16) - 164));
-  parsedResponse += QString("Lightbar supply voltage: %1 volts<br>").arg(0.05 * pmuResponse.at(3).toUShort(&ok, 16));
-  parsedResponse += QString("Lightbar PSU current: %1 mA<br>").arg(2.44 * pmuResponse.at(4).toUShort(&ok, 16));
-  statusDict.clear();
-  statusDict.insert(0, "None");
-  statusDict.insert(1, "Battery voltage crossed max limit");
-  statusDict.insert(2, "Battery voltage crossed recharge limit");
-  parsedResponse += QString("Alarms: %1<br>").arg(statusDict[pmuResponse.at(5).toUShort(&ok, 16)]);
-  parsedResponse += QString("Time to mode change: %1 minutes<br>").arg(pmuResponse.at(6).toUShort(&ok, 16));
-  parsedResponse += QString("Uptime: %1 hours, %2 minutes<br>").arg(pmuResponse.at(8).toUShort(&ok, 16)).arg(pmuResponse.at(7).toUShort(&ok, 16));
-  parsedResponse += QString("Error count: %1").arg(pmuResponse.at(9).toUShort(&ok, 16));
-  return QStringList() << parsedResponse;
+  QString status = responseList.at(0);
+  QString batteryVoltage = responseList.at(1);
+  QString batteryTemperature = responseList.at(2);
+  QString lbSupplyVoltage = responseList.at(3);
+  QString lbPsuCurrent = responseList.at(4);
+  QString alarms = responseList.at(5);
+  QString timeToModeChange = responseList.at(6);
+  QString uptimeMinutes = responseList.at(7);
+  QString uptimeHours = responseList.at(8);
+  QString errorCount = responseList.at(9);
+  if (status.startsWith("ERROR")) {
+    status = QString("+Status: %1").arg(status);
+  } else {
+    QString parsedResponse;
+    QMap <int, QString> statusDict;
+    quint32 statusInt = responseList.at(0).toLong(&ok, 16);
+    // parse mode bits
+    statusDict.insert(0, "Invalid");
+    statusDict.insert(1, "Charging");
+    statusDict.insert(2, "Standby");
+    statusDict.insert(3, "Shutdown");
+    statusDict.insert(4, "Error");
+    statusDict.insert(5, "Emergency");
+    statusDict.insert(6, "Test");
+    statusDict.insert(7, "Powerdown");
+    status = QString("+Mode: %1<br>").arg(statusDict[statusInt & 0xF]);
+    // parse battery status bits
+    statusDict.clear();
+    statusDict.insert(0, "Good");
+    statusDict.insert(1, "Disconnected");
+    statusDict.insert(2, "Fully charged");
+    statusDict.insert(3, "Fully discharged");
+    statusDict.insert(4, "Needs charge");
+    statusDict.insert(5, "Needs powerdown");
+    status += QString("Battery status: %1<br>").arg(statusDict[(statusInt >> 4) & 0xF]);
+    // parse temperature status bits
+    statusDict.clear();
+    statusDict.insert(0, "Good");
+    statusDict.insert(1, "Charge limit exceeded");
+    statusDict.insert(2, "Emergency limit exceeded");
+    status += QString("Temperature status: %1<br>").arg(statusDict[(statusInt >> 8) & 0x3]);
+    // parse lightbar voltage status bits
+    statusDict.clear();
+    statusDict.insert(0, "Good");
+    statusDict.insert(1, "Exceeded limits");
+    status += QString("Lightbar voltage status: %1<br>").arg(statusDict[(statusInt >> 10) & 0x1]);
+    // parse lightbar current status bits
+    statusDict.clear();
+    statusDict.insert(0, "Good");
+    statusDict.insert(1, "Exceeded limits");
+    status += QString("Lightbar current status: %1<br>").arg(statusDict[(statusInt >> 11) & 0x1]);
+    // parse test button status bits
+    statusDict.clear();
+    statusDict.insert(0, "Released");
+    statusDict.insert(1, "Pressed");
+    status += QString("Test button status: %1<br>").arg(statusDict[(statusInt >> 12) & 0x1]);
+    // parse PSU status bits
+    statusDict.clear();
+    statusDict.insert(0, "42v on");
+    statusDict.insert(1, "42v off");
+    status += QString("PSU status: %1<br>").arg(statusDict[(statusInt >> 13) & 0x1]);
+    // parse certification mark status
+    statusDict.clear();
+    statusDict.insert(0, "UL");
+    statusDict.insert(1, "CE");
+    status += QString("Certification mark: %1<br>").arg(statusDict[(statusInt >> 15) & 0x1]);
+  }
+  if (batteryVoltage.startsWith("ERROR") == false) {
+    batteryVoltage = QString("%1 volts").arg(0.04 * batteryVoltage.toUShort(&ok, 16));
+  }
+  if (batteryTemperature.startsWith("ERROR") == false) {
+    batteryTemperature = QString("%1 C").arg(0.125 * batteryTemperature.toUShort(&ok, 16) - 164);
+  }
+  if (lbSupplyVoltage.startsWith("ERROR") == false) {
+    lbSupplyVoltage = QString("%1 volts").arg(0.05 * lbSupplyVoltage.toUShort(&ok, 16));
+  }
+  if (lbPsuCurrent.startsWith("ERROR") == false) {
+    lbPsuCurrent = QString("%1 mA").arg(1.44 * lbPsuCurrent.toUShort(&ok, 16));
+  }
+  if (alarms.startsWith("ERROR") == false) {
+    QMap <int, QString> alarmsDict;
+    alarmsDict.insert(0, "None");
+    alarmsDict.insert(1, "Battery voltage crossed max limit");
+    alarmsDict.insert(2, "Battery voltage crossed recharge limit");
+    alarms = alarmsDict[alarms.toUShort(&ok, 16)];
+  }
+  if (timeToModeChange.startsWith("ERROR") == false) {
+    timeToModeChange = QString("%1 mintues").arg(timeToModeChange.toUShort(&ok, 16));
+  }
+  QString uptime;
+  if (uptimeHours.startsWith("ERROR") || uptimeMinutes.startsWith("ERROR")) {
+    uptime = uptimeHours;
+  } else {
+    uptime = QString("%1 hours, %2 minutes").arg(uptimeHours.toUShort(&ok, 16)).arg(uptimeMinutes.toUShort(&ok, 16));
+  }
+  if (errorCount.startsWith("ERROR") == false) {
+    errorCount = QString("%1").arg(errorCount.toUShort(&ok, 16));
+  }
+  return QStringList() << status
+                       << QString("+Battery voltage: %1").arg(batteryVoltage)
+                       << QString("+Battery temperature: %1").arg(batteryTemperature)
+                       << QString("+Lightbar supply voltage: %1").arg(lbSupplyVoltage)
+                       << QString("+Lightbar PSU current: %1").arg(lbPsuCurrent)
+                       << QString("+Alarms: %1").arg(alarms)
+                       << QString("+Time to mode change: %1").arg(timeToModeChange)
+                       << QString("+Uptime: %1").arg(uptime)
+                       << QString("+Error count: %1").arg(errorCount);
+
 }
 
-QStringList build_get_bbConfig(QStringList argList) {
+QStringList get_bbConfig(QStringList argList, interface *iface) {
   QString battNum;
   QStringList cmdList;
+  QStringList responseList;
   if (argList.length() == 0) {
     battNum = "C0";
-  } else if (argList.length() == 1) {
+  } else {
     // map battery number to I2C address
     if (argList.at(0) == "00") {
       battNum = "C0";
     } else {
       battNum = "C2";
     }
-  } else {
-    cmdList << "ERROR: expected battery number<br>";
-    cmdList << "Example: get bbConfig 00";
-    return cmdList;
   }
   cmdList << QString("R%1%2").arg(battNum).arg("82"); // hardware rev
   cmdList << QString("R%1%2").arg(battNum).arg("83"); // temperature cal
-  cmdList << QString("R%1%2").arg(battNum).arg("84"); // serial number low word
-  cmdList << QString("R%1%2").arg(battNum).arg("85"); // serial number high word
+  cmdList << QString("R%1%2").arg(battNum).arg("84"); // serial number high word
+  cmdList << QString("R%1%2").arg(battNum).arg("85"); // serial number low word
   cmdList << QString("R%1%2").arg(battNum).arg("86"); // charge time
   cmdList << QString("R%1%2").arg(battNum).arg("87"); // trickle time
   cmdList << QString("R%1%2").arg(battNum).arg("88"); // standby time
@@ -1619,154 +1689,226 @@ QStringList build_get_bbConfig(QStringList argList) {
   cmdList << QString("R%1%2").arg(battNum).arg("92"); // shutdown time
   cmdList << QString("R%1%2").arg(battNum).arg("93"); // product code low word
   cmdList << QString("R%1%2").arg(battNum).arg("94"); // product code high word
-  return cmdList;
-}
-
-QStringList parse_get_bbConfig(QStringList pmuResponse) {
+  responseList = iface->queryPmu(cmdList);
+  QString hardwareRev = responseList.at(0);
+  QString tempCal = responseList.at(1);
+  QString snHigh = responseList.at(2);
+  QString snLow = responseList.at(3);
+  QString chargeTime = responseList.at(4);
+  QString trickleTime = responseList.at(5);
+  QString standbyTime = responseList.at(6);
+  QString maxBatteryVoltage = responseList.at(7);
+  QString minBatteryVoltage = responseList.at(8);
+  QString rechargeBatteryVoltage = responseList.at(9);
+  QString maxChargeTemp = responseList.at(10);
+  QString maxEmergencyTemp = responseList.at(11);
+  QString minEmergencyVerifyVoltage = responseList.at(12);
+  QString maxEmergencyVerifyVoltage = responseList.at(13);
+  QString maxLbPsuCurrent = responseList.at(14);
+  QString certificationMark = responseList.at(15);
+  QString shutdownTime = responseList.at(16);
+  QString prodCodeLow = responseList.at(17);
+  QString prodCodeHigh = responseList.at(18);
   bool ok;
-  QStringList parsedResponse;
-  parsedResponse << QString("Hardware revision: %1").arg(pmuResponse.at(0));
-  parsedResponse << QString("Temperature calibration: %1").arg(pmuResponse.at(1));
-  parsedResponse << QString("Serial number: %1%2").arg(pmuResponse.at(2)).arg(pmuResponse.at(3));
-  parsedResponse << QString("Charge time: %1 minutes").arg(pmuResponse.at(4).toUShort(&ok, 16));
-  parsedResponse << QString("Trickle time: %1 minutes").arg(pmuResponse.at(5).toUShort(&ok, 16));
-  parsedResponse << QString("Standby time: %1 minutes").arg(pmuResponse.at(6).toUShort(&ok, 16));
-  parsedResponse << QString("Shutdown time: %1 minutes").arg(pmuResponse.at(16).toUShort(&ok, 16));
-  parsedResponse << QString("Max battery voltage: %1 volts").arg(pmuResponse.at(7).toUShort(&ok, 16) * 0.04);
-  parsedResponse << QString("Min battery voltage: %1 volts").arg(pmuResponse.at(8).toUShort(&ok, 16) * 0.04);
-  parsedResponse << QString("Recharge battery voltage: %1 volts").arg(pmuResponse.at(9).toUShort(&ok, 16) * 0.04);
-  parsedResponse << QString("Max charge temperature: %1 C").arg((pmuResponse.at(10).toUShort(&ok, 16) - 164) * 0.125);
-  parsedResponse << QString("Max emergency temperature: %1 C").arg((pmuResponse.at(11).toUShort(&ok, 16) - 164) * 0.125);
-  parsedResponse << QString("Min emergency verify voltage: %1 volts").arg(pmuResponse.at(12).toUShort(&ok, 16) * 0.05);
-  parsedResponse << QString("Max emergency verify voltage: %1 volts").arg(pmuResponse.at(13).toUShort(&ok, 16) * 0.05);
-  parsedResponse << QString("Max lightbar PSU current: %1 mA").arg(pmuResponse.at(14).toUShort(&ok, 16) * 2.44);
-  parsedResponse << QString("Certification mark: %1").arg((pmuResponse.at(15) == "0000") ? "UL" : "CE");
-  parsedResponse << QString("Product code: %1%2").arg(pmuResponse.at(17)).arg(pmuResponse.at(18));
-  return parsedResponse;
+  QString serialNum;
+  if (snLow.startsWith("ERROR") || snHigh.startsWith("ERROR")) {
+    serialNum = snLow;
+  } else {
+    serialNum = QString("%1%2").arg(snHigh).arg(snLow);
+  }
+  if (chargeTime.startsWith("ERROR") == false) {
+    chargeTime = QString("%1 minutes").arg(chargeTime.toUShort((&ok, 16)));
+  }
+  if (trickleTime.startsWith("ERROR") == false) {
+    trickleTime = QString("%1 minutes").arg(trickleTime.toUShort((&ok, 16)));
+  }
+  if (standbyTime.startsWith("ERROR") == false) {
+    standbyTime = QString("%1 minutes").arg(standbyTime.toUShort((&ok, 16)));
+  }
+  if (shutdownTime.startsWith("ERROR") == false) {
+    shutdownTime = QString("%1 minutes").arg(shutdownTime.toUShort((&ok, 16)));
+  }
+  if (maxBatteryVoltage.startsWith("ERROR") == false) {
+    maxBatteryVoltage = QString("%1 volts").arg(maxBatteryVoltage.toUShort(&ok, 16) * 0.04)
+  }
+  if (minBatteryVoltage.startsWith("ERROR") == false) {
+    minBatteryVoltage = QString("%1 volts").arg(minBatteryVoltage.toUShort(&ok, 16) * 0.04)
+  }
+  if (rechargeBatteryVoltage.startsWith("ERROR") == false) {
+    rechargeBatteryVoltage = QString("%1 volts").arg(rechargeBatteryVoltage.toUShort(&ok, 16) * 0.04)
+  }
+  if (maxChargeTemp.startsWith("ERROR") == false) {
+    maxChargeTemp = QString("%1 C").arg((maxChargeTemp.toUShort(&ok, 16) - 164) * 0.125);
+  }
+  if (maxEmergencyTemp.startsWith("ERROR") == false) {
+    maxEmergencyTemp = QString("%1 C").arg((maxEmergencyTemp.toUShort(&ok, 16) - 164) * 0.125);
+  }
+  if (minEmergencyVerifyVoltage.startsWith("ERROR") == false) {
+    minEmergencyVerifyVoltage = QString("%1 volts").arg(minEmergencyVerifyVoltage.toUShort(&ok, 16) * 0.05);
+  }
+  if (maxEmergencyVerifyVoltage.startsWith("ERROR") == false) {
+    maxEmergencyVerifyVoltage = QString("%1 volts").arg(maxEmergencyVerifyVoltage.toUShort(&ok, 16) * 0.05);
+  }
+  if (maxLbPsuCurrent.startsWith("ERROR") == false) {
+    maxLbPsuCurrent = QString("%1 mA").arg(maxLbPsuCurrent.toUShort(&ok, 16) * 2.44);
+  }
+  if (certificationMark.startsWith("ERROR") == false) {
+    certificationMark = (certificationMark == "0000") ? "UL" : "CE";
+  }
+  QString productCode;
+  if (prodCodeHigh.startsWith("ERROR") || prodCodeLow.startsWith("ERROR")) {
+    productCode = prodCodeHigh;
+  } else {
+    productCode = QString("%1%2").arg(prodCodeLow).arg(prodCodeHigh);
+  }
+  return QStringList() << QString("+Hardware revision: %1").arg(hardwareRev)
+                       << QString("+Temperature calibration: %1").arg(tempCal)
+                       << QString("+Serial number: %1").arg(serialNum)
+                       << QString("+Charge time: %1").arg(chargeTime)
+                       << QString("+Trickle time: %1").arg(trickleTime)
+                       << QString("+Standby time: %1").arg(standbyTime)
+                       << QString("+Shutdown time: %1").arg(shutdownTime)
+                       << QString("+Max battery voltage: %1").arg(maxBatteryVoltage)
+                       << QString("+Min battery voltage: %1").arg(minBatteryVoltage)
+                       << QString("+Recharge battery voltage: %1").arg(rechargeBatteryVoltage)
+                       << QString("+Max charge temperature: %1").arg(maxChargeTemp)
+                       << QString("+Max emergency temperature: %1").arg(maxEmergencyTemp)
+                       << QString("+Min emergency verify voltage: %1").arg(minEmergencyVerifyVoltage)
+                       << QString("+Max emergency verify voltage: %1").arg(maxEmergencyVerifyVoltage)
+                       << QString("Max lightbar PSU current: %1 mA").arg(maxLbPsuCurrent)
+                       << QString("Certification mark: %1").arg(certificationMark)
+                       << QString("Product code: %1%2").arg(productCode);
 }
 
 /*** reset commands ***/
-QStringList build_reset_usage(QStringList argList) {
+QStringList reset_usage(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!U";
+  return iface->queryPmu(QStringList() << "!U");
 }
 
-QStringList build_reset_oldLog(QStringList argList) {
+QStringList reset_oldLog(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!L";
+  return iface->queryPmu(QStringList() << "!L");
 }
 
-QStringList build_reset_log(QStringList argList) {
+QStringList reset_log(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!K";
+  return iface->queryPmu(QStringList() << "!K");
 }
 
-QStringList build_reset_logIndex(QStringList argList) {
-  return QStringList() << QString("J%1").arg(argList.at(0));
+QStringList reset_logIndex(QStringList argList, interface *iface) {
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("J%1").arg(argList.at(0)));
 }
 
-QStringList build_reset_eeprom(QStringList argList) {
+QStringList reset_eeprom(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!Z";
+  return iface->queryPmu(QStringList() << "!Z");
 }
 
-QStringList build_reset_eepromToDefault(QStringList argList) {
+QStringList reset_eepromToDefault(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!C";
+  return iface->queryPmu(QStringList() << "!C");
 }
 
-QStringList build_reset_eepromToLatestMapVersion(QStringList argList) {
+QStringList reset_eepromToLatestMapVersion(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!E";
+  return iface->queryPmu(QStringList() << "!E");
 }
 
-QStringList build_reset_network(QStringList argList) {
+QStringList reset_network(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!N";
+  return iface->queryPmu(QStringList() << "!N");
 }
 
-QStringList build_reset_networkWithoutChecking(QStringList argList) {
+QStringList reset_networkWithoutChecking(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!N1";
+  return iface->queryPmu(QStringList() << "!N1");
 }
 
-QStringList build_reset_daliCommissioning(QStringList argList) {
+QStringList reset_daliCommissioning(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!Y";
+  return iface->queryPmu(QStringList()<< "!Y");
 }
 
-QStringList build_reset_daliPowerMetering(QStringList argList) {
+QStringList reset_daliPowerMetering(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!A";
+  return iface->queryPmu(QStringList()<< "!A");
 }
 
 /*** reboot commands ***/
-QStringList build_reboot_pmu(QStringList argList) {
+QStringList reboot_pmu(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!R";
+  return iface->queryPmu(QStringList() << "!R");
 }
 
-QStringList build_reboot_wirelessCard(QStringList argList) {
+QStringList reboot_wirelessCard(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!W";
+  return iface->queryPmu(QStringList() << "!W");
 }
 
-QStringList build_reboot_i2cDevices(QStringList argList) {
+QStringList reboot_i2cDevices(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!X";
+  return iface->queryPmu(QStringList() << "!X");
 }
 
 /*** reload commands ***/
-QStringList build_reload_dlaFirmware(QStringList argList) {
+QStringList reload_dlaFirmware(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!B";
+  return iface->queryPmu(QStringList() << "!B");
 }
 
-QStringList build_reload_wirelessModuleFirmware(QStringList argList) {
+QStringList reload_wirelessModuleFirmware(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!M";
+  return iface->queryPmu(QStringList() << "!M");
 }
 
-QStringList build_reload_powerboardFirmware(QStringList argList) {
+QStringList reload_powerboardFirmware(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!P";
+  return iface->queryPmu(QStringList() << "!P");
 }
 
-QStringList build_reload_lightbarFirmware(QStringList argList) {
+QStringList reload_lightbarFirmware(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!P";
+  return iface->queryPmu(QStringList() << "!P");
 }
 
-QStringList build_reload_batteryBackupFirmware(QStringList argList) {
+QStringList reload_batteryBackupFirmware(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!P";
+  return iface->queryPmu(QStringList() << "!P");
 }
 
-QStringList build_reload_motionSensorFirmware(QStringList argList) {
+QStringList reload_motionSensorFirmware(QStringList argList, interface *iface) {
   (void) argList;
-  return QStringList() << "!V";
+  return iface->queryPmu(QStringList() << "!V");
 }
 
 /*** log commands ***/
-QStringList build_get_logIndex(QStringList argList) {
+QStringList get_logIndex(QStringList argList, interface *iface) {
+  QStringList responseList;
   (void) argList;
-  return QStringList() << "K";
-}
-
-QStringList parse_get_logIndex(QStringList pmuResponse) {
-  QString arg1 = pmuResponse.at(0);
-  QString head = arg1.left(4);
-  arg1.remove(0, 4);
-  QString tail = arg1.left(4);
-  arg1.remove(0, 4);
-  QString first = arg1.left(4);
-  if (first == "FFFF") {
-    first = "none";
+  responseList = iface->queryPmu(QStringList() << "K");
+  if (responseList.at(0).startsWith("ERROR")) {
+    return responseList;
+  } else {
+    QString arg1 = responseList.at(0);
+    QString head = arg1.left(4);
+    arg1.remove(0, 4);
+    QString tail = arg1.left(4);
+    arg1.remove(0, 4);
+    QString first = arg1.left(4);
+    if (first == "FFFF") {
+      first = "none";
+    }
+    return QStringList() << QString("head: %1<br>tail: %2<br>first recent: %3").arg(head).arg(tail).arg(first);
   }
-  return QStringList() << QString("head: %1<br>tail: %2<br>first recent: %3").arg(head).arg(tail).arg(first);
 }
 
-QStringList build_get_log(QStringList argList) {
+QStringList get_log(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
   bool ok;
   QString index;
   if (argList.length() == 0) {
@@ -1782,7 +1924,7 @@ QStringList build_get_log(QStringList argList) {
   return QStringList() << QString("K%1").arg(index);
 }
 
-QStringList parse_get_log(QStringList pmuResponse) {
+QStringList parse_get_log(QStringList responseList) {
   QString arg1;
   int uptimeSize, valueSize, baseTime, uptime;
   QString eventType, eventValue;
@@ -1791,7 +1933,7 @@ QStringList parse_get_log(QStringList pmuResponse) {
   bool isLastEntry;
   QString timestamp;
   int numEvents = 0;
-  arg1 = pmuResponse.at(0);
+  arg1 = responseList.at(0);
   baseTime = 0;
   do {
     // assemble log entry
@@ -1907,216 +2049,220 @@ QStringList parse_get_log(QStringList pmuResponse) {
   return QStringList() << log;
 }
 
-QStringList build_insert_logEntry(QStringList argList) {
-  return QStringList() << QString("E%1").arg(argList.at(0));
+QStringList insert_logEntry(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
+  cmdList << QString("E%1").arg(argList.at(0));
+  return iface->queryPmu(cmdList);
 }
 
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   QStringList keywordList;
   // get & set PMU register commands
-  m_cmdTable.insert("get firmwareVersion", new cmdEntry(build_get_firmwareVersion, parse_get_firmwareVersion));
-  m_cmdTable.insert("get productCode", new cmdEntry(build_get_productCode));
-  m_cmdTable.insert("set productCode", new cmdEntry(build_set_productCode));
-  m_cmdTable.insert("get serialNumber", new cmdEntry(build_get_serialNumber));
-  m_cmdTable.insert("set serialNumber", new cmdEntry(build_set_serialNumber));
-  m_cmdTable.insert("get unixTime", new cmdEntry(build_get_unixTime));
-  m_cmdTable.insert("set unixTime", new cmdEntry(build_set_unixTime));
-  m_cmdTable.insert("get temperature", new cmdEntry(build_get_temperature, parse_get_temperature));
-  m_cmdTable.insert("get lightLevel", new cmdEntry(build_get_lightLevel, parse_get_lightLevel));
-  m_cmdTable.insert("set lightManualLevel", new cmdEntry(build_set_lightManualLevel));
-  m_cmdTable.insert("set lightOverrideActiveLevel", new cmdEntry(build_set_lightOverrideActiveLevel));
-  m_cmdTable.insert("set lightOverrideInactiveLevel", new cmdEntry(build_set_lightOverrideInactiveLevel));
-  m_cmdTable.insert("get sensorDelayTime", new cmdEntry(build_get_sensorDelayTime));
-  m_cmdTable.insert("get sensorOverrideDelayTime", new cmdEntry(build_get_sensorOverrideDelayTime));
-  m_cmdTable.insert("set sensorOverrideDelayTime", new cmdEntry(build_set_sensorOverrideDelayTime));
-  m_cmdTable.insert("get upTime", new cmdEntry(build_get_upTime, parse_get_upTime));
-  m_cmdTable.insert("get usage", new cmdEntry(build_get_usage, parse_get_usage));
-  m_cmdTable.insert("get numLogEntries", new cmdEntry(build_get_numLogEntries));
-  m_cmdTable.insert("get configCalibration", new cmdEntry(build_get_configCalibration, parse_get_configCalibration));
-  m_cmdTable.insert("set configCalibrationP0", new cmdEntry(build_set_configCalibrationP0));
-  m_cmdTable.insert("set configCalibrationP1", new cmdEntry(build_set_configCalibrationP1));
-  m_cmdTable.insert("set configCalibrationP2", new cmdEntry(build_set_configCalibrationP2));
-  m_cmdTable.insert("set configCalibrationP3", new cmdEntry(build_set_configCalibrationP3));
-  m_cmdTable.insert("get buildTime", new cmdEntry(build_get_buildTime));
-  m_cmdTable.insert("set buildTime", new cmdEntry(build_set_buildTime));
-  m_cmdTable.insert("get sensorTimeoutCountdown", new cmdEntry(build_get_sensorTimeoutCountdown));
-  m_cmdTable.insert("get currentLightLevel", new cmdEntry(build_get_currentLightLevel));
-  m_cmdTable.insert("get safeMode", new cmdEntry(build_get_safeMode));
-  m_cmdTable.insert("get lightBarSelect", new cmdEntry(build_get_lightBarSelect));
-  m_cmdTable.insert("set lightBarSelect", new cmdEntry(build_set_lightBarSelect));
-  m_cmdTable.insert("get powerConsumption", new cmdEntry(build_get_powerConsumption, parse_get_powerConsumption));
-  m_cmdTable.insert("get wirelessDataAggregator", new cmdEntry(build_get_wirelessDataAggregator));
-  m_cmdTable.insert("set wirelessDataAggregator", new cmdEntry(build_set_wirelessDataAggregator));
-  m_cmdTable.insert("get resetUsageTimestamp", new cmdEntry(build_get_resetUsageTimestamp));
-  m_cmdTable.insert("get pwmPeriodRegister", new cmdEntry(build_get_pwmPeriodRegister));
-  m_cmdTable.insert("set pwmPeriodRegister", new cmdEntry(build_set_pwmPeriodRegister));
-  m_cmdTable.insert("get analogSensorValue", new cmdEntry(build_get_analogSensorValue));
-  m_cmdTable.insert("get analogReportingHysteresis", new cmdEntry(build_get_analogReportingHysteresis));
-  m_cmdTable.insert("get zone", new cmdEntry(build_get_zone));
-  m_cmdTable.insert("set zone", new cmdEntry(build_set_zone));
-  m_cmdTable.insert("get lightTemporaryActiveLevel", new cmdEntry(build_get_lightTemporaryActiveLevel));
-  m_cmdTable.insert("set lightTemporaryActiveLevel", new cmdEntry(build_set_lightTemporaryActiveLevel));
-  m_cmdTable.insert("get lightTemporaryInactiveLevel", new cmdEntry(build_get_lightTemporaryInactiveLevel));
-  m_cmdTable.insert("set lightTemporaryInactiveLevel", new cmdEntry(build_set_lightTemporaryInactiveLevel));
-  m_cmdTable.insert("get sensorTemporaryDelayTime", new cmdEntry(build_get_sensorTemporaryDelayTime));
-  m_cmdTable.insert("set sensorTemporaryDelayTime", new cmdEntry(build_set_sensorTemporaryDealyTime));
-  m_cmdTable.insert("get temporaryOverrideTimeout", new cmdEntry(build_get_temporaryOverrideTimeout));
-  m_cmdTable.insert("set temporaryOverrideTimeout", new cmdEntry(build_set_temporaryOverrideTiemout));
-  m_cmdTable.insert("get setRemoteState", new cmdEntry(build_get_setRemoteState));
-  m_cmdTable.insert("set setRemoteState", new cmdEntry(build_set_setRemoteState));
-  m_cmdTable.insert("get remoteSetDelayTime", new cmdEntry(build_get_remoteStateDelayTime));
-  m_cmdTable.insert("set remoteSetDelayTime", new cmdEntry(build_set_remoteStateDelayTime));
-  m_cmdTable.insert("get remoteSecondsCountdown", new cmdEntry(build_get_remoteSecondsCountdown));
-  m_cmdTable.insert("get minimumDimmingValue", new cmdEntry(build_get_minimumDimmingValue));
-  m_cmdTable.insert("get powerCalibration", new cmdEntry(build_get_powerCalibration, parse_get_powerCalibration));
-  m_cmdTable.insert("set powerCalibrationA0", new cmdEntry(build_set_powerCalibrationA0));
-  m_cmdTable.insert("set powerCalibrationB0", new cmdEntry(build_set_powerCalibrationB0));
-  m_cmdTable.insert("set powerCalibrationC0", new cmdEntry(build_set_powerCalibrationC0));
-  m_cmdTable.insert("set powerCalibrationMA", new cmdEntry(build_set_powerCalibrationMA));
-  m_cmdTable.insert("set powerCalibrationMB", new cmdEntry(build_set_powerCalibrationMB));
-  m_cmdTable.insert("set powerCalibrationMC", new cmdEntry(build_set_powerCalibrationMC));
-  m_cmdTable.insert("set powerCalibrationPOff", new cmdEntry(build_set_powerCalibrationPOff));
-  m_cmdTable.insert("set powerCalibrationPOn", new cmdEntry(build_set_powerCalibrationPOn));
-  m_cmdTable.insert("set powerCalibrationT0", new cmdEntry(build_set_powerCalibrationT0));
-  m_cmdTable.insert("get powerEstimatorTemperatureOverride", new cmdEntry(build_get_powerEstimatorTemperatureOverride));
-  m_cmdTable.insert("set powerEstimatorTemperatureOverride", new cmdEntry(build_set_powerEstimatorTemperatureOverride));
-  m_cmdTable.insert("get cachedTemperatureValue", new cmdEntry(build_get_cachedTemperatureValue));
-  m_cmdTable.insert("get eepromSize", new cmdEntry(build_get_eepromSize));
-  m_cmdTable.insert("get hardwareRevision", new cmdEntry(build_get_hardwareRevision));
-  m_cmdTable.insert("get wirelessConfig", new cmdEntry(build_get_wirelessConfig, parse_get_wirelessConfig));
-  m_cmdTable.insert("set wirelessPanId", new cmdEntry(build_set_wirelessPanId));
-  m_cmdTable.insert("set wirelessChannelMask", new cmdEntry(build_set_wirelessChannelMask));
-  m_cmdTable.insert("set wirelessShortAddress", new cmdEntry(build_set_wirelessShortAddress));
-  m_cmdTable.insert("set wirelessRole", new cmdEntry(build_set_wirelessRole));
-  m_cmdTable.insert("set wirelessWatchdogHold", new cmdEntry(build_set_wirelessWatchdogHold));
-  m_cmdTable.insert("set wirelessWatchdogPeriod", new cmdEntry(build_set_wirelessWatchdogPeriod));
-  m_cmdTable.insert("set wirelessNetworkKey", new cmdEntry(build_set_wirelessNetworkKey));
-  m_cmdTable.insert("get firmwareCode", new cmdEntry(build_get_firmwareCode));
-  m_cmdTable.insert("get moduleFirmwareCode", new cmdEntry(build_get_moduleFirmwareCode));
-  m_cmdTable.insert("get maxTemperature", new cmdEntry(build_get_maxTemperature, parse_get_maxTemperature));
-  m_cmdTable.insert("get overTemperatureConfig", new cmdEntry(build_get_overTemperatureConfig, parse_get_overTemperatureConfig));
-  m_cmdTable.insert("set overTemperatureThresholdLow", new cmdEntry(build_set_overTemperatureThresholdLow));
-  m_cmdTable.insert("set overTemperatureThresholdHigh", new cmdEntry(build_get_overTemperatureThresholdHigh));
-  m_cmdTable.insert("set overTemperatureDimmingLimit", new cmdEntry(build_set_overTemperatureDimmingLimit));
-  m_cmdTable.insert("get analogDimmingMode", new cmdEntry(build_get_analogDimmingMode, parse_get_analogDimmingMode));
-  m_cmdTable.insert("set analogDimmingMode", new cmdEntry(build_set_analogDimmingMode));
-  m_cmdTable.insert("get fixtureIdMode", new cmdEntry(build_get_fixtureIdMode));
-  m_cmdTable.insert("set fixtureIdMode", new cmdEntry(build_set_fixtureIdMode));
-  m_cmdTable.insert("get acFrequency", new cmdEntry(build_get_acFrequency));
-  m_cmdTable.insert("get sensorBits", new cmdEntry(build_get_sensorBits));
-  m_cmdTable.insert("get powerMeterCommand", new cmdEntry(build_get_powerMeterCommand));
-  m_cmdTable.insert("set powerMeterCommand", new cmdEntry(build_set_powerMeterCommand));
-  m_cmdTable.insert("get powerMeterRegister", new cmdEntry(build_get_powerMeterRegister));
-  m_cmdTable.insert("set powerMeterRegister", new cmdEntry(build_set_powerMeterRegister));
-  m_cmdTable.insert("get ambientTemperature", new cmdEntry(build_get_ambientTemperature));
-  m_cmdTable.insert("get lightSensorLevel", new cmdEntry(build_get_lightSensorLevel));
-  m_cmdTable.insert("get sensorConfig", new cmdEntry(build_get_sensorConfig, parse_get_sensorConfig));
-  m_cmdTable.insert("set sensor0Timeout", new cmdEntry(build_set_sensor0Timeout));
-  m_cmdTable.insert("set sensor0Offset", new cmdEntry(build_set_sensor0Offset));
-  m_cmdTable.insert("set sensor1Timeout", new cmdEntry(build_set_sensor1Timeout));
-  m_cmdTable.insert("set sensor1Offset", new cmdEntry(build_set_sensor1Offset));
-  m_cmdTable.insert("get analogDimmingConfig", new cmdEntry(build_get_analogDimmingConfig, parse_get_analogDimmingConfig));
-  m_cmdTable.insert("set analogDimmingLowValue", new cmdEntry(build_set_analogDimmingLowValue));
-  m_cmdTable.insert("set analogDimmingHighValue", new cmdEntry(build_set_analogDimmingHighValue));
-  m_cmdTable.insert("set analogDimmingOffValue", new cmdEntry(build_set_analogDimmingOffValue));
-  m_cmdTable.insert("get powerMeasurementMode", new cmdEntry(build_get_powerMeasurementMode));
-  m_cmdTable.insert("set powerMeasurementMode", new cmdEntry(build_set_powerMeasurementMode));
-  m_cmdTable.insert("get externalPowerMeter", new cmdEntry(build_get_externalPowerMeter));
-  m_cmdTable.insert("set externalPowerMeter", new cmdEntry(build_set_externalPowerMeter));
-  m_cmdTable.insert("get ambientSensorValue", new cmdEntry(build_get_ambientSensorValue));
-  m_cmdTable.insert("get ambientConfig", new cmdEntry(build_get_ambientConfig, parse_get_ambientConfig));
-  m_cmdTable.insert("set ambientActiveLevel", new cmdEntry(build_set_ambientActiveLevel));
-  m_cmdTable.insert("set ambientInactiveLevel", new cmdEntry(build_set_ambientInactiveLevel));
-  m_cmdTable.insert("set ambientEnvironmentalGain", new cmdEntry(build_set_ambientEnvironmentalGain));
-  m_cmdTable.insert("set ambientOffHysteresis", new cmdEntry(build_set_ambientOffHysteresis));
-  m_cmdTable.insert("set ambientOnHysteresis", new cmdEntry(build_set_ambientOnHysteresis));
-  m_cmdTable.insert("get powerboardProtocol", new cmdEntry(build_get_powerboardProtocol));
-  m_cmdTable.insert("get ledOverride", new cmdEntry(build_get_ledOverride));
-  m_cmdTable.insert("set ledOverride", new cmdEntry(build_set_ledOverride));
-  m_cmdTable.insert("get fadeUpStep", new cmdEntry(build_get_fadeUpStep));
-  m_cmdTable.insert("set fadeUpStep", new cmdEntry(build_set_fadeUpStep));
-  m_cmdTable.insert("get fadeDownStep", new cmdEntry(build_get_fadeDownStep));
-  m_cmdTable.insert("set fadeDownStep", new cmdEntry(build_set_fadeDownStep));
-  m_cmdTable.insert("get maxBrightness", new cmdEntry(build_get_maxBrightness));
-  m_cmdTable.insert("set maxBrightness", new cmdEntry(build_set_maxBrightness));
-  m_cmdTable.insert("get i2cResets", new cmdEntry(build_get_i2cResets));
-  m_cmdTable.insert("get sensorGuardTime", new cmdEntry(build_get_sensorGuardTime));
-  m_cmdTable.insert("set sensorGuardTime", new cmdEntry(build_set_sensorGuardTime));
-  m_cmdTable.insert("get inputVoltage", new cmdEntry(build_get_inputVoltage));
-  m_cmdTable.insert("get inputVoltageCalibration", new cmdEntry(build_get_inputVoltageCalibration));
-  m_cmdTable.insert("set inputVoltageCalibration", new cmdEntry(build_set_inputVoltageCalibration));
-  m_cmdTable.insert("get numLightbars", new cmdEntry(build_get_numLightbars));
-  m_cmdTable.insert("set numLightbars", new cmdEntry(build_set_numLightbars));
-  m_cmdTable.insert("get currentLimit", new cmdEntry(build_get_currentLimit));
-  m_cmdTable.insert("set currentLimit", new cmdEntry(build_set_currentLimit));
-  m_cmdTable.insert("get bootloaderCode", new cmdEntry(build_get_bootloaderCode));
-  m_cmdTable.insert("get xpressMode", new cmdEntry(build_get_xpressMode));
-  m_cmdTable.insert("set xpressMode", new cmdEntry(build_set_xpressMode));
-  m_cmdTable.insert("get batteryBackupStatus", new cmdEntry(build_get_batteryBackupStatus, parse_get_batteryBackupStatus));
-  m_cmdTable.insert("set batteryBackupStatus", new cmdEntry(build_set_batteryBackupStatus));
-  m_cmdTable.insert("get sensorSeconds", new cmdEntry(build_get_sensorSeconds));
-  m_cmdTable.insert("get inputVoltageTwo", new cmdEntry(build_get_inputVoltageTwo));
-  m_cmdTable.insert("get inputVoltageTwoCalibration", new cmdEntry(build_get_inputVoltageTwoCalibration));
-  m_cmdTable.insert("set inputVoltageTwoCalibration", new cmdEntry(build_set_inputVoltageTwoCalibration));
-  m_cmdTable.insert("get maxRampUpSpeed", new cmdEntry(build_get_maxRampUpSpeed));
-  m_cmdTable.insert("set maxRampUpSpeed", new cmdEntry(build_set_maxRampUpSpeed));
-  m_cmdTable.insert("get maxRampDownSpeed", new cmdEntry(build_get_maxRampDownSpeed));
-  m_cmdTable.insert("set maxRampDownSpeed", new cmdEntry(build_set_maxRampDownSpeed));
-  m_cmdTable.insert("get emergencyLightLevel", new cmdEntry(build_get_emergencyLightLevel));
-  m_cmdTable.insert("get batteryBackupPowerCalibration", new cmdEntry(build_get_batteryBackupPowerCalibration));
-  m_cmdTable.insert("set batteryBackupPowerCalibration", new cmdEntry(build_set_batteryBackupPowerCalibration));
-  m_cmdTable.insert("get motionSensorProfile", new cmdEntry(build_get_motionSensorProfile));
-  m_cmdTable.insert("set motionSensorProfile", new cmdEntry(build_set_motionSensorProfile));
-  m_cmdTable.insert("get powerMeterConfig", new cmdEntry(build_get_powerMeterConfig, parse_get_powerMeterConfig));
-  m_cmdTable.insert("set powerMeterLevelAtOff", new cmdEntry(build_set_powerMeterLevelAtOff));
-  m_cmdTable.insert("set powerMeterLevelAtMin", new cmdEntry(build_set_powerMeterLevelAtMin));
-  m_cmdTable.insert("set powerMeterLevelAtMax", new cmdEntry(build_set_powerMeterLevelAtMax));
-  m_cmdTable.insert("set powerMeterType", new cmdEntry(build_set_powerMeterType));
-  m_cmdTable.insert("get DLAiSlaveMode", new cmdEntry(build_get_DLAiSlaveMode));
-  m_cmdTable.insert("set DLAiSlaveMode", new cmdEntry(build_set_DLAiSlaveMode));
-  m_cmdTable.insert("get DALIBootloadingActive", new cmdEntry(build_get_DALIBootlodingActive));
-  m_cmdTable.insert("get testingMode", new cmdEntry(build_get_testingMode));
-  m_cmdTable.insert("set testingMode", new cmdEntry(build_set_testingMode));
-  m_cmdTable.insert("get numBatteriesSupported", new cmdEntry(build_get_numBatteriesSupported));
+  m_exeTable.insert("get firmwareVersion", &get_firmwareVersion);
+  m_exeTable.insert("get productCode", get_productCode);
+  m_exeTable.insert("set productCode", set_productCode);
+  m_exeTable.insert("get serialNumber", get_serialNumber);
+  m_exeTable.insert("set serialNumber", set_serialNumber);
+  m_exeTable.insert("get unixTime", get_unixTime);
+  m_exeTable.insert("set unixTime", set_unixTime);
+  m_exeTable.insert("get temperature", get_temperature, parse_get_temperature);
+  m_exeTable.insert("get lightLevel", get_lightLevel, parse_get_lightLevel);
+  m_exeTable.insert("set lightManualLevel", set_lightManualLevel);
+  m_exeTable.insert("set lightOverrideActiveLevel", set_lightOverrideActiveLevel);
+  m_exeTable.insert("set lightOverrideInactiveLevel", set_lightOverrideInactiveLevel);
+  m_exeTable.insert("get sensorDelayTime", get_sensorDelayTime);
+  m_exeTable.insert("get sensorOverrideDelayTime", get_sensorOverrideDelayTime);
+  m_exeTable.insert("set sensorOverrideDelayTime", set_sensorOverrideDelayTime);
+  m_exeTable.insert("get upTime", get_upTime, parse_get_upTime);
+  m_exeTable.insert("get usage", get_usage, parse_get_usage);
+  m_exeTable.insert("get numLogEntries", get_numLogEntries);
+  m_exeTable.insert("get configCalibration", get_configCalibration, parse_get_configCalibration);
+  m_exeTable.insert("set configCalibrationP0", set_configCalibrationP0);
+  m_exeTable.insert("set configCalibrationP1", set_configCalibrationP1);
+  m_exeTable.insert("set configCalibrationP2", set_configCalibrationP2);
+  m_exeTable.insert("set configCalibrationP3", set_configCalibrationP3);
+  m_exeTable.insert("get buildTime", get_buildTime);
+  m_exeTable.insert("set buildTime", set_buildTime);
+  m_exeTable.insert("get sensorTimeoutCountdown", get_sensorTimeoutCountdown);
+  m_exeTable.insert("get currentLightLevel", get_currentLightLevel);
+  m_exeTable.insert("get safeMode", get_safeMode);
+  m_exeTable.insert("get lightBarSelect", get_lightBarSelect);
+  m_exeTable.insert("set lightBarSelect", set_lightBarSelect);
+  m_exeTable.insert("get powerConsumption", get_powerConsumption, parse_get_powerConsumption);
+  m_exeTable.insert("get wirelessDataAggregator", get_wirelessDataAggregator);
+  m_exeTable.insert("set wirelessDataAggregator", set_wirelessDataAggregator);
+  m_exeTable.insert("get resetUsageTimestamp", get_resetUsageTimestamp);
+  m_exeTable.insert("get pwmPeriodRegister", get_pwmPeriodRegister);
+  m_exeTable.insert("set pwmPeriodRegister", set_pwmPeriodRegister);
+  m_exeTable.insert("get analogSensorValue", get_analogSensorValue);
+  m_exeTable.insert("get analogReportingHysteresis", get_analogReportingHysteresis);
+  m_exeTable.insert("get zone", get_zone);
+  m_exeTable.insert("set zone", set_zone);
+  m_exeTable.insert("get lightTemporaryActiveLevel", get_lightTemporaryActiveLevel);
+  m_exeTable.insert("set lightTemporaryActiveLevel", set_lightTemporaryActiveLevel);
+  m_exeTable.insert("get lightTemporaryInactiveLevel", get_lightTemporaryInactiveLevel);
+  m_exeTable.insert("set lightTemporaryInactiveLevel", set_lightTemporaryInactiveLevel);
+  m_exeTable.insert("get sensorTemporaryDelayTime", get_sensorTemporaryDelayTime);
+  m_exeTable.insert("set sensorTemporaryDelayTime", set_sensorTemporaryDealyTime);
+  m_exeTable.insert("get temporaryOverrideTimeout", get_temporaryOverrideTimeout);
+  m_exeTable.insert("set temporaryOverrideTimeout", set_temporaryOverrideTiemout);
+  m_exeTable.insert("get setRemoteState", get_setRemoteState);
+  m_exeTable.insert("set setRemoteState", set_setRemoteState);
+  m_exeTable.insert("get remoteSetDelayTime", get_remoteStateDelayTime);
+  m_exeTable.insert("set remoteSetDelayTime", set_remoteStateDelayTime);
+  m_exeTable.insert("get remoteSecondsCountdown", get_remoteSecondsCountdown);
+  m_exeTable.insert("get minimumDimmingValue", get_minimumDimmingValue);
+  m_exeTable.insert("get powerCalibration", get_powerCalibration, parse_get_powerCalibration);
+  m_exeTable.insert("set powerCalibrationA0", set_powerCalibrationA0);
+  m_exeTable.insert("set powerCalibrationB0", set_powerCalibrationB0);
+  m_exeTable.insert("set powerCalibrationC0", set_powerCalibrationC0);
+  m_exeTable.insert("set powerCalibrationMA", set_powerCalibrationMA);
+  m_exeTable.insert("set powerCalibrationMB", set_powerCalibrationMB);
+  m_exeTable.insert("set powerCalibrationMC", set_powerCalibrationMC);
+  m_exeTable.insert("set powerCalibrationPOff", set_powerCalibrationPOff);
+  m_exeTable.insert("set powerCalibrationPOn", set_powerCalibrationPOn);
+  m_exeTable.insert("set powerCalibrationT0", set_powerCalibrationT0);
+  m_exeTable.insert("get powerEstimatorTemperatureOverride", get_powerEstimatorTemperatureOverride);
+  m_exeTable.insert("set powerEstimatorTemperatureOverride", set_powerEstimatorTemperatureOverride);
+  m_exeTable.insert("get cachedTemperatureValue", get_cachedTemperatureValue);
+  m_exeTable.insert("get eepromSize", get_eepromSize);
+  m_exeTable.insert("get hardwareRevision", get_hardwareRevision);
+  m_exeTable.insert("get wirelessConfig", get_wirelessConfig, parse_get_wirelessConfig);
+  m_exeTable.insert("set wirelessPanId", set_wirelessPanId);
+  m_exeTable.insert("set wirelessChannelMask", set_wirelessChannelMask);
+  m_exeTable.insert("set wirelessShortAddress", set_wirelessShortAddress);
+  m_exeTable.insert("set wirelessRole", set_wirelessRole);
+  m_exeTable.insert("set wirelessWatchdogHold", set_wirelessWatchdogHold);
+  m_exeTable.insert("set wirelessWatchdogPeriod", set_wirelessWatchdogPeriod);
+  m_exeTable.insert("set wirelessNetworkKey", set_wirelessNetworkKey);
+  m_exeTable.insert("get firmwareCode", get_firmwareCode);
+  m_exeTable.insert("get moduleFirmwareCode", get_moduleFirmwareCode);
+  m_exeTable.insert("get maxTemperature", get_maxTemperature, parse_get_maxTemperature);
+  m_exeTable.insert("get overTemperatureConfig", get_overTemperatureConfig, parse_get_overTemperatureConfig);
+  m_exeTable.insert("set overTemperatureThresholdLow", set_overTemperatureThresholdLow);
+  m_exeTable.insert("set overTemperatureThresholdHigh", get_overTemperatureThresholdHigh);
+  m_exeTable.insert("set overTemperatureDimmingLimit", set_overTemperatureDimmingLimit);
+  m_exeTable.insert("get analogDimmingMode", get_analogDimmingMode, parse_get_analogDimmingMode);
+  m_exeTable.insert("set analogDimmingMode", set_analogDimmingMode);
+  m_exeTable.insert("get fixtureIdMode", get_fixtureIdMode);
+  m_exeTable.insert("set fixtureIdMode", set_fixtureIdMode);
+  m_exeTable.insert("get acFrequency", get_acFrequency);
+  m_exeTable.insert("get sensorBits", get_sensorBits);
+  m_exeTable.insert("get powerMeterCommand", get_powerMeterCommand);
+  m_exeTable.insert("set powerMeterCommand", set_powerMeterCommand);
+  m_exeTable.insert("get powerMeterRegister", get_powerMeterRegister);
+  m_exeTable.insert("set powerMeterRegister", set_powerMeterRegister);
+  m_exeTable.insert("get ambientTemperature", get_ambientTemperature);
+  m_exeTable.insert("get lightSensorLevel", get_lightSensorLevel);
+  m_exeTable.insert("get sensorConfig", get_sensorConfig, parse_get_sensorConfig);
+  m_exeTable.insert("set sensor0Timeout", set_sensor0Timeout);
+  m_exeTable.insert("set sensor0Offset", set_sensor0Offset);
+  m_exeTable.insert("set sensor1Timeout", set_sensor1Timeout);
+  m_exeTable.insert("set sensor1Offset", set_sensor1Offset);
+  m_exeTable.insert("get analogDimmingConfig", get_analogDimmingConfig, parse_get_analogDimmingConfig);
+  m_exeTable.insert("set analogDimmingLowValue", set_analogDimmingLowValue);
+  m_exeTable.insert("set analogDimmingHighValue", set_analogDimmingHighValue);
+  m_exeTable.insert("set analogDimmingOffValue", set_analogDimmingOffValue);
+  m_exeTable.insert("get powerMeasurementMode", get_powerMeasurementMode);
+  m_exeTable.insert("set powerMeasurementMode", set_powerMeasurementMode);
+  m_exeTable.insert("get externalPowerMeter", get_externalPowerMeter);
+  m_exeTable.insert("set externalPowerMeter", set_externalPowerMeter);
+  m_exeTable.insert("get ambientSensorValue", get_ambientSensorValue);
+  m_exeTable.insert("get ambientConfig", get_ambientConfig, parse_get_ambientConfig);
+  m_exeTable.insert("set ambientActiveLevel", set_ambientActiveLevel);
+  m_exeTable.insert("set ambientInactiveLevel", set_ambientInactiveLevel);
+  m_exeTable.insert("set ambientEnvironmentalGain", set_ambientEnvironmentalGain);
+  m_exeTable.insert("set ambientOffHysteresis", set_ambientOffHysteresis);
+  m_exeTable.insert("set ambientOnHysteresis", set_ambientOnHysteresis);
+  m_exeTable.insert("get powerboardProtocol", get_powerboardProtocol);
+  m_exeTable.insert("get ledOverride", get_ledOverride);
+  m_exeTable.insert("set ledOverride", set_ledOverride);
+  m_exeTable.insert("get fadeUpStep", get_fadeUpStep);
+  m_exeTable.insert("set fadeUpStep", set_fadeUpStep);
+  m_exeTable.insert("get fadeDownStep", get_fadeDownStep);
+  m_exeTable.insert("set fadeDownStep", set_fadeDownStep);
+  m_exeTable.insert("get maxBrightness", get_maxBrightness);
+  m_exeTable.insert("set maxBrightness", set_maxBrightness);
+  m_exeTable.insert("get i2cResets", get_i2cResets);
+  m_exeTable.insert("get sensorGuardTime", get_sensorGuardTime);
+  m_exeTable.insert("set sensorGuardTime", set_sensorGuardTime);
+  m_exeTable.insert("get inputVoltage", get_inputVoltage);
+  m_exeTable.insert("get inputVoltageCalibration", get_inputVoltageCalibration);
+  m_exeTable.insert("set inputVoltageCalibration", set_inputVoltageCalibration);
+  m_exeTable.insert("get numLightbars", get_numLightbars);
+  m_exeTable.insert("set numLightbars", set_numLightbars);
+  m_exeTable.insert("get currentLimit", get_currentLimit);
+  m_exeTable.insert("set currentLimit", set_currentLimit);
+  m_exeTable.insert("get bootloaderCode", get_bootloaderCode);
+  m_exeTable.insert("get xpressMode", get_xpressMode);
+  m_exeTable.insert("set xpressMode", set_xpressMode);
+  m_exeTable.insert("get batteryBackupStatus", get_batteryBackupStatus, parse_get_batteryBackupStatus);
+  m_exeTable.insert("set batteryBackupStatus", set_batteryBackupStatus);
+  m_exeTable.insert("get sensorSeconds", get_sensorSeconds);
+  m_exeTable.insert("get inputVoltageTwo", get_inputVoltageTwo);
+  m_exeTable.insert("get inputVoltageTwoCalibration", get_inputVoltageTwoCalibration);
+  m_exeTable.insert("set inputVoltageTwoCalibration", set_inputVoltageTwoCalibration);
+  m_exeTable.insert("get maxRampUpSpeed", get_maxRampUpSpeed);
+  m_exeTable.insert("set maxRampUpSpeed", set_maxRampUpSpeed);
+  m_exeTable.insert("get maxRampDownSpeed", get_maxRampDownSpeed);
+  m_exeTable.insert("set maxRampDownSpeed", set_maxRampDownSpeed);
+  m_exeTable.insert("get emergencyLightLevel", get_emergencyLightLevel);
+  m_exeTable.insert("get batteryBackupPowerCalibration", get_batteryBackupPowerCalibration);
+  m_exeTable.insert("set batteryBackupPowerCalibration", set_batteryBackupPowerCalibration);
+  m_exeTable.insert("get motionSensorProfile", get_motionSensorProfile);
+  m_exeTable.insert("set motionSensorProfile", set_motionSensorProfile);
+  m_exeTable.insert("get powerMeterConfig", get_powerMeterConfig, parse_get_powerMeterConfig);
+  m_exeTable.insert("set powerMeterLevelAtOff", set_powerMeterLevelAtOff);
+  m_exeTable.insert("set powerMeterLevelAtMin", set_powerMeterLevelAtMin);
+  m_exeTable.insert("set powerMeterLevelAtMax", set_powerMeterLevelAtMax);
+  m_exeTable.insert("set powerMeterType", set_powerMeterType);
+  m_exeTable.insert("get DLAiSlaveMode", get_DLAiSlaveMode);
+  m_exeTable.insert("set DLAiSlaveMode", set_DLAiSlaveMode);
+  m_exeTable.insert("get DALIBootloadingActive", get_DALIBootlodingActive);
+  m_exeTable.insert("get testingMode", get_testingMode);
+  m_exeTable.insert("set testingMode", set_testingMode);
+  m_exeTable.insert("get numBatteriesSupported", get_numBatteriesSupported);
   // get & set lightbar commands
-  m_cmdTable.insert("get lbVersion", new cmdEntry(build_get_lbVersion, parse_get_lbVersion));
-  m_cmdTable.insert("get lbStatus", new cmdEntry(build_get_lbStatus, parse_get_lbStatus));
-  m_cmdTable.insert("get lbConfig", new cmdEntry(build_get_lbConfig, parse_get_lbConfig));
+  m_exeTable.insert("get lbVersion", get_lbVersion, parse_get_lbVersion);
+  m_exeTable.insert("get lbStatus", get_lbStatus, parse_get_lbStatus);
+  m_exeTable.insert("get lbConfig", get_lbConfig, parse_get_lbConfig);
   // get & set battery backup commands
-  m_cmdTable.insert("get bbVersion", new cmdEntry(build_get_bbVersion, parse_get_bbVersion));
-  m_cmdTable.insert("get bbStatus", new cmdEntry(build_get_bbStatus, parse_get_bbStatus));
-  m_cmdTable.insert("get bbConfig", new cmdEntry(build_get_bbConfig, parse_get_bbConfig));
+  m_exeTable.insert("get bbVersion", get_bbVersion, parse_get_bbVersion);
+  m_exeTable.insert("get bbStatus", get_bbStatus, parse_get_bbStatus);
+  m_exeTable.insert("get bbConfig", get_bbConfig, parse_get_bbConfig);
   // reset commands
-  m_cmdTable.insert("reset usage", new cmdEntry(build_reset_usage));
-  m_cmdTable.insert("reset oldLog", new cmdEntry(build_reset_oldLog));
-  m_cmdTable.insert("reset log", new cmdEntry(build_reset_log));
-  m_cmdTable.insert("reset logIndex", new cmdEntry(build_reset_logIndex));
-  m_cmdTable.insert("reset eeprom", new cmdEntry(build_reset_eeprom));
-  m_cmdTable.insert("reset eepromToDefault", new cmdEntry(build_reset_eepromToDefault));
-  m_cmdTable.insert("reset eepromToLatestMapVersion", new cmdEntry(build_reset_eepromToLatestMapVersion));
-  m_cmdTable.insert("reset network", new cmdEntry(build_reset_network));
-  m_cmdTable.insert("reset networkWithoutChecking", new cmdEntry(build_reset_networkWithoutChecking));
-  m_cmdTable.insert("reset daliCommissioning", new cmdEntry(build_reset_daliCommissioning));
-  m_cmdTable.insert("reset daliPowerMetering", new cmdEntry(build_reset_daliPowerMetering));
+  m_exeTable.insert("reset usage", reset_usage);
+  m_exeTable.insert("reset oldLog", reset_oldLog);
+  m_exeTable.insert("reset log", reset_log);
+  m_exeTable.insert("reset logIndex", reset_logIndex);
+  m_exeTable.insert("reset eeprom", reset_eeprom);
+  m_exeTable.insert("reset eepromToDefault", reset_eepromToDefault);
+  m_exeTable.insert("reset eepromToLatestMapVersion", reset_eepromToLatestMapVersion);
+  m_exeTable.insert("reset network", reset_network);
+  m_exeTable.insert("reset networkWithoutChecking", reset_networkWithoutChecking);
+  m_exeTable.insert("reset daliCommissioning", reset_daliCommissioning);
+  m_exeTable.insert("reset daliPowerMetering", reset_daliPowerMetering);
   // reboot commands
-  m_cmdTable.insert("reboot pmu", new cmdEntry(build_reboot_pmu));
-  m_cmdTable.insert("reboot wirelessCard", new cmdEntry(build_reboot_wirelessCard));
-  m_cmdTable.insert("reboot i2cDevices", new cmdEntry(build_reboot_i2cDevices));
+  m_exeTable.insert("reboot pmu", reboot_pmu);
+  m_exeTable.insert("reboot wirelessCard", reboot_wirelessCard);
+  m_exeTable.insert("reboot i2cDevices", reboot_i2cDevices);
   // reload commands
-  m_cmdTable.insert("reload dlaFirmware", new cmdEntry(build_reload_dlaFirmware));
-  m_cmdTable.insert("reload wirelessModuleFirmware", new cmdEntry(build_reload_wirelessModuleFirmware));
-  m_cmdTable.insert("reload powerboardFirmware", new cmdEntry(build_reload_powerboardFirmware));
-  m_cmdTable.insert("reload lightbarFirmware", new cmdEntry(build_reload_lightbarFirmware));
-  m_cmdTable.insert("reload batteryBackupFirmware", new cmdEntry(build_reload_batteryBackupFirmware));
-  m_cmdTable.insert("reload motionSensorFirmware", new cmdEntry(build_reload_motionSensorFirmware));
+  m_exeTable.insert("reload dlaFirmware", reload_dlaFirmware);
+  m_exeTable.insert("reload wirelessModuleFirmware", reload_wirelessModuleFirmware);
+  m_exeTable.insert("reload powerboardFirmware", reload_powerboardFirmware);
+  m_exeTable.insert("reload lightbarFirmware", reload_lightbarFirmware);
+  m_exeTable.insert("reload batteryBackupFirmware", reload_batteryBackupFirmware);
+  m_exeTable.insert("reload motionSensorFirmware", reload_motionSensorFirmware);
   // log commands
-  m_cmdTable.insert("get logIndex", new cmdEntry(build_get_logIndex, parse_get_logIndex));
-  m_cmdTable.insert("get log", new cmdEntry(build_get_log, parse_get_log));
-  m_cmdTable.insert("insert logEntry", new cmdEntry(build_insert_logEntry));
+  m_exeTable.insert("get logIndex", get_logIndex, parse_get_logIndex);
+  //m_cmdTable.insert("get log", get_log, parse_get_log);
+  m_exeTable.insert("get log", macro_get_log);
+  m_exeTable.insert("insert logEntry", insert_logEntry);
   // build the dictionary of helper commands
-  m_cmdCompleter = new QCompleter(m_cmdTable.keys(), this);
-  m_cmdCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-  m_cmdCompleter->setCompletionMode(QCompleter::InlineCompletion);
+  m_cmdCompleter = new QCompleter(m_exeTable.keys(), this);
+  m_cmdCompleter->setCaseSensitivity(Qt+CaseInsensitive);
+  m_cmdCompleter->setCompletionMode(QCompleter+InlineCompletion);
   // build a dictionary of error responses
   m_errorResponses.insert("ERROR: FFFF", "ERROR: Invalid opcode");
   m_errorResponses.insert("ERROR: FFFE", "ERROR: Syntax error");
@@ -2139,11 +2285,7 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
 }
 
 struct cmdEntry * cmdHelper::getCmdEntry(QString cmd) {
-  return m_cmdTable[cmd];
-}
-
-QString cmdHelper::parseError(QString pmuResponse) {
-  return m_errorResponses[pmuResponse];
+  return m_exeTable[cmd];
 }
 
 QString cmdHelper::getNextCompletion(void) {
