@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include "cmdhelper.h"
 #include "cmdhistory.h"
-#include "cmdio.h"
 #include "preferencesdialog.h"
 
 namespace Ui {
@@ -34,9 +33,11 @@ private:
   Ui::MainWindow *ui;
   bool eventFilter(QObject *target, QEvent *event);
   void checkForInstalledKexts(void);
+  QString processUserRequest(QString *request);
+  QString buildPrompt(void);
+  QString buildAppHelp(void);
   cmdHelper *m_cmdHelper;
   cmdHistory *m_cmdHistory;
-  cmdIO *m_cmdIO;
   interface *m_interface;
   preferencesDialog *m_preferencesDialog;
 };

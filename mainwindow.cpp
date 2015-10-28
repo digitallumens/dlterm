@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "interface.h"
 #include "solarized.h"
 #include <QDebug>
 #include <QFileDialog>
@@ -7,12 +8,13 @@
 #include <QScrollBar>
 #include <QMessageBox>
 #include <QDesktopServices>
+#include <QDate>
+#include <QTime>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui(new Ui::MainWindow),
   m_cmdHelper(new cmdHelper::cmdHelper),
   m_cmdHistory(new cmdHistory::cmdHistory),
-  m_cmdIO(new cmdIO::cmdIO),
   m_interface(new interface::interface),
   m_preferencesDialog(new preferencesDialog::preferencesDialog) {
   ui->setupUi(this);
@@ -74,6 +76,74 @@ void MainWindow::checkForInstalledKexts(void) {
   }
 }
 
+QString MainWindow::processUserRequest(QString *request) {
+  QStringList argList;
+  QStringList responseList;
+  QString preamble;
+  QString response;
+  if (request->startsWith("help")) {
+    solarized::setTextColor(request, solarized::SOLAR_MAGENTA);
+    return buildAppHelp();
+  }
+  // check for a helper handler
+  cmdHandler_t handler = m_cmdHelper->getCmdHandler(*request);
+  if (handler == NULL) {
+    // not a helper command
+    responseList = m_interface->queryPmu(QStringList() << *request);
+    solarized::setTextColor(request, solarized::SOLAR_BASE_01);
+  } else {
+    argList = request->split(" ");
+    argList.removeFirst();
+    argList.removeFirst();
+    // pass control to the helper
+    responseList = handler(argList, m_interface);
+    solarized::setTextColor(request, solarized::SOLAR_YELLOW);
+  }
+  // flatten
+  foreach(QString r, responseList) {
+    if (r.contains("ERROR")) {
+      solarized::setTextColor(&r, solarized::SOLAR_RED);
+    } else if (r.startsWith("+")) {
+      // parsed responses
+      r.remove("+");
+      solarized::setTextColor(&r, solarized::SOLAR_BLUE);
+    } else if (r.contains("OK")) {
+      solarized::setTextColor(&r, solarized::SOLAR_GREEN);
+    } else {
+      // unparsed responses
+      solarized::setTextColor(&r, solarized::SOLAR_VIOLET);
+    }
+    response += (r + "<br>");
+  }
+  return response;
+}
+
+QString MainWindow::buildPrompt(void) {
+  QString prompt;
+  QString timestamp;
+  if (ui->actionShow_Timestamp->isChecked()) {
+    timestamp = QDate::currentDate().toString(Qt::ISODate) + " " + QTime::currentTime().toString(Qt::ISODate);
+    prompt = timestamp + " > ";
+  } else {
+    prompt = " > ";
+  }
+  solarized::setTextColor(&prompt, solarized::SOLAR_BASE_01);
+  return prompt;
+}
+
+QString MainWindow::buildAppHelp(void) {
+  QString response;
+  QStringList helpList = m_cmdHelper->help();
+  foreach(QString h, helpList) {
+    response.append(h + "<br>");
+  }
+  solarized::setTextColor(&response, solarized::SOLAR_BASE_01);
+  if (response.endsWith("<br>") == false) {
+    response.append("<br>");
+  }
+  return response;
+}
+
 bool MainWindow::eventFilter(QObject *target, QEvent *event) {
   QString userRequest;
   QString pmuResponse;
@@ -92,8 +162,8 @@ bool MainWindow::eventFilter(QObject *target, QEvent *event) {
       }
       // process the command
       m_cmdHistory->append(userRequest);
-      prompt = m_cmdIO->buildPrompt(ui->actionShow_Timestamp->isChecked());
-      pmuResponse = m_cmdIO->processUserRequest(&userRequest, ui->actionShow_PMU_Command->isChecked(), m_interface, m_cmdHelper);
+      prompt = buildPrompt();
+      pmuResponse = processUserRequest(&userRequest);
       ui->commandLine->clear();
       ui->outputFeed->insertHtml(prompt + userRequest + "<br>");
       ui->outputFeed->insertHtml(pmuResponse + "<br>");

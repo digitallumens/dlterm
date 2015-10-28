@@ -1,4 +1,5 @@
 #include "cmdhelper.h"
+#include "interface.h"
 #include "dllib.h"
 #include <QAbstractItemView>
 #include <QEvent>
@@ -43,7 +44,7 @@ QString toYDHMS(QString timeInSec) {
 QStringList get_firmwareVersion(QStringList argList, interface *iface) {
   QStringList responseList;
   (void) argList;
-  responseList = iface->queryPmu(QStringList << "G0000");
+  responseList = iface->queryPmu(QStringList() << "G0000");
   if (responseList.at(0).startsWith("ERROR")) {
     return responseList;
   } else {
@@ -87,7 +88,7 @@ QStringList set_unixTime(QStringList argList, interface *iface) {
   if (argList.length() == 0) {
     return QStringList() << "ERROR: expected a value";
   }
-  return iface->queryPmu(QStringList() << QString("S0003 %1").arg(argList.at(0));
+  return iface->queryPmu(QStringList() << QString("S0003 %1").arg(argList.at(0)));
 }
 
 QStringList get_temperature(QStringList argList, interface *iface) {
@@ -115,12 +116,12 @@ QStringList get_lightLevel(QStringList argList, interface *iface) {
           << "G0008" // light overrirde active level
           << "G0009"; // light override inactive level
   responseList = iface->queryPmu(cmdList);
-  return QStringList << QString("+Current level: %1").arg(responseList.at(0))
-                     << QString("+Manual level: %1").arg(responseList.at(1))
-                     << QString("+Active level: %1").arg(responseList.at(2))
-                     << QString("+Inactive level: %1").arg(responseList.at(3))
-                     << QString("+Override active level: %1").arg(responseList.at(4))
-                     << QString("+Override inactive level: %1").arg(responseList.at(5));
+  return QStringList() << QString("+Current level: %1").arg(responseList.at(0))
+                       << QString("+Manual level: %1").arg(responseList.at(1))
+                       << QString("+Active level: %1").arg(responseList.at(2))
+                       << QString("+Inactive level: %1").arg(responseList.at(3))
+                       << QString("+Override active level: %1").arg(responseList.at(4))
+                       << QString("+Override inactive level: %1").arg(responseList.at(5));
 }
 
 QStringList set_lightManualLevel(QStringList argList, interface *iface) {
@@ -169,7 +170,7 @@ QStringList get_upTime(QStringList argList, interface *iface) {
 }
 
 QStringList get_usage(QStringList argList, interface *iface) {
-  QStringList cmdlist;
+  QStringList cmdList;
   QStringList responseList;
   bool ok;
   (void) argList;
@@ -182,7 +183,7 @@ QStringList get_usage(QStringList argList, interface *iface) {
           << "G0012" // perm Wh
           << "G0013" // sensor events
           << "G0014"; // perm sensor events
-  responseList = iface->queryPmu(cmdlist);
+  responseList = iface->queryPmu(cmdList);
   return QStringList() << QString("+Up time: %1").arg(toYDHMS(responseList.at(0)))
                        << QString("+Active time: %1").arg(toYDHMS(responseList.at(1)))
                        << QString("+Inactive time: %1").arg(toYDHMS(responseList.at(2)))
@@ -208,10 +209,10 @@ QStringList get_configCalibration(QStringList argList, interface *iface) {
           << "G0018" // P2
           << "G0019"; // P3
   responseList = iface->queryPmu(cmdList);
-  return QStringList() << QString("+P0: %1").arg(pmuReponseList.at(0))
-                       << QString("+P1: %1").arg(pmuReponseList.at(1))
-                       << QString("+P2: %1").arg(pmuReponseList.at(2))
-                       << QString("+P3: %1").arg(pmuReponseList.at(3));
+  return QStringList() << QString("+P0: %1").arg(responseList.at(0))
+                       << QString("+P1: %1").arg(responseList.at(1))
+                       << QString("+P2: %1").arg(responseList.at(2))
+                       << QString("+P3: %1").arg(responseList.at(3));
 }
 
 QStringList set_configCalibrationP0(QStringList argList, interface *iface) {
@@ -560,8 +561,8 @@ QStringList get_wirelessConfig(QStringList argList, interface *iface) {
   unsigned group;
   unsigned freq;
   bool encrypted;
-  LRNetwork+groupAndFreqFromPanidAndChmask(panid, chmask, &group, &freq, &encrypted);
-  QString netId = LRNetwork+nwidFromGroupAndFreq(group, freq, encrypted);
+  LRNetwork::groupAndFreqFromPanidAndChmask(panid, chmask, &group, &freq, &encrypted);
+  QString netId = LRNetwork::nwidFromGroupAndFreq(group, freq, encrypted);
   QStringList parsedResponse;
   return QStringList() << QString("+Network ID: %1").arg(netId)
                        << QString("+Pan ID: %1").arg(responseList.at(0))
@@ -642,8 +643,8 @@ QStringList get_maxTemperature(QStringList argList, interface *iface) {
   QString temperature = responseList.at(0);
   QString time = responseList.at(1);
   time = (time.startsWith("ERROR")) ? time : toYDHMS(time);
-  responseList->append(QString("+Temperature: %1").arg(temperature));
-  responseList->append(QString("+Time: %1").arg(time));
+  return QStringList() << QString("+Temperature: %1").arg(temperature)
+                       << QString("+Time: %1").arg(time);
 }
 
 QStringList get_overTemperatureConfig(QStringList argList, interface *iface) {
@@ -653,7 +654,7 @@ QStringList get_overTemperatureConfig(QStringList argList, interface *iface) {
   cmdList << "G0045" // low threshold
           << "G0046" // high threshold
           << "G0047"; // dimming limit
-  responseList = iface(cmdList);
+  responseList = iface->queryPmu(cmdList);
   return QStringList() << QString("+Low threshold: %1").arg(responseList.at(0))
                        << QString("+High threshold: %1").arg(responseList.at(1))
                        << QString("+Dimming limit: %1").arg(responseList.at(2));
@@ -1376,6 +1377,7 @@ QStringList get_lbStatus(QStringList argList, interface *iface) {
   cmdList << QString("R%1%2").arg(barNum).arg("80"); // light level
   cmdList << QString("R%1%2").arg(barNum).arg("81"); // light active slew rate
   cmdList << QString("R%1%2").arg(barNum).arg("82"); // light inactive slew rate
+  responseList = iface->queryPmu(cmdList);
   QString bypass = responseList.at(0);
   QString stringCurrent1 = responseList.at(1);
   QString stringCurrent2 = responseList.at(2);
@@ -1392,10 +1394,10 @@ QStringList get_lbStatus(QStringList argList, interface *iface) {
   quint16 val;
   if (bypass.startsWith("ERROR") == false) {
     val = responseList.at(0).toUShort(&ok, 16);
-    if (statusInt & 4) {
-      bypass << "active";
+    if (val & 4) {
+      bypass = "active";
     } else {
-      bypass << "inactive";
+      bypass = "inactive";
     }
   }
   if (stringCurrent1.startsWith("ERROR") == false) {
@@ -1717,25 +1719,25 @@ QStringList get_bbConfig(QStringList argList, interface *iface) {
     serialNum = QString("%1%2").arg(snHigh).arg(snLow);
   }
   if (chargeTime.startsWith("ERROR") == false) {
-    chargeTime = QString("%1 minutes").arg(chargeTime.toUShort((&ok, 16)));
+    chargeTime = QString("%1 minutes").arg(chargeTime.toUShort(&ok, 16));
   }
   if (trickleTime.startsWith("ERROR") == false) {
-    trickleTime = QString("%1 minutes").arg(trickleTime.toUShort((&ok, 16)));
+    trickleTime = QString("%1 minutes").arg(trickleTime.toUShort(&ok, 16));
   }
   if (standbyTime.startsWith("ERROR") == false) {
-    standbyTime = QString("%1 minutes").arg(standbyTime.toUShort((&ok, 16)));
+    standbyTime = QString("%1 minutes").arg(standbyTime.toUShort(&ok, 16));
   }
   if (shutdownTime.startsWith("ERROR") == false) {
-    shutdownTime = QString("%1 minutes").arg(shutdownTime.toUShort((&ok, 16)));
+    shutdownTime = QString("%1 minutes").arg(shutdownTime.toUShort(&ok, 16));
   }
   if (maxBatteryVoltage.startsWith("ERROR") == false) {
-    maxBatteryVoltage = QString("%1 volts").arg(maxBatteryVoltage.toUShort(&ok, 16) * 0.04)
+    maxBatteryVoltage = QString("%1 volts").arg(maxBatteryVoltage.toUShort(&ok, 16) * 0.04);
   }
   if (minBatteryVoltage.startsWith("ERROR") == false) {
-    minBatteryVoltage = QString("%1 volts").arg(minBatteryVoltage.toUShort(&ok, 16) * 0.04)
+    minBatteryVoltage = QString("%1 volts").arg(minBatteryVoltage.toUShort(&ok, 16) * 0.04);
   }
   if (rechargeBatteryVoltage.startsWith("ERROR") == false) {
-    rechargeBatteryVoltage = QString("%1 volts").arg(rechargeBatteryVoltage.toUShort(&ok, 16) * 0.04)
+    rechargeBatteryVoltage = QString("%1 volts").arg(rechargeBatteryVoltage.toUShort(&ok, 16) * 0.04);
   }
   if (maxChargeTemp.startsWith("ERROR") == false) {
     maxChargeTemp = QString("%1 C").arg((maxChargeTemp.toUShort(&ok, 16) - 164) * 0.125);
@@ -1902,42 +1904,49 @@ QStringList get_logIndex(QStringList argList, interface *iface) {
     if (first == "FFFF") {
       first = "none";
     }
-    return QStringList() << QString("head: %1<br>tail: %2<br>first recent: %3").arg(head).arg(tail).arg(first);
+    return QStringList() << QString("+head: %1").arg(head)
+                         << QString("+tail: %1").arg(tail)
+                         << QString("+first: %1").arg(first);
   }
 }
 
 QStringList get_log(QStringList argList, interface *iface) {
-  QStringList cmdList;
   QStringList responseList;
-  bool ok;
   QString index;
   if (argList.length() == 0) {
-    index.setNum(logIndex, 16);
-    // pad with leading zeros
-    while (index.length() < 4) {
-      index.prepend("0");
+    // get log index
+    responseList = iface->queryPmu(QStringList() << "K");
+    if (responseList.at(0).startsWith("ERROR")) {
+      return responseList;
     }
+    QString arg1 = responseList.at(0);
+    QString head = arg1.left(4);
+    arg1.remove(0, 4);
+    QString tail = arg1.left(4);
+    arg1.remove(0, 4);
+    QString first = arg1.left(4);
+    if (first == "FFFF") {
+      first = "none";
+    }
+    index = first;
   } else {
     index = argList.at(0);
-    logIndex = index.toUShort(&ok, 16);
   }
-  return QStringList() << QString("K%1").arg(index);
-}
-
-QStringList parse_get_log(QStringList responseList) {
-  QString arg1;
+  // get log record
+  responseList = iface->queryPmu(QStringList() << QString("K%1").arg(index));
+  QString element;
   int uptimeSize, valueSize, baseTime, uptime;
   QString eventType, eventValue;
-  QString log;
+  QStringList log;
   bool ok;
   bool isLastEntry;
   QString timestamp;
   int numEvents = 0;
-  arg1 = responseList.at(0);
+  element = responseList.at(0);
   baseTime = 0;
   do {
     // assemble log entry
-    uptimeSize = arg1.left(1).toInt(&ok, 16);
+    uptimeSize = element.left(1).toInt(&ok, 16);
     // most significant bit of uptime size is last entry indicator
     if (uptimeSize > 7) {
       isLastEntry = true;
@@ -1946,15 +1955,15 @@ QStringList parse_get_log(QStringList responseList) {
       isLastEntry = false;
     }
     // strip elements from the log entry
-    arg1.remove(0, 1);
-    valueSize = arg1.left(1).toInt(&ok, 16);
-    arg1.remove(0, 1);
-    eventType = arg1.left(2);
-    arg1.remove(0, 2);
-    uptime = arg1.left(uptimeSize * 2).toInt(&ok, 16);
-    arg1.remove(0, uptimeSize * 2);
-    eventValue = arg1.left(valueSize * 2);
-    arg1.remove(0, valueSize * 2);
+    element.remove(0, 1);
+    valueSize = element.left(1).toInt(&ok, 16);
+    element.remove(0, 1);
+    eventType = element.left(2);
+    element.remove(0, 2);
+    uptime = element.left(uptimeSize * 2).toInt(&ok, 16);
+    element.remove(0, uptimeSize * 2);
+    eventValue = element.left(valueSize * 2);
+    element.remove(0, valueSize * 2);
     // compute uptime
     if (uptimeSize == 4) {
       baseTime = uptime;
@@ -1972,7 +1981,7 @@ QStringList parse_get_log(QStringList responseList) {
       powerEventsMap.insert("01", "Power up");
       powerEventsMap.insert("02", "Power restored");
       powerEventsMap.insert("03", "Power soft reset");
-      log += QString("%1 > %2").arg(timestamp).arg(powerEventsMap[eventValue]);
+      log << QString("+%1 > %2").arg(timestamp).arg(powerEventsMap[eventValue]);
     } else if (eventType == "01") {
       // build a dictionary of activity state transition events
       QMap <QString, QString> activityStateTransitionEventsMap;
@@ -1984,21 +1993,21 @@ QStringList parse_get_log(QStringList responseList) {
       activityStateTransitionEventsMap.insert("05", "Remote sensor & sensor 0 active");
       activityStateTransitionEventsMap.insert("06", "Remote sensor & sensor 1 active");
       activityStateTransitionEventsMap.insert("07", "Remote sensor, sensor 0, and sensor 1 active");
-      log += QString("%1 > %2").arg(timestamp).arg(activityStateTransitionEventsMap[eventValue]);
+      log << QString("+%1 > %2").arg(timestamp).arg(activityStateTransitionEventsMap[eventValue]);
     } else if (eventType == "02") {
       // type 2 events are not implemented
-      log += QString("%1 > Type 2 event: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 > Type 2 event: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "03") {
-      log += QString("%1 > Sensor off: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 > Sensor off: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "04") {
       // unspecified value
-      log += QString("%1 > SerialNet watchdog tripped").arg(timestamp);
+      log << QString("+%1 > SerialNet watchdog tripped").arg(timestamp);
     } else if (eventType == "05") {
-      log += QString("%1 > Temperature state change: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 > Temperature state change: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "06") {
-      log += QString("%1 > Lightbar error: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 > Lightbar error: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "07") {
-      log += QString("%1 > RTC set event: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 > RTC set event: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "08") {
       int batteryNumber;
       // build a dictionary of battery backup events
@@ -2024,268 +2033,256 @@ QStringList parse_get_log(QStringList responseList) {
       } else {
         batteryNumber = 0;
       }
-      log += QString("%1 > Battery backup %2 event: %3").arg(timestamp).arg(batteryNumber).arg(batteryBackupEventsMap[eventValue]);
+      log << QString("+%1 > Battery backup %2 event: %3").arg(timestamp).arg(batteryNumber).arg(batteryBackupEventsMap[eventValue]);
     } else if (eventType == "09") {
-      log += QString("%1 > I2C watchdog reset event: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 > I2C watchdog reset event: %2").arg(timestamp).arg(eventValue);
     } else if (eventType == "0A") {
       // unspecified value
-      log += QString("%1 > Registers restored from backup").arg(timestamp);
+      log << QString("+%1 > Registers restored from backup").arg(timestamp);
     } else {
       // unknown event
-      log += QString("%1 > Type %2 event: %3").arg(timestamp).arg(eventType).arg(eventValue);
+      log << QString("+%1 > Type %2 event: %3").arg(timestamp).arg(eventType).arg(eventValue);
     }
-    // insert a break
-    log += "<br>";
     // count events
     numEvents++;
-  } while (arg1.isEmpty() != true);
+  } while (element.isEmpty() != true);
   // notify the user that more logs are available
   if (isLastEntry == true) {
-    log += "[End of log]";
+    log << "+[End of log]";
   } else {
-    log += "[More events available...]";
+    log << "+[More events available...]";
     logIndex += numEvents;
   }
-  return QStringList() << log;
+  return log;
 }
 
 QStringList insert_logEntry(QStringList argList, interface *iface) {
-  QStringList cmdList;
-  QStringList responseList;
-  cmdList << QString("E%1").arg(argList.at(0));
-  return iface->queryPmu(cmdList);
+  if (argList.length() == 0) {
+    return QStringList() << "ERROR: expected a value";
+  }
+  return iface->queryPmu(QStringList() << QString("E%1").arg(argList.at(0)));
 }
 
 cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   QStringList keywordList;
   // get & set PMU register commands
-  m_exeTable.insert("get firmwareVersion", &get_firmwareVersion);
-  m_exeTable.insert("get productCode", get_productCode);
-  m_exeTable.insert("set productCode", set_productCode);
-  m_exeTable.insert("get serialNumber", get_serialNumber);
-  m_exeTable.insert("set serialNumber", set_serialNumber);
-  m_exeTable.insert("get unixTime", get_unixTime);
-  m_exeTable.insert("set unixTime", set_unixTime);
-  m_exeTable.insert("get temperature", get_temperature, parse_get_temperature);
-  m_exeTable.insert("get lightLevel", get_lightLevel, parse_get_lightLevel);
-  m_exeTable.insert("set lightManualLevel", set_lightManualLevel);
-  m_exeTable.insert("set lightOverrideActiveLevel", set_lightOverrideActiveLevel);
-  m_exeTable.insert("set lightOverrideInactiveLevel", set_lightOverrideInactiveLevel);
-  m_exeTable.insert("get sensorDelayTime", get_sensorDelayTime);
-  m_exeTable.insert("get sensorOverrideDelayTime", get_sensorOverrideDelayTime);
-  m_exeTable.insert("set sensorOverrideDelayTime", set_sensorOverrideDelayTime);
-  m_exeTable.insert("get upTime", get_upTime, parse_get_upTime);
-  m_exeTable.insert("get usage", get_usage, parse_get_usage);
-  m_exeTable.insert("get numLogEntries", get_numLogEntries);
-  m_exeTable.insert("get configCalibration", get_configCalibration, parse_get_configCalibration);
-  m_exeTable.insert("set configCalibrationP0", set_configCalibrationP0);
-  m_exeTable.insert("set configCalibrationP1", set_configCalibrationP1);
-  m_exeTable.insert("set configCalibrationP2", set_configCalibrationP2);
-  m_exeTable.insert("set configCalibrationP3", set_configCalibrationP3);
-  m_exeTable.insert("get buildTime", get_buildTime);
-  m_exeTable.insert("set buildTime", set_buildTime);
-  m_exeTable.insert("get sensorTimeoutCountdown", get_sensorTimeoutCountdown);
-  m_exeTable.insert("get currentLightLevel", get_currentLightLevel);
-  m_exeTable.insert("get safeMode", get_safeMode);
-  m_exeTable.insert("get lightBarSelect", get_lightBarSelect);
-  m_exeTable.insert("set lightBarSelect", set_lightBarSelect);
-  m_exeTable.insert("get powerConsumption", get_powerConsumption, parse_get_powerConsumption);
-  m_exeTable.insert("get wirelessDataAggregator", get_wirelessDataAggregator);
-  m_exeTable.insert("set wirelessDataAggregator", set_wirelessDataAggregator);
-  m_exeTable.insert("get resetUsageTimestamp", get_resetUsageTimestamp);
-  m_exeTable.insert("get pwmPeriodRegister", get_pwmPeriodRegister);
-  m_exeTable.insert("set pwmPeriodRegister", set_pwmPeriodRegister);
-  m_exeTable.insert("get analogSensorValue", get_analogSensorValue);
-  m_exeTable.insert("get analogReportingHysteresis", get_analogReportingHysteresis);
-  m_exeTable.insert("get zone", get_zone);
-  m_exeTable.insert("set zone", set_zone);
-  m_exeTable.insert("get lightTemporaryActiveLevel", get_lightTemporaryActiveLevel);
-  m_exeTable.insert("set lightTemporaryActiveLevel", set_lightTemporaryActiveLevel);
-  m_exeTable.insert("get lightTemporaryInactiveLevel", get_lightTemporaryInactiveLevel);
-  m_exeTable.insert("set lightTemporaryInactiveLevel", set_lightTemporaryInactiveLevel);
-  m_exeTable.insert("get sensorTemporaryDelayTime", get_sensorTemporaryDelayTime);
-  m_exeTable.insert("set sensorTemporaryDelayTime", set_sensorTemporaryDealyTime);
-  m_exeTable.insert("get temporaryOverrideTimeout", get_temporaryOverrideTimeout);
-  m_exeTable.insert("set temporaryOverrideTimeout", set_temporaryOverrideTiemout);
-  m_exeTable.insert("get setRemoteState", get_setRemoteState);
-  m_exeTable.insert("set setRemoteState", set_setRemoteState);
-  m_exeTable.insert("get remoteSetDelayTime", get_remoteStateDelayTime);
-  m_exeTable.insert("set remoteSetDelayTime", set_remoteStateDelayTime);
-  m_exeTable.insert("get remoteSecondsCountdown", get_remoteSecondsCountdown);
-  m_exeTable.insert("get minimumDimmingValue", get_minimumDimmingValue);
-  m_exeTable.insert("get powerCalibration", get_powerCalibration, parse_get_powerCalibration);
-  m_exeTable.insert("set powerCalibrationA0", set_powerCalibrationA0);
-  m_exeTable.insert("set powerCalibrationB0", set_powerCalibrationB0);
-  m_exeTable.insert("set powerCalibrationC0", set_powerCalibrationC0);
-  m_exeTable.insert("set powerCalibrationMA", set_powerCalibrationMA);
-  m_exeTable.insert("set powerCalibrationMB", set_powerCalibrationMB);
-  m_exeTable.insert("set powerCalibrationMC", set_powerCalibrationMC);
-  m_exeTable.insert("set powerCalibrationPOff", set_powerCalibrationPOff);
-  m_exeTable.insert("set powerCalibrationPOn", set_powerCalibrationPOn);
-  m_exeTable.insert("set powerCalibrationT0", set_powerCalibrationT0);
-  m_exeTable.insert("get powerEstimatorTemperatureOverride", get_powerEstimatorTemperatureOverride);
-  m_exeTable.insert("set powerEstimatorTemperatureOverride", set_powerEstimatorTemperatureOverride);
-  m_exeTable.insert("get cachedTemperatureValue", get_cachedTemperatureValue);
-  m_exeTable.insert("get eepromSize", get_eepromSize);
-  m_exeTable.insert("get hardwareRevision", get_hardwareRevision);
-  m_exeTable.insert("get wirelessConfig", get_wirelessConfig, parse_get_wirelessConfig);
-  m_exeTable.insert("set wirelessPanId", set_wirelessPanId);
-  m_exeTable.insert("set wirelessChannelMask", set_wirelessChannelMask);
-  m_exeTable.insert("set wirelessShortAddress", set_wirelessShortAddress);
-  m_exeTable.insert("set wirelessRole", set_wirelessRole);
-  m_exeTable.insert("set wirelessWatchdogHold", set_wirelessWatchdogHold);
-  m_exeTable.insert("set wirelessWatchdogPeriod", set_wirelessWatchdogPeriod);
-  m_exeTable.insert("set wirelessNetworkKey", set_wirelessNetworkKey);
-  m_exeTable.insert("get firmwareCode", get_firmwareCode);
-  m_exeTable.insert("get moduleFirmwareCode", get_moduleFirmwareCode);
-  m_exeTable.insert("get maxTemperature", get_maxTemperature, parse_get_maxTemperature);
-  m_exeTable.insert("get overTemperatureConfig", get_overTemperatureConfig, parse_get_overTemperatureConfig);
-  m_exeTable.insert("set overTemperatureThresholdLow", set_overTemperatureThresholdLow);
-  m_exeTable.insert("set overTemperatureThresholdHigh", get_overTemperatureThresholdHigh);
-  m_exeTable.insert("set overTemperatureDimmingLimit", set_overTemperatureDimmingLimit);
-  m_exeTable.insert("get analogDimmingMode", get_analogDimmingMode, parse_get_analogDimmingMode);
-  m_exeTable.insert("set analogDimmingMode", set_analogDimmingMode);
-  m_exeTable.insert("get fixtureIdMode", get_fixtureIdMode);
-  m_exeTable.insert("set fixtureIdMode", set_fixtureIdMode);
-  m_exeTable.insert("get acFrequency", get_acFrequency);
-  m_exeTable.insert("get sensorBits", get_sensorBits);
-  m_exeTable.insert("get powerMeterCommand", get_powerMeterCommand);
-  m_exeTable.insert("set powerMeterCommand", set_powerMeterCommand);
-  m_exeTable.insert("get powerMeterRegister", get_powerMeterRegister);
-  m_exeTable.insert("set powerMeterRegister", set_powerMeterRegister);
-  m_exeTable.insert("get ambientTemperature", get_ambientTemperature);
-  m_exeTable.insert("get lightSensorLevel", get_lightSensorLevel);
-  m_exeTable.insert("get sensorConfig", get_sensorConfig, parse_get_sensorConfig);
-  m_exeTable.insert("set sensor0Timeout", set_sensor0Timeout);
-  m_exeTable.insert("set sensor0Offset", set_sensor0Offset);
-  m_exeTable.insert("set sensor1Timeout", set_sensor1Timeout);
-  m_exeTable.insert("set sensor1Offset", set_sensor1Offset);
-  m_exeTable.insert("get analogDimmingConfig", get_analogDimmingConfig, parse_get_analogDimmingConfig);
-  m_exeTable.insert("set analogDimmingLowValue", set_analogDimmingLowValue);
-  m_exeTable.insert("set analogDimmingHighValue", set_analogDimmingHighValue);
-  m_exeTable.insert("set analogDimmingOffValue", set_analogDimmingOffValue);
-  m_exeTable.insert("get powerMeasurementMode", get_powerMeasurementMode);
-  m_exeTable.insert("set powerMeasurementMode", set_powerMeasurementMode);
-  m_exeTable.insert("get externalPowerMeter", get_externalPowerMeter);
-  m_exeTable.insert("set externalPowerMeter", set_externalPowerMeter);
-  m_exeTable.insert("get ambientSensorValue", get_ambientSensorValue);
-  m_exeTable.insert("get ambientConfig", get_ambientConfig, parse_get_ambientConfig);
-  m_exeTable.insert("set ambientActiveLevel", set_ambientActiveLevel);
-  m_exeTable.insert("set ambientInactiveLevel", set_ambientInactiveLevel);
-  m_exeTable.insert("set ambientEnvironmentalGain", set_ambientEnvironmentalGain);
-  m_exeTable.insert("set ambientOffHysteresis", set_ambientOffHysteresis);
-  m_exeTable.insert("set ambientOnHysteresis", set_ambientOnHysteresis);
-  m_exeTable.insert("get powerboardProtocol", get_powerboardProtocol);
-  m_exeTable.insert("get ledOverride", get_ledOverride);
-  m_exeTable.insert("set ledOverride", set_ledOverride);
-  m_exeTable.insert("get fadeUpStep", get_fadeUpStep);
-  m_exeTable.insert("set fadeUpStep", set_fadeUpStep);
-  m_exeTable.insert("get fadeDownStep", get_fadeDownStep);
-  m_exeTable.insert("set fadeDownStep", set_fadeDownStep);
-  m_exeTable.insert("get maxBrightness", get_maxBrightness);
-  m_exeTable.insert("set maxBrightness", set_maxBrightness);
-  m_exeTable.insert("get i2cResets", get_i2cResets);
-  m_exeTable.insert("get sensorGuardTime", get_sensorGuardTime);
-  m_exeTable.insert("set sensorGuardTime", set_sensorGuardTime);
-  m_exeTable.insert("get inputVoltage", get_inputVoltage);
-  m_exeTable.insert("get inputVoltageCalibration", get_inputVoltageCalibration);
-  m_exeTable.insert("set inputVoltageCalibration", set_inputVoltageCalibration);
-  m_exeTable.insert("get numLightbars", get_numLightbars);
-  m_exeTable.insert("set numLightbars", set_numLightbars);
-  m_exeTable.insert("get currentLimit", get_currentLimit);
-  m_exeTable.insert("set currentLimit", set_currentLimit);
-  m_exeTable.insert("get bootloaderCode", get_bootloaderCode);
-  m_exeTable.insert("get xpressMode", get_xpressMode);
-  m_exeTable.insert("set xpressMode", set_xpressMode);
-  m_exeTable.insert("get batteryBackupStatus", get_batteryBackupStatus, parse_get_batteryBackupStatus);
-  m_exeTable.insert("set batteryBackupStatus", set_batteryBackupStatus);
-  m_exeTable.insert("get sensorSeconds", get_sensorSeconds);
-  m_exeTable.insert("get inputVoltageTwo", get_inputVoltageTwo);
-  m_exeTable.insert("get inputVoltageTwoCalibration", get_inputVoltageTwoCalibration);
-  m_exeTable.insert("set inputVoltageTwoCalibration", set_inputVoltageTwoCalibration);
-  m_exeTable.insert("get maxRampUpSpeed", get_maxRampUpSpeed);
-  m_exeTable.insert("set maxRampUpSpeed", set_maxRampUpSpeed);
-  m_exeTable.insert("get maxRampDownSpeed", get_maxRampDownSpeed);
-  m_exeTable.insert("set maxRampDownSpeed", set_maxRampDownSpeed);
-  m_exeTable.insert("get emergencyLightLevel", get_emergencyLightLevel);
-  m_exeTable.insert("get batteryBackupPowerCalibration", get_batteryBackupPowerCalibration);
-  m_exeTable.insert("set batteryBackupPowerCalibration", set_batteryBackupPowerCalibration);
-  m_exeTable.insert("get motionSensorProfile", get_motionSensorProfile);
-  m_exeTable.insert("set motionSensorProfile", set_motionSensorProfile);
-  m_exeTable.insert("get powerMeterConfig", get_powerMeterConfig, parse_get_powerMeterConfig);
-  m_exeTable.insert("set powerMeterLevelAtOff", set_powerMeterLevelAtOff);
-  m_exeTable.insert("set powerMeterLevelAtMin", set_powerMeterLevelAtMin);
-  m_exeTable.insert("set powerMeterLevelAtMax", set_powerMeterLevelAtMax);
-  m_exeTable.insert("set powerMeterType", set_powerMeterType);
-  m_exeTable.insert("get DLAiSlaveMode", get_DLAiSlaveMode);
-  m_exeTable.insert("set DLAiSlaveMode", set_DLAiSlaveMode);
-  m_exeTable.insert("get DALIBootloadingActive", get_DALIBootlodingActive);
-  m_exeTable.insert("get testingMode", get_testingMode);
-  m_exeTable.insert("set testingMode", set_testingMode);
-  m_exeTable.insert("get numBatteriesSupported", get_numBatteriesSupported);
+  m_cmdTable.insert("get firmwareVersion", &get_firmwareVersion);
+  m_cmdTable.insert("get productCode", get_productCode);
+  m_cmdTable.insert("set productCode", set_productCode);
+  m_cmdTable.insert("get serialNumber", get_serialNumber);
+  m_cmdTable.insert("set serialNumber", set_serialNumber);
+  m_cmdTable.insert("get unixTime", get_unixTime);
+  m_cmdTable.insert("set unixTime", set_unixTime);
+  m_cmdTable.insert("get temperature", get_temperature);
+  m_cmdTable.insert("get lightLevel", get_lightLevel);
+  m_cmdTable.insert("set lightManualLevel", set_lightManualLevel);
+  m_cmdTable.insert("set lightOverrideActiveLevel", set_lightOverrideActiveLevel);
+  m_cmdTable.insert("set lightOverrideInactiveLevel", set_lightOverrideInactiveLevel);
+  m_cmdTable.insert("get sensorDelayTime", get_sensorDelayTime);
+  m_cmdTable.insert("get sensorOverrideDelayTime", get_sensorOverrideDelayTime);
+  m_cmdTable.insert("set sensorOverrideDelayTime", set_sensorOverrideDelayTime);
+  m_cmdTable.insert("get upTime", get_upTime);
+  m_cmdTable.insert("get usage", get_usage);
+  m_cmdTable.insert("get numLogEntries", get_numLogEntries);
+  m_cmdTable.insert("get configCalibration", get_configCalibration);
+  m_cmdTable.insert("set configCalibrationP0", set_configCalibrationP0);
+  m_cmdTable.insert("set configCalibrationP1", set_configCalibrationP1);
+  m_cmdTable.insert("set configCalibrationP2", set_configCalibrationP2);
+  m_cmdTable.insert("set configCalibrationP3", set_configCalibrationP3);
+  m_cmdTable.insert("get buildTime", get_buildTime);
+  m_cmdTable.insert("set buildTime", set_buildTime);
+  m_cmdTable.insert("get sensorTimeoutCountdown", get_sensorTimeoutCountdown);
+  m_cmdTable.insert("get currentLightLevel", get_currentLightLevel);
+  m_cmdTable.insert("get safeMode", get_safeMode);
+  m_cmdTable.insert("get lightBarSelect", get_lightBarSelect);
+  m_cmdTable.insert("set lightBarSelect", set_lightBarSelect);
+  m_cmdTable.insert("get powerConsumption", get_powerConsumption);
+  m_cmdTable.insert("get wirelessDataAggregator", get_wirelessDataAggregator);
+  m_cmdTable.insert("set wirelessDataAggregator", set_wirelessDataAggregator);
+  m_cmdTable.insert("get resetUsageTimestamp", get_resetUsageTimestamp);
+  m_cmdTable.insert("get pwmPeriodRegister", get_pwmPeriodRegister);
+  m_cmdTable.insert("set pwmPeriodRegister", set_pwmPeriodRegister);
+  m_cmdTable.insert("get analogSensorValue", get_analogSensorValue);
+  m_cmdTable.insert("get analogReportingHysteresis", get_analogReportingHysteresis);
+  m_cmdTable.insert("get zone", get_zone);
+  m_cmdTable.insert("set zone", set_zone);
+  m_cmdTable.insert("get lightTemporaryActiveLevel", get_lightTemporaryActiveLevel);
+  m_cmdTable.insert("set lightTemporaryActiveLevel", set_lightTemporaryActiveLevel);
+  m_cmdTable.insert("get lightTemporaryInactiveLevel", get_lightTemporaryInactiveLevel);
+  m_cmdTable.insert("set lightTemporaryInactiveLevel", set_lightTemporaryInactiveLevel);
+  m_cmdTable.insert("get sensorTemporaryDelayTime", get_sensorTemporaryDelayTime);
+  m_cmdTable.insert("set sensorTemporaryDelayTime", set_sensorTemporaryDealyTime);
+  m_cmdTable.insert("get temporaryOverrideTimeout", get_temporaryOverrideTimeout);
+  m_cmdTable.insert("set temporaryOverrideTimeout", set_temporaryOverrideTiemout);
+  m_cmdTable.insert("get setRemoteState", get_setRemoteState);
+  m_cmdTable.insert("set setRemoteState", set_setRemoteState);
+  m_cmdTable.insert("get remoteSetDelayTime", get_remoteStateDelayTime);
+  m_cmdTable.insert("set remoteSetDelayTime", set_remoteStateDelayTime);
+  m_cmdTable.insert("get remoteSecondsCountdown", get_remoteSecondsCountdown);
+  m_cmdTable.insert("get minimumDimmingValue", get_minimumDimmingValue);
+  m_cmdTable.insert("get powerCalibration", get_powerCalibration);
+  m_cmdTable.insert("set powerCalibrationA0", set_powerCalibrationA0);
+  m_cmdTable.insert("set powerCalibrationB0", set_powerCalibrationB0);
+  m_cmdTable.insert("set powerCalibrationC0", set_powerCalibrationC0);
+  m_cmdTable.insert("set powerCalibrationMA", set_powerCalibrationMA);
+  m_cmdTable.insert("set powerCalibrationMB", set_powerCalibrationMB);
+  m_cmdTable.insert("set powerCalibrationMC", set_powerCalibrationMC);
+  m_cmdTable.insert("set powerCalibrationPOff", set_powerCalibrationPOff);
+  m_cmdTable.insert("set powerCalibrationPOn", set_powerCalibrationPOn);
+  m_cmdTable.insert("set powerCalibrationT0", set_powerCalibrationT0);
+  m_cmdTable.insert("get powerEstimatorTemperatureOverride", get_powerEstimatorTemperatureOverride);
+  m_cmdTable.insert("set powerEstimatorTemperatureOverride", set_powerEstimatorTemperatureOverride);
+  m_cmdTable.insert("get cachedTemperatureValue", get_cachedTemperatureValue);
+  m_cmdTable.insert("get eepromSize", get_eepromSize);
+  m_cmdTable.insert("get hardwareRevision", get_hardwareRevision);
+  m_cmdTable.insert("get wirelessConfig", get_wirelessConfig);
+  m_cmdTable.insert("set wirelessPanId", set_wirelessPanId);
+  m_cmdTable.insert("set wirelessChannelMask", set_wirelessChannelMask);
+  m_cmdTable.insert("set wirelessShortAddress", set_wirelessShortAddress);
+  m_cmdTable.insert("set wirelessRole", set_wirelessRole);
+  m_cmdTable.insert("set wirelessWatchdogHold", set_wirelessWatchdogHold);
+  m_cmdTable.insert("set wirelessWatchdogPeriod", set_wirelessWatchdogPeriod);
+  m_cmdTable.insert("set wirelessNetworkKey", set_wirelessNetworkKey);
+  m_cmdTable.insert("get firmwareCode", get_firmwareCode);
+  m_cmdTable.insert("get moduleFirmwareCode", get_moduleFirmwareCode);
+  m_cmdTable.insert("get maxTemperature", get_maxTemperature);
+  m_cmdTable.insert("get overTemperatureConfig", get_overTemperatureConfig);
+  m_cmdTable.insert("set overTemperatureThresholdLow", set_overTemperatureThresholdLow);
+  m_cmdTable.insert("set overTemperatureThresholdHigh", get_overTemperatureThresholdHigh);
+  m_cmdTable.insert("set overTemperatureDimmingLimit", set_overTemperatureDimmingLimit);
+  m_cmdTable.insert("get analogDimmingMode", get_analogDimmingMode);
+  m_cmdTable.insert("set analogDimmingMode", set_analogDimmingMode);
+  m_cmdTable.insert("get fixtureIdMode", get_fixtureIdMode);
+  m_cmdTable.insert("set fixtureIdMode", set_fixtureIdMode);
+  m_cmdTable.insert("get acFrequency", get_acFrequency);
+  m_cmdTable.insert("get sensorBits", get_sensorBits);
+  m_cmdTable.insert("get powerMeterCommand", get_powerMeterCommand);
+  m_cmdTable.insert("set powerMeterCommand", set_powerMeterCommand);
+  m_cmdTable.insert("get powerMeterRegister", get_powerMeterRegister);
+  m_cmdTable.insert("set powerMeterRegister", set_powerMeterRegister);
+  m_cmdTable.insert("get ambientTemperature", get_ambientTemperature);
+  m_cmdTable.insert("get lightSensorLevel", get_lightSensorLevel);
+  m_cmdTable.insert("get sensorConfig", get_sensorConfig);
+  m_cmdTable.insert("set sensor0Timeout", set_sensor0Timeout);
+  m_cmdTable.insert("set sensor0Offset", set_sensor0Offset);
+  m_cmdTable.insert("set sensor1Timeout", set_sensor1Timeout);
+  m_cmdTable.insert("set sensor1Offset", set_sensor1Offset);
+  m_cmdTable.insert("get analogDimmingConfig", get_analogDimmingConfig);
+  m_cmdTable.insert("set analogDimmingLowValue", set_analogDimmingLowValue);
+  m_cmdTable.insert("set analogDimmingHighValue", set_analogDimmingHighValue);
+  m_cmdTable.insert("set analogDimmingOffValue", set_analogDimmingOffValue);
+  m_cmdTable.insert("get powerMeasurementMode", get_powerMeasurementMode);
+  m_cmdTable.insert("set powerMeasurementMode", set_powerMeasurementMode);
+  m_cmdTable.insert("get externalPowerMeter", get_externalPowerMeter);
+  m_cmdTable.insert("set externalPowerMeter", set_externalPowerMeter);
+  m_cmdTable.insert("get ambientSensorValue", get_ambientSensorValue);
+  m_cmdTable.insert("get ambientConfig", get_ambientConfig);
+  m_cmdTable.insert("set ambientActiveLevel", set_ambientActiveLevel);
+  m_cmdTable.insert("set ambientInactiveLevel", set_ambientInactiveLevel);
+  m_cmdTable.insert("set ambientEnvironmentalGain", set_ambientEnvironmentalGain);
+  m_cmdTable.insert("set ambientOffHysteresis", set_ambientOffHysteresis);
+  m_cmdTable.insert("set ambientOnHysteresis", set_ambientOnHysteresis);
+  m_cmdTable.insert("get powerboardProtocol", get_powerboardProtocol);
+  m_cmdTable.insert("get ledOverride", get_ledOverride);
+  m_cmdTable.insert("set ledOverride", set_ledOverride);
+  m_cmdTable.insert("get fadeUpStep", get_fadeUpStep);
+  m_cmdTable.insert("set fadeUpStep", set_fadeUpStep);
+  m_cmdTable.insert("get fadeDownStep", get_fadeDownStep);
+  m_cmdTable.insert("set fadeDownStep", set_fadeDownStep);
+  m_cmdTable.insert("get maxBrightness", get_maxBrightness);
+  m_cmdTable.insert("set maxBrightness", set_maxBrightness);
+  m_cmdTable.insert("get i2cResets", get_i2cResets);
+  m_cmdTable.insert("get sensorGuardTime", get_sensorGuardTime);
+  m_cmdTable.insert("set sensorGuardTime", set_sensorGuardTime);
+  m_cmdTable.insert("get inputVoltage", get_inputVoltage);
+  m_cmdTable.insert("get inputVoltageCalibration", get_inputVoltageCalibration);
+  m_cmdTable.insert("set inputVoltageCalibration", set_inputVoltageCalibration);
+  m_cmdTable.insert("get numLightbars", get_numLightbars);
+  m_cmdTable.insert("set numLightbars", set_numLightbars);
+  m_cmdTable.insert("get currentLimit", get_currentLimit);
+  m_cmdTable.insert("set currentLimit", set_currentLimit);
+  m_cmdTable.insert("get bootloaderCode", get_bootloaderCode);
+  m_cmdTable.insert("get xpressMode", get_xpressMode);
+  m_cmdTable.insert("set xpressMode", set_xpressMode);
+  m_cmdTable.insert("get batteryBackupStatus", get_batteryBackupStatus);
+  m_cmdTable.insert("set batteryBackupStatus", set_batteryBackupStatus);
+  m_cmdTable.insert("get sensorSeconds", get_sensorSeconds);
+  m_cmdTable.insert("get inputVoltageTwo", get_inputVoltageTwo);
+  m_cmdTable.insert("get inputVoltageTwoCalibration", get_inputVoltageTwoCalibration);
+  m_cmdTable.insert("set inputVoltageTwoCalibration", set_inputVoltageTwoCalibration);
+  m_cmdTable.insert("get maxRampUpSpeed", get_maxRampUpSpeed);
+  m_cmdTable.insert("set maxRampUpSpeed", set_maxRampUpSpeed);
+  m_cmdTable.insert("get maxRampDownSpeed", get_maxRampDownSpeed);
+  m_cmdTable.insert("set maxRampDownSpeed", set_maxRampDownSpeed);
+  m_cmdTable.insert("get emergencyLightLevel", get_emergencyLightLevel);
+  m_cmdTable.insert("get batteryBackupPowerCalibration", get_batteryBackupPowerCalibration);
+  m_cmdTable.insert("set batteryBackupPowerCalibration", set_batteryBackupPowerCalibration);
+  m_cmdTable.insert("get motionSensorProfile", get_motionSensorProfile);
+  m_cmdTable.insert("set motionSensorProfile", set_motionSensorProfile);
+  m_cmdTable.insert("get powerMeterConfig", get_powerMeterConfig);
+  m_cmdTable.insert("set powerMeterLevelAtOff", set_powerMeterLevelAtOff);
+  m_cmdTable.insert("set powerMeterLevelAtMin", set_powerMeterLevelAtMin);
+  m_cmdTable.insert("set powerMeterLevelAtMax", set_powerMeterLevelAtMax);
+  m_cmdTable.insert("set powerMeterType", set_powerMeterType);
+  m_cmdTable.insert("get DLAiSlaveMode", get_DLAiSlaveMode);
+  m_cmdTable.insert("set DLAiSlaveMode", set_DLAiSlaveMode);
+  m_cmdTable.insert("get DALIBootloadingActive", get_DALIBootlodingActive);
+  m_cmdTable.insert("get testingMode", get_testingMode);
+  m_cmdTable.insert("set testingMode", set_testingMode);
+  m_cmdTable.insert("get numBatteriesSupported", get_numBatteriesSupported);
   // get & set lightbar commands
-  m_exeTable.insert("get lbVersion", get_lbVersion, parse_get_lbVersion);
-  m_exeTable.insert("get lbStatus", get_lbStatus, parse_get_lbStatus);
-  m_exeTable.insert("get lbConfig", get_lbConfig, parse_get_lbConfig);
+  m_cmdTable.insert("get lbVersion", get_lbVersion);
+  m_cmdTable.insert("get lbStatus", get_lbStatus);
+  m_cmdTable.insert("get lbConfig", get_lbConfig);
   // get & set battery backup commands
-  m_exeTable.insert("get bbVersion", get_bbVersion, parse_get_bbVersion);
-  m_exeTable.insert("get bbStatus", get_bbStatus, parse_get_bbStatus);
-  m_exeTable.insert("get bbConfig", get_bbConfig, parse_get_bbConfig);
+  m_cmdTable.insert("get bbVersion", get_bbVersion);
+  m_cmdTable.insert("get bbStatus", get_bbStatus);
+  m_cmdTable.insert("get bbConfig", get_bbConfig);
   // reset commands
-  m_exeTable.insert("reset usage", reset_usage);
-  m_exeTable.insert("reset oldLog", reset_oldLog);
-  m_exeTable.insert("reset log", reset_log);
-  m_exeTable.insert("reset logIndex", reset_logIndex);
-  m_exeTable.insert("reset eeprom", reset_eeprom);
-  m_exeTable.insert("reset eepromToDefault", reset_eepromToDefault);
-  m_exeTable.insert("reset eepromToLatestMapVersion", reset_eepromToLatestMapVersion);
-  m_exeTable.insert("reset network", reset_network);
-  m_exeTable.insert("reset networkWithoutChecking", reset_networkWithoutChecking);
-  m_exeTable.insert("reset daliCommissioning", reset_daliCommissioning);
-  m_exeTable.insert("reset daliPowerMetering", reset_daliPowerMetering);
+  m_cmdTable.insert("reset usage", reset_usage);
+  m_cmdTable.insert("reset oldLog", reset_oldLog);
+  m_cmdTable.insert("reset log", reset_log);
+  m_cmdTable.insert("reset logIndex", reset_logIndex);
+  m_cmdTable.insert("reset eeprom", reset_eeprom);
+  m_cmdTable.insert("reset eepromToDefault", reset_eepromToDefault);
+  m_cmdTable.insert("reset eepromToLatestMapVersion", reset_eepromToLatestMapVersion);
+  m_cmdTable.insert("reset network", reset_network);
+  m_cmdTable.insert("reset networkWithoutChecking", reset_networkWithoutChecking);
+  m_cmdTable.insert("reset daliCommissioning", reset_daliCommissioning);
+  m_cmdTable.insert("reset daliPowerMetering", reset_daliPowerMetering);
   // reboot commands
-  m_exeTable.insert("reboot pmu", reboot_pmu);
-  m_exeTable.insert("reboot wirelessCard", reboot_wirelessCard);
-  m_exeTable.insert("reboot i2cDevices", reboot_i2cDevices);
+  m_cmdTable.insert("reboot pmu", reboot_pmu);
+  m_cmdTable.insert("reboot wirelessCard", reboot_wirelessCard);
+  m_cmdTable.insert("reboot i2cDevices", reboot_i2cDevices);
   // reload commands
-  m_exeTable.insert("reload dlaFirmware", reload_dlaFirmware);
-  m_exeTable.insert("reload wirelessModuleFirmware", reload_wirelessModuleFirmware);
-  m_exeTable.insert("reload powerboardFirmware", reload_powerboardFirmware);
-  m_exeTable.insert("reload lightbarFirmware", reload_lightbarFirmware);
-  m_exeTable.insert("reload batteryBackupFirmware", reload_batteryBackupFirmware);
-  m_exeTable.insert("reload motionSensorFirmware", reload_motionSensorFirmware);
+  m_cmdTable.insert("reload dlaFirmware", reload_dlaFirmware);
+  m_cmdTable.insert("reload wirelessModuleFirmware", reload_wirelessModuleFirmware);
+  m_cmdTable.insert("reload powerboardFirmware", reload_powerboardFirmware);
+  m_cmdTable.insert("reload lightbarFirmware", reload_lightbarFirmware);
+  m_cmdTable.insert("reload batteryBackupFirmware", reload_batteryBackupFirmware);
+  m_cmdTable.insert("reload motionSensorFirmware", reload_motionSensorFirmware);
   // log commands
-  m_exeTable.insert("get logIndex", get_logIndex, parse_get_logIndex);
-  //m_cmdTable.insert("get log", get_log, parse_get_log);
-  m_exeTable.insert("get log", macro_get_log);
-  m_exeTable.insert("insert logEntry", insert_logEntry);
+  m_cmdTable.insert("get logIndex", get_logIndex);
+  m_cmdTable.insert("get log", get_log);
+  m_cmdTable.insert("insert logEntry", insert_logEntry);
   // build the dictionary of helper commands
-  m_cmdCompleter = new QCompleter(m_exeTable.keys(), this);
-  m_cmdCompleter->setCaseSensitivity(Qt+CaseInsensitive);
-  m_cmdCompleter->setCompletionMode(QCompleter+InlineCompletion);
-  // build a dictionary of error responses
-  m_errorResponses.insert("ERROR: FFFF", "ERROR: Invalid opcode");
-  m_errorResponses.insert("ERROR: FFFE", "ERROR: Syntax error");
-  m_errorResponses.insert("ERROR: FFFD", "ERROR: Invalid register");
-  m_errorResponses.insert("ERROR: FFFC", "ERROR: Register is read only");
-  m_errorResponses.insert("ERROR: FFFB", "ERROR: Invalid register length");
-  m_errorResponses.insert("ERROR: FFFA", "ERROR: ARP not addressed");
-  m_errorResponses.insert("ERROR: FFF9", "ERROR: Flash error");
-  m_errorResponses.insert("ERROR: FFF8", "ERROR: Storage out of bounds");
-  m_errorResponses.insert("ERROR: FFF7", "ERROR: Storage unaligned");
-  m_errorResponses.insert("ERROR: FFF6", "ERROR: Message queue full");
-  m_errorResponses.insert("ERROR: FFF5", "ERROR: I2C error");
-  m_errorResponses.insert("ERROR: FFF4", "ERROR: Internal error");
-  m_errorResponses.insert("ERROR: FFF3", "ERROR: Insufficient free buffers");
-  m_errorResponses.insert("ERROR: FFF2", "ERROR: Bad image");
-  m_errorResponses.insert("ERROR: FFF1", "ERROR: Remote install fail");
-  m_errorResponses.insert("ERROR: FFF0", "ERROR: Bus error");
-  m_errorResponses.insert("ERROR: FFEF", "ERROR: Bus busy");
-  m_errorResponses.insert("ERROR: FFEE", "ERROR: Resource busy");
+  m_cmdCompleter = new QCompleter(m_cmdTable.keys(), this);
+  m_cmdCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+  m_cmdCompleter->setCompletionMode(QCompleter::InlineCompletion);
 }
 
-struct cmdEntry * cmdHelper::getCmdEntry(QString cmd) {
-  return m_exeTable[cmd];
+cmdHandler_t cmdHelper::getCmdHandler(QString request) {
+  QStringList argv;
+  QString cmd;
+  argv = request.split(" ");
+  // a helper request looks like:
+  // verb object [optional argList]
+  // example: set serialNumber 12345678
+  if (argv.length() < 2) {
+    return NULL;
+  }
+  cmd = QString("%1 %2").arg(argv.at(0)).arg(argv.at(1));
+  return m_cmdTable[cmd];
 }
 
 QString cmdHelper::getNextCompletion(void) {

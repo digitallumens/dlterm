@@ -4,6 +4,10 @@
 #include <QObject>
 #include <QCompleter>
 
+class interface;
+
+typedef QStringList(*cmdHandler_t)(QStringList argList, interface *io);
+
 class cmdHelper : public QObject
 {
     Q_OBJECT
@@ -11,8 +15,7 @@ class cmdHelper : public QObject
 public:
   explicit cmdHelper(QObject *parent = 0);
   QCompleter *m_cmdCompleter;
-  exe_t *getExe(QString cmd);
-  QString parseError(QString pmuResponse);
+  cmdHandler_t getCmdHandler(QString request);
   QString getNextCompletion(void);
   int getCurrentCompletionLength(void);
   QStringList help(void);
@@ -22,9 +25,7 @@ signals:
 public slots:
 
 private:
-  typedef QStringList(*exe_t)(QStringList argList, interface *io);
-  QHash <QString, cmd_t> m_cmdTable;
-  QMap <QString, QString> m_errorResponses;
+  QHash <QString, cmdHandler_t> m_cmdTable;
 };
 
 #endif // CMDHELPER_H

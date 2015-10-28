@@ -18,8 +18,7 @@ SOURCES += main.cpp\
     interface.cpp \
     bifurcationdialog.cpp \
     emberdialog.cpp \
-    globalgateway.cpp \
-    cmdio.cpp
+    globalgateway.cpp
 
 HEADERS  += mainwindow.h \
     cmdhelper.h \
@@ -29,8 +28,7 @@ HEADERS  += mainwindow.h \
     interface.h \
     bifurcationdialog.h \
     emberdialog.h \
-    globalgateway.h \
-    cmdio.h
+    globalgateway.h
 
 FORMS    += mainwindow.ui \
     preferencesdialog.ui \

@@ -166,4 +166,5 @@ QStringList interface::queryPmu(QStringList cmdList) {
       responseList << response;
     }
   }
+  return responseList;
 }
