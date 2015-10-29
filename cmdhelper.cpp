@@ -6,8 +6,6 @@
 #include <QKeyEvent>
 #include <QDebug>
 
-quint16 logIndex = 0;
-
 QString toYDHMS(QString timeInSec) {
   bool ok;
   quint32 ulTimeInSec = timeInSec.toULong(&ok, 16);
@@ -38,6 +36,16 @@ QString toYDHMS(QString timeInSec) {
     outTime.truncate(outTime.length() - 1);
   }
   return outTime;
+}
+
+QString toHexNum(int num, int size) {
+  QString hexNum;
+  hexNum.setNum(num, 16);
+  // pad with leading zeros
+  while(hexNum.length() < (size * 2)) {
+    hexNum.prepend("0");
+  }
+  return hexNum.toUpper();
 }
 
 /*** PMU register commands ***/
@@ -1888,19 +1896,15 @@ QStringList reload_motionSensorFirmware(QStringList argList, interface *iface) {
 }
 
 /*** log commands ***/
-QStringList get_logIndex(QStringList argList, interface *iface) {
-  QStringList responseList;
-  (void) argList;
-  responseList = iface->queryPmu(QStringList() << "K");
-  if (responseList.at(0).startsWith("ERROR")) {
-    return responseList;
+QStringList parse_logIndex(QString response) {
+  if (response.startsWith("ERROR")) {
+    return QStringList() << response;
   } else {
-    QString arg1 = responseList.at(0);
-    QString head = arg1.left(4);
-    arg1.remove(0, 4);
-    QString tail = arg1.left(4);
-    arg1.remove(0, 4);
-    QString first = arg1.left(4);
+    QString head = response.left(4);
+    response.remove(0, 4);
+    QString tail = response.left(4);
+    response.remove(0, 4);
+    QString first = response.left(4);
     if (first == "FFFF") {
       first = "none";
     }
@@ -1910,30 +1914,7 @@ QStringList get_logIndex(QStringList argList, interface *iface) {
   }
 }
 
-QStringList get_log(QStringList argList, interface *iface) {
-  QStringList responseList;
-  QString index;
-  if (argList.length() == 0) {
-    // get log index
-    responseList = iface->queryPmu(QStringList() << "K");
-    if (responseList.at(0).startsWith("ERROR")) {
-      return responseList;
-    }
-    QString arg1 = responseList.at(0);
-    QString head = arg1.left(4);
-    arg1.remove(0, 4);
-    QString tail = arg1.left(4);
-    arg1.remove(0, 4);
-    QString first = arg1.left(4);
-    if (first == "FFFF") {
-      first = "none";
-    }
-    index = first;
-  } else {
-    index = argList.at(0);
-  }
-  // get log record
-  responseList = iface->queryPmu(QStringList() << QString("K%1").arg(index));
+QStringList parse_log(int startIndex, QString response) {
   QString element;
   int uptimeSize, valueSize, baseTime, uptime;
   QString eventType, eventValue;
@@ -1941,8 +1922,9 @@ QStringList get_log(QStringList argList, interface *iface) {
   bool ok;
   bool isLastEntry;
   QString timestamp;
+  QString index;
   int numEvents = 0;
-  element = responseList.at(0);
+  element = response;
   baseTime = 0;
   do {
     // assemble log entry
@@ -1973,6 +1955,8 @@ QStringList get_log(QStringList argList, interface *iface) {
     }
     timestamp.setNum(uptime, 16);
     timestamp = toYDHMS(timestamp);
+    index = toHexNum(startIndex + numEvents, 2);
+    numEvents++;
     // parse log entry
     if (eventType == "00") {
       // build a dictionary of power events
@@ -1981,7 +1965,7 @@ QStringList get_log(QStringList argList, interface *iface) {
       powerEventsMap.insert("01", "Power up");
       powerEventsMap.insert("02", "Power restored");
       powerEventsMap.insert("03", "Power soft reset");
-      log << QString("+%1 > %2").arg(timestamp).arg(powerEventsMap[eventValue]);
+      log << QString("+%1 %2 > %3").arg(index).arg(timestamp).arg(powerEventsMap[eventValue]);
     } else if (eventType == "01") {
       // build a dictionary of activity state transition events
       QMap <QString, QString> activityStateTransitionEventsMap;
@@ -1993,21 +1977,21 @@ QStringList get_log(QStringList argList, interface *iface) {
       activityStateTransitionEventsMap.insert("05", "Remote sensor & sensor 0 active");
       activityStateTransitionEventsMap.insert("06", "Remote sensor & sensor 1 active");
       activityStateTransitionEventsMap.insert("07", "Remote sensor, sensor 0, and sensor 1 active");
-      log << QString("+%1 > %2").arg(timestamp).arg(activityStateTransitionEventsMap[eventValue]);
+      log << QString("+%1 %2 > %3").arg(index).arg(timestamp).arg(activityStateTransitionEventsMap[eventValue]);
     } else if (eventType == "02") {
       // type 2 events are not implemented
-      log << QString("+%1 > Type 2 event: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 %2 > Type 2 event: %3").arg(index).arg(timestamp).arg(eventValue);
     } else if (eventType == "03") {
-      log << QString("+%1 > Sensor off: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 %2 > Sensor off: %3").arg(index).arg(timestamp).arg(eventValue);
     } else if (eventType == "04") {
       // unspecified value
-      log << QString("+%1 > SerialNet watchdog tripped").arg(timestamp);
+      log << QString("+%1 %2 > SerialNet watchdog tripped").arg(index).arg(timestamp);
     } else if (eventType == "05") {
-      log << QString("+%1 > Temperature state change: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 %2 > Temperature state change: %3").arg(index).arg(timestamp).arg(eventValue);
     } else if (eventType == "06") {
-      log << QString("+%1 > Lightbar error: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 %2 > Lightbar error: %3").arg(index).arg(timestamp).arg(eventValue);
     } else if (eventType == "07") {
-      log << QString("+%1 > RTC set event: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 %2 > RTC set event: %3").arg(index).arg(timestamp).arg(eventValue);
     } else if (eventType == "08") {
       int batteryNumber;
       // build a dictionary of battery backup events
@@ -2033,26 +2017,68 @@ QStringList get_log(QStringList argList, interface *iface) {
       } else {
         batteryNumber = 0;
       }
-      log << QString("+%1 > Battery backup %2 event: %3").arg(timestamp).arg(batteryNumber).arg(batteryBackupEventsMap[eventValue]);
+      log << QString("+%1 %2 > Battery backup %3 event: %4").arg(index).arg(timestamp).arg(batteryNumber).arg(batteryBackupEventsMap[eventValue]);
     } else if (eventType == "09") {
-      log << QString("+%1 > I2C watchdog reset event: %2").arg(timestamp).arg(eventValue);
+      log << QString("+%1 %2 > I2C watchdog reset event: %3").arg(index).arg(timestamp).arg(eventValue);
     } else if (eventType == "0A") {
       // unspecified value
-      log << QString("+%1 > Registers restored from backup").arg(timestamp);
+      log << QString("+%1 %2 > Registers restored from backup").arg(index).arg(timestamp);
     } else {
       // unknown event
-      log << QString("+%1 > Type %2 event: %3").arg(timestamp).arg(eventType).arg(eventValue);
+      log << QString("+%1 %2 > Type %3 event: %4").arg(index).arg(timestamp).arg(eventType).arg(eventValue);
     }
-    // count events
-    numEvents++;
   } while (element.isEmpty() != true);
   // notify the user that more logs are available
   if (isLastEntry == true) {
     log << "+[End of log]";
   } else {
-    log << "+[More events available...]";
-    logIndex += numEvents;
+    log << QString("+[More events available...]");
   }
+  return log;
+}
+
+QStringList get_log(QStringList argList, interface *iface) {
+  bool ok;
+  QStringList responseList;
+  QStringList logIndex;
+  QStringList logSegment;
+  QStringList log;
+  QString firstIndex;
+  int startIndex;
+  QString endTag;
+  if (argList.length() == 0) {
+    // find most recent power up event
+    responseList = iface->queryPmu(QStringList() << QString("K"));
+    logIndex = parse_logIndex(responseList.at(0));
+    // expected +first: firstIndex
+    firstIndex = (QStringList() << logIndex.at(2).split(" ")).at(1);
+    if (firstIndex == "none") {
+      return QStringList() << "[No recent events]";
+    }
+    startIndex = firstIndex.toInt(&ok, 16);
+  } else if (argList.contains("index")) {
+    // display index
+    responseList = iface->queryPmu(QStringList() << QString("K"));
+    return parse_logIndex(responseList.at(0));
+  } else {
+    startIndex = argList.at(0).toInt(&ok, 16);
+  }
+  // fetch logs
+  do {
+    responseList = iface->queryPmu(QStringList() << QString("K%1").arg(toHexNum(startIndex, 2)));
+    if (responseList.at(0).startsWith("ERROR")) {
+      // exit on error
+      log << responseList.at(0);
+      return log;
+    } else {
+      logSegment = parse_log(startIndex, responseList.at(0));
+      endTag = logSegment.takeLast();
+      log << logSegment;
+      startIndex += logSegment.length();
+    }
+  } while ((endTag != "+[End of log]") || (log.length() >= 20));
+  // append the end tag
+  log << endTag;
   return log;
 }
 
@@ -2262,7 +2288,6 @@ cmdHelper::cmdHelper(QObject *parent) : QObject(parent) {
   m_cmdTable.insert("reload batteryBackupFirmware", reload_batteryBackupFirmware);
   m_cmdTable.insert("reload motionSensorFirmware", reload_motionSensorFirmware);
   // log commands
-  m_cmdTable.insert("get logIndex", get_logIndex);
   m_cmdTable.insert("get log", get_log);
   m_cmdTable.insert("insert logEntry", insert_logEntry);
   // build the dictionary of helper commands
