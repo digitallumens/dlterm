@@ -1953,7 +1953,7 @@ QStringList parse_log(int startIndex, QString response) {
       uptime += baseTime;
       baseTime = uptime;
     }
-    timestamp.setNum(uptime, 16);
+    timestamp = toHexNum(uptime, 4);
     timestamp = toYDHMS(timestamp);
     index = toHexNum(startIndex + numEvents, 2);
     numEvents++;

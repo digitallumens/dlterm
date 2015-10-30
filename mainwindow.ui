@@ -107,7 +107,6 @@
     </property>
     <addaction name="actionClear_Output"/>
     <addaction name="actionShow_Timestamp"/>
-    <addaction name="actionShow_PMU_Command"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -151,14 +150,6 @@
    </property>
    <property name="text">
     <string>Show Timestamp</string>
-   </property>
-  </action>
-  <action name="actionShow_PMU_Command">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Show PMU Command</string>
    </property>
   </action>
   <action name="actionSave_Output_to_File">
