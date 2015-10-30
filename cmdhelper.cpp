@@ -1881,13 +1881,60 @@ QStringList reload_powerboardFirmware(QStringList argList, interface *iface) {
 }
 
 QStringList reload_lightbarFirmware(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
+  QStringList returnList;
+  bool ok;
+  int numLightbars;
   (void) argList;
-  return iface->queryPmu(QStringList() << "!P");
+  // get num lightbars
+  responseList = iface->queryPmu(QStringList() << "G0068");
+  if (responseList.at(0).startsWith("ERROR")) {
+    return QStringList() << QString("Num lightbars: %1").arg(responseList.at(0));
+  }
+  numLightbars = responseList.at(0).toInt(&ok, 16);
+  returnList << QString("+Num lightbars: %1").arg(numLightbars);
+  if (numLightbars != 0) {
+    for (int i = 0; i < numLightbars; i++) {
+      cmdList << QString("!P%1").arg(toHexNum(i, 1));
+    }
+    responseList = iface->queryPmu(cmdList);
+    for (int i = 0; i < numLightbars; i++) {
+      returnList << QString("+Lightbar %1: %2").arg(toHexNum(i, 1)).arg(responseList.at(i));
+    }
+  }
+  return returnList;
 }
 
 QStringList reload_batteryBackupFirmware(QStringList argList, interface *iface) {
+  QStringList cmdList;
+  QStringList responseList;
+  QStringList returnList;
+  bool ok;
+  int numBatteryBackups;
   (void) argList;
-  return iface->queryPmu(QStringList() << "!P");
+  // get num battery backups
+  responseList = iface->queryPmu(QStringList() << "G007E");
+  if (responseList.at(0).startsWith("ERROR")) {
+    return QStringList() << QString("Num battery backups: %1").arg(responseList.at(0));
+  }
+  numBatteryBackups = responseList.at(0).toInt(&ok, 16);
+  returnList << QString("+Num battery backups: %1").arg(numBatteryBackups);
+  if (numBatteryBackups != 0) {
+    for (int i = 0; i < numBatteryBackups; i++) {
+      // map battery num to i2c address
+      if (i == 0) {
+        cmdList << QString("!PC0");
+      } else if (i == 1) {
+        cmdList << QString("!PC2");
+      }
+    }
+    responseList = iface->queryPmu(cmdList);
+    for (int i = 0; i < numBatteryBackups; i++) {
+      returnList << QString("+Battery backup %1: %2").arg(toHexNum(i, 1)).arg(responseList.at(i));
+    }
+  }
+  return returnList;
 }
 
 QStringList reload_motionSensorFirmware(QStringList argList, interface *iface) {

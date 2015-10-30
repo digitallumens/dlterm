@@ -82,7 +82,7 @@ QString MainWindow::processUserRequest(QString *request) {
   QString preamble;
   QString response;
   if (request->startsWith("help")) {
-    solarized::setTextColor(request, solarized::SOLAR_MAGENTA);
+    solarized::setTextColor(request, solarized::SOLAR_YELLOW);
     return buildAppHelp();
   }
   // check for a helper handler
@@ -102,9 +102,13 @@ QString MainWindow::processUserRequest(QString *request) {
   // flatten
   foreach(QString r, responseList) {
     if (r.contains("ERROR")) {
+      // remove plus from parsed responses with errors
+      if (r.startsWith("+")) {
+        r.remove("+");
+      }
       solarized::setTextColor(&r, solarized::SOLAR_RED);
     } else if (r.startsWith("+")) {
-      // parsed responses
+      // parsed responses start with plus
       r.remove("+");
       solarized::setTextColor(&r, solarized::SOLAR_BLUE);
     } else if (r.contains("OK")) {
@@ -134,12 +138,16 @@ QString MainWindow::buildPrompt(void) {
 QString MainWindow::buildAppHelp(void) {
   QString response;
   QStringList helpList = m_cmdHelper->help();
-  foreach(QString h, helpList) {
-    response.append(h + "<br>");
+  foreach(QString r, helpList) {
+    if (r.startsWith("-")) {
+      solarized::setTextColor(&r, solarized::SOLAR_BASE_01);
+    } else {
+      solarized::setTextColor(&r, solarized::SOLAR_CYAN);
+    }
+    response += (r + "<br>");
   }
-  solarized::setTextColor(&response, solarized::SOLAR_BASE_01);
   if (response.endsWith("<br>") == false) {
-    response.append("<br>");
+    response += "<br>";
   }
   return response;
 }
