@@ -158,6 +158,9 @@ QStringList interface::queryPmu(QStringList cmdList) {
       ret = gw->issuePMUCommand(m_pmuRemote, cmd, response, len);
     } else {
       ret = m_pmuUSB->issueCommand(cmd, response, len);
+      if (ret != DLLIB_SUCCESS ) {
+        responseList << QString("ERROR: %1").arg(ret);
+      }
     }
     // parse error
     if (response.startsWith("ERROR")) {

@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   // connect signals and slots
   connect(m_interface, SIGNAL(connectionEstablished()), this, SLOT(on_connectionEstablished()));
   connect(m_interface, SIGNAL(connectionStatusChanged(QString)), this, SLOT(on_connectionStatusChanged(QString)));
-  this->setWindowTitle("DLTerm: Disconnected");
+  this->setWindowTitle("DLTerm");
   // install telegesis drivers if missing
   checkForInstalledKexts();
 }
@@ -246,7 +246,10 @@ void MainWindow::on_connectionEstablished(void) {
 }
 
 void MainWindow::on_connectionStatusChanged(QString status) {
-  this->setWindowTitle(QString("DLTerm: %1").arg(status));
+  QString response;
+  response = QString("[%1]").arg(status);
+  solarized::setTextColor(&response, solarized::SOLAR_BASE_01);
+  ui->outputFeed->insertHtml(QString("%1<br>").arg(response));
 }
 
 void MainWindow::on_actionClear_Output_triggered() {
@@ -270,6 +273,6 @@ void MainWindow::on_actionAbout_triggered() {
   QMessageBox::about(this, "About DLTerm",
                      tr("<p><b>Digital Lumens Terminal</b></p>"
                         "<p><small>Version 0.3.0</small></p>"
-                        "<p><small>Build date 10/21/15</small></p>"
+                        "<p><small>Build date 11/2/15</small></p>"
                         "<small>Copyright &copy; 2010-2015. All rights reserved.</small>"));
 }
