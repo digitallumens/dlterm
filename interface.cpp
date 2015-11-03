@@ -3,9 +3,12 @@
 #include "globalgateway.h"
 #include <QApplication>
 
-interface::interface(QObject *parent) : QObject(parent)
-{
-
+interface::interface(QObject *parent) : QObject(parent),
+  m_pmuRemote(NULL),
+  m_pmuUSB(NULL),
+  m_joined(false),
+  m_connected(false),
+  m_closed(false) {
 }
 
 void interface::configure(QString networkStr, quint32 serialNumber) {
