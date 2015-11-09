@@ -107,6 +107,7 @@ buildDMG(){
     DIST_ARCHIVE=MacInstaller/$DIST_NAME.dmg
     ln -s /Applications $DIST_PATH/Applications
     cp MacInstaller/MacDiskImageTools/files_to_be_hidden_on_dmg/DS_Store $DIST_PATH/.DS_Store || exit -1
+		chmod +x $DIST_PATH/.DS_Store
     cp MacInstaller/MacDiskImageTools/files_to_be_hidden_on_dmg/backgroundImage.tiff $DIST_PATH/.backgroundImage.tiff || exit -1
     # The following is a possible fix for "hdiutil: create failed - error -5341"
     # per http://stackoverflow.com/questions/18621467/error-creating-disk-image-using-hdutil
