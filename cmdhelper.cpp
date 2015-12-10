@@ -1360,7 +1360,7 @@ QStringList get_lbVersion(QStringList argList, interface *iface) {
   }
   protocol = responseList.at(0);
   return QStringList() << QString("+Firmware version: %1").arg(version)
-                       << QString("+Firmware code: %1%2").arg(code)
+                       << QString("+Firmware code: %1").arg(code)
                        << QString("+Protocol version: %1").arg(protocol);
 }
 
@@ -1475,16 +1475,16 @@ QStringList get_lbConfig(QStringList argList, interface *iface) {
   cmdList << QString("R%1%2").arg(barNum).arg("8E"); // bypass override temperature
   cmdList << QString("R%1%2").arg(barNum).arg("8F"); // temperature throttle limit
   responseList = iface->queryPmu(cmdList);
-  return QStringList() << QString("Hardware revision: %1").arg(responseList.at(0))
-                       << QString("Temperature calibration: %1").arg(responseList.at(1))
-                       << QString("LED device type: %1").arg(responseList.at(2))
-                       << QString("Serial number: %1%2").arg(responseList.at(3)).arg(responseList.at(4))
-                       << QString("Current sense bypass threshold: %1").arg(responseList.at(5))
-                       << QString("Current sense bypass hysteresis: %1").arg(responseList.at(6))
-                       << QString("Estimator current sense coefficient: %1").arg(responseList.at(7))
-                       << QString("Estimator current sense exponent: %1").arg(responseList.at(8))
-                       << QString("Bypass override temperature: %1").arg(responseList.at(9))
-                       << QString("Temperature throttle limit: %1").arg(responseList.at(10));
+  return QStringList() << QString("+Hardware revision: %1").arg(responseList.at(0))
+                       << QString("+Temperature calibration: %1").arg(responseList.at(1))
+                       << QString("+LED device type: %1").arg(responseList.at(2))
+                       << QString("+Serial number: %1%2").arg(responseList.at(3)).arg(responseList.at(4))
+                       << QString("+Current sense bypass threshold: %1").arg(responseList.at(5))
+                       << QString("+Current sense bypass hysteresis: %1").arg(responseList.at(6))
+                       << QString("+Estimator current sense coefficient: %1").arg(responseList.at(7))
+                       << QString("+Estimator current sense exponent: %1").arg(responseList.at(8))
+                       << QString("+Bypass override temperature: %1").arg(responseList.at(9))
+                       << QString("+Temperature throttle limit: %1").arg(responseList.at(10));
 }
 
 /*** battery backup register commands ***/
@@ -1526,7 +1526,7 @@ QStringList get_bbVersion(QStringList argList, interface *iface) {
   }
   protocol = responseList.at(0);
   return QStringList() << QString("+Firmware version: %1").arg(version)
-                       << QString("+Firmware code: %1%2").arg(code)
+                       << QString("+Firmware code: %1").arg(code)
                        << QString("+Protocol version: %1").arg(protocol);
 }
 
@@ -1621,13 +1621,13 @@ QStringList get_bbStatus(QStringList argList, interface *iface) {
     statusDict.clear();
     statusDict.insert(0, "UL");
     statusDict.insert(1, "CE");
-    status += QString("Certification mark: %1<br>").arg(statusDict[(statusInt >> 15) & 0x1]);
+    status += QString("Certification mark: %1").arg(statusDict[(statusInt >> 15) & 0x1]);
   }
   if (batteryVoltage.startsWith("ERROR") == false) {
     batteryVoltage = QString("%1 volts").arg(0.04 * batteryVoltage.toUShort(&ok, 16));
   }
   if (batteryTemperature.startsWith("ERROR") == false) {
-    batteryTemperature = QString("%1 C").arg(0.125 * batteryTemperature.toUShort(&ok, 16) - 164);
+    batteryTemperature = QString("%1 C").arg((0.125 * batteryTemperature.toUShort(&ok, 16)) - 164);
   }
   if (lbSupplyVoltage.startsWith("ERROR") == false) {
     lbSupplyVoltage = QString("%1 volts").arg(0.05 * lbSupplyVoltage.toUShort(&ok, 16));
@@ -1785,9 +1785,9 @@ QStringList get_bbConfig(QStringList argList, interface *iface) {
                        << QString("+Max emergency temperature: %1").arg(maxEmergencyTemp)
                        << QString("+Min emergency verify voltage: %1").arg(minEmergencyVerifyVoltage)
                        << QString("+Max emergency verify voltage: %1").arg(maxEmergencyVerifyVoltage)
-                       << QString("Max lightbar PSU current: %1 mA").arg(maxLbPsuCurrent)
-                       << QString("Certification mark: %1").arg(certificationMark)
-                       << QString("Product code: %1%2").arg(productCode);
+                       << QString("+Max lightbar PSU current: %1 mA").arg(maxLbPsuCurrent)
+                       << QString("+Certification mark: %1").arg(certificationMark)
+                       << QString("+Product code: %1").arg(productCode);
 }
 
 /*** reset commands ***/
@@ -2070,6 +2070,9 @@ QStringList parse_log(int startIndex, QString response) {
     } else if (eventType == "0A") {
       // unspecified value
       log << QString("+%1 %2 > Registers restored from backup").arg(index).arg(timestamp);
+    } else if (eventType == "0B") {
+      // unspecified value
+      log << QString("+%1 %2 > Ember reset reason: %3").arg(index).arg(timestamp).arg(eventValue);
     } else {
       // unknown event
       log << QString("+%1 %2 > Type %3 event: %4").arg(index).arg(timestamp).arg(eventType).arg(eventValue);

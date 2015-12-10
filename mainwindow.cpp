@@ -272,7 +272,7 @@ void MainWindow::on_actionPreferences_triggered() {
 void MainWindow::on_actionAbout_triggered() {
   QMessageBox::about(this, "About DLTerm",
                      tr("<p><b>Digital Lumens Terminal</b></p>"
-                        "<p><small>Version 0.3.0</small></p>"
-                        "<p><small>Build date 11/2/15</small></p>"
+                        "<p><small>Version 0.4.0</small></p>"
+                        "<p><small>Build date 12/10/15</small></p>"
                         "<small>Copyright &copy; 2010-2015. All rights reserved.</small>"));
 }
